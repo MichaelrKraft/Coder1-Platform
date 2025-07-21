@@ -19,14 +19,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const staticPath = path.join(__dirname, '../static');
 console.log('Static directory path:', staticPath);
 
-// Main page - Coder1 Homepage (must come BEFORE static files)
+// Main page - PRD Generator (must come BEFORE static files)
 app.get('/', (req, res) => {
-    const filePath = path.join(staticPath, 'homepage.html');
+    const filePath = path.join(staticPath, 'product-creation-hub.html');
     console.log('Serving main page from:', filePath);
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error('Error serving main page:', err);
-            res.status(404).send('Homepage not found');
+            res.status(404).send('File not found');
         }
     });
 });
@@ -39,6 +39,18 @@ app.get('/product-creation', (req, res) => {
         if (err) {
             console.error('Error serving product creation page:', err);
             res.status(404).send('File not found');
+        }
+    });
+});
+
+// Coder1 Platform homepage route
+app.get('/platform', (req, res) => {
+    const filePath = path.join(staticPath, 'homepage.html');
+    console.log('Serving Coder1 platform page from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving platform page:', err);
+            res.status(404).send('Platform page not found');
         }
     });
 });
