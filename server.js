@@ -2,11 +2,11 @@
 const app = require('./src/app-simple');
 const PORT = process.env.PORT || 3000;
 
-// Start the server  
-app.listen(PORT, '127.0.0.1', () => {
+// Start the server - bind to all interfaces for production
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Coder1 Platform is running on port ${PORT}`);
-  console.log(`📱 Frontend: http://localhost:${PORT}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  console.log(`📱 Frontend: http://0.0.0.0:${PORT}`);
+  console.log(`🏥 Health check: http://0.0.0.0:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
