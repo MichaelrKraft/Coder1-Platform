@@ -15,17 +15,35 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Define static directory path
+const staticPath = path.join(__dirname, '../static');
+console.log('Static directory path:', staticPath);
+
 // Serve static files from static directory
-app.use(express.static(path.join(__dirname, '../static')));
+app.use(express.static(staticPath));
 
 // Main page - Product Creation Hub
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../static', 'product-creation-hub.html'));
+    const filePath = path.join(staticPath, 'product-creation-hub.html');
+    console.log('Serving main page from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving main page:', err);
+            res.status(404).send('File not found');
+        }
+    });
 });
 
 // Product Creation Hub route
 app.get('/product-creation', (req, res) => {
-    res.sendFile(path.join(__dirname, '../static', 'product-creation-hub.html'));
+    const filePath = path.join(staticPath, 'product-creation-hub.html');
+    console.log('Serving product creation from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving product creation page:', err);
+            res.status(404).send('File not found');
+        }
+    });
 });
 
 // Health check endpoint
