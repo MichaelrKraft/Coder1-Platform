@@ -15,6 +15,16 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Mount the product creation API routes
+try {
+    const productCreationAPI = require('./routes/product-creation-api');
+    app.use('/api', productCreationAPI);
+    console.log('✅ Product Creation API routes mounted successfully');
+} catch (error) {
+    console.error('❌ Failed to mount Product Creation API routes:', error.message);
+    console.error('This may cause PRD generation and other features to fail');
+}
+
 // Define static directory path
 const staticPath = path.join(__dirname, '../static');
 console.log('Static directory path:', staticPath);
@@ -99,27 +109,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Basic API endpoint for PRD generation
-app.post('/api/generate-prd', (req, res) => {
-  const { projectName, description } = req.body;
-  
-  // Simple response for now
-  res.json({
-    success: true,
-    prd: {
-      title: projectName,
-      description: description,
-      sections: [
-        'Executive Summary',
-        'Project Overview',
-        'Technical Requirements',
-        'User Experience',
-        'Timeline & Milestones'
-      ],
-      generatedAt: new Date().toISOString()
-    }
-  });
-});
+// Note: Full API endpoints are now mounted from product-creation-api.js
+// including /api/prd/generate, /api/analytics/*, etc.
 
 // Error handling
 app.use((err, req, res, next) => {

@@ -1,0 +1,14 @@
+{
+  "id": "test-123",
+  "title": "website Project",
+  "originalRequest": "Build a jewelry ecommerce store",
+  "projectType": "website",
+  "complexity": "moderate",
+  "confidence": "high",
+  "createdAt": "2025-07-21T20:03:49.900Z",
+  "files": {
+    "prd": "PRD.md",
+    "metadata": "PRD-metadata.json",
+    "enhancedPrompt": "Enhanced Website Build Request:\n\nOriginal Request: Build a jewelry ecommerce store\n\nESSENTIAL REQUIREMENTS:\n• Test question → Test answer\n\nPROJECT TYPE: website\nCOMPLEXITY: moderate\nTARGET AUDIENCE: General users\n\nPlease build a comprehensive, functional website that addresses all the above requirements and delivers a professional result that meets the user's specific needs."
+  }
+}
