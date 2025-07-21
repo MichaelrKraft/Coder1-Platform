@@ -46,6 +46,18 @@ app.get('/product-creation', (req, res) => {
 // Serve IDE static assets first (for CSS, JS files)
 app.use('/ide/static', express.static(path.join(__dirname, '../ide-build/static')));
 
+// Test route for debugging
+app.get('/ide/test', (req, res) => {
+    const filePath = path.join(__dirname, '../ide-build', 'test.html');
+    console.log('Serving IDE test from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving IDE test page:', err);
+            res.status(404).send('IDE test not found');
+        }
+    });
+});
+
 // Coder1 IDE route - serve the built React app
 app.get('/ide', (req, res) => {
     const filePath = path.join(__dirname, '../ide-build', 'index.html');
