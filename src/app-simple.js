@@ -43,21 +43,17 @@ app.get('/product-creation', (req, res) => {
     });
 });
 
-// Coder1 IDE route
+// Serve IDE static assets first (for CSS, JS files)
+app.use('/ide/static', express.static(path.join(__dirname, '../ide-build/static')));
+
+// Coder1 IDE route - serve the built React app
 app.get('/ide', (req, res) => {
-    const filePath = path.join(__dirname, 'static', 'ide-interface.html');
+    const filePath = path.join(__dirname, '../ide-build', 'index.html');
     console.log('Serving IDE from:', filePath);
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error('Error serving IDE page:', err);
-            // Fallback to terminal interface if ide-interface.html doesn't exist
-            const fallbackPath = path.join(__dirname, 'static', 'terminal-interface.html');
-            res.sendFile(fallbackPath, (fallbackErr) => {
-                if (fallbackErr) {
-                    console.error('Error serving fallback IDE page:', fallbackErr);
-                    res.status(404).send('IDE interface not found');
-                }
-            });
+            res.status(404).send('IDE interface not found');
         }
     });
 });
