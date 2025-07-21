@@ -76,4 +76,4 @@ MIT License - Open source autonomous coding platform.
 
 🤖 Generated with Claude Code
 
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Claude <noreply@anthropic.com># Deployment fix Mon Jul 21 08:53:34 MDT 2025
