@@ -19,10 +19,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const staticPath = path.join(__dirname, '../static');
 console.log('Static directory path:', staticPath);
 
-// Serve static files from static directory
-app.use(express.static(staticPath));
-
-// Main page - Product Creation Hub
+// Main page - Product Creation Hub (must come BEFORE static files)
 app.get('/', (req, res) => {
     const filePath = path.join(staticPath, 'product-creation-hub.html');
     console.log('Serving main page from:', filePath);
@@ -45,6 +42,9 @@ app.get('/product-creation', (req, res) => {
         }
     });
 });
+
+// Serve static files from static directory (comes AFTER custom routes)
+app.use(express.static(staticPath));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
