@@ -19,14 +19,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const staticPath = path.join(__dirname, '../static');
 console.log('Static directory path:', staticPath);
 
-// Main page - Product Creation Hub (must come BEFORE static files)
+// Main page - Coder1 Homepage (must come BEFORE static files)
 app.get('/', (req, res) => {
-    const filePath = path.join(staticPath, 'product-creation-hub.html');
+    const filePath = path.join(staticPath, 'homepage.html');
     console.log('Serving main page from:', filePath);
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error('Error serving main page:', err);
-            res.status(404).send('File not found');
+            res.status(404).send('Homepage not found');
         }
     });
 });
