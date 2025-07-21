@@ -48,19 +48,19 @@ app.get('/health', (req, res) => {
 
 // Main route - serve the homepage
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'CANONICAL', 'homepage.html'));
+    res.sendFile(path.join(__dirname, 'homepage.html'));
 });
 
 // IDE route - serve React IDE
 app.get('/ide', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'CANONICAL', 'ide-react.html'));
+    res.sendFile(path.join(__dirname, 'ide-react.html'));
 });
 
 // Static middleware (after routes)
 app.use(express.static(path.join(__dirname, 'static')));
 
 // Serve IDE static assets
-app.use('/ide/static', express.static(path.join(__dirname, 'static', 'static')));
+app.use('/ide/static', express.static(path.join(__dirname, 'static')));
 
 // Voice API endpoints
 app.post('/api/voice/stt', upload.single('audio'), async (req, res) => {
