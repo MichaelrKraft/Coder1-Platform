@@ -74,6 +74,14 @@ app.get('/ide/test', (req, res) => {
 app.get('/ide', (req, res) => {
     const filePath = path.join(__dirname, '../ide-build', 'index.html');
     console.log('Serving IDE from:', filePath);
+    
+    // Add cache-busting headers
+    res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+    
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error('Error serving IDE page:', err);
