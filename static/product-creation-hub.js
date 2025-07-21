@@ -1643,8 +1643,8 @@ Please analyze this PRD and help me build this project step by step.`;
         
         // Navigate to Coder1 IDE with context
         const ideUrl = this.currentProject 
-            ? '/Users/michaelkraft/autonomous_vibe_interface/coder1-ide?project=transfer'
-            : '/Users/michaelkraft/autonomous_vibe_interface/coder1-ide';
+            ? '/ide?project=transfer'
+            : '/ide';
             
         window.open(ideUrl, '_blank');
         

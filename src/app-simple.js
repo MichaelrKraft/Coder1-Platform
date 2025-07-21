@@ -43,6 +43,30 @@ app.get('/product-creation', (req, res) => {
     });
 });
 
+// Coder1 IDE route
+app.get('/ide', (req, res) => {
+    const filePath = path.join(__dirname, 'static', 'ide-interface.html');
+    console.log('Serving IDE from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving IDE page:', err);
+            // Fallback to terminal interface if ide-interface.html doesn't exist
+            const fallbackPath = path.join(__dirname, 'static', 'terminal-interface.html');
+            res.sendFile(fallbackPath, (fallbackErr) => {
+                if (fallbackErr) {
+                    console.error('Error serving fallback IDE page:', fallbackErr);
+                    res.status(404).send('IDE interface not found');
+                }
+            });
+        }
+    });
+});
+
+// Alternative IDE routes
+app.get('/coder1-ide', (req, res) => {
+    res.redirect('/ide');
+});
+
 // Serve static files from static directory (comes AFTER custom routes)
 app.use(express.static(staticPath));
 
