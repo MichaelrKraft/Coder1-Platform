@@ -9,8 +9,8 @@ const InfiniteLoopManager = require('../services/InfiniteLoopManager');
 let infiniteManager = null;
 
 // Initialize manager
-const getManager = async () => {
-  if (!infiniteManager && InfiniteLoopManager) {
+const getManager = () => {
+  if (!infiniteManager) {
     infiniteManager = new InfiniteLoopManager();
   }
   return infiniteManager;
@@ -19,14 +19,7 @@ const getManager = async () => {
 // Test Claude API connection
 router.get('/test-connection', async (req, res) => {
   try {
-    const manager = await getManager();
-    if (!manager) {
-      return res.status(503).json({ 
-        success: false, 
-        error: 'Infinite Loop Manager not initialized' 
-      });
-    }
-
+    const manager = getManager();
     const result = await manager.testClaudeConnection();
     res.json(result);
   } catch (error) {
@@ -41,18 +34,11 @@ router.get('/test-connection', async (req, res) => {
 // Start infinite loop
 router.post('/start', async (req, res) => {
   try {
-    const manager = await getManager();
-    if (!manager) {
-      return res.status(503).json({ 
-        success: false, 
-        error: 'Infinite Loop Manager not initialized' 
-      });
-    }
-
-    const { specPath, outputDirectory, count } = req.body;
+    const manager = getManager();
+    const { specPath, outputDirectory, count, command: userCommand } = req.body;
     
     // Create command string
-    const command = `/infinite ${specPath || 'specs/ui-spec-v3.md'} ${outputDirectory || 'source_infinite'} ${count || 'infinite'}`;
+    const command = userCommand || `/infinite ${specPath || 'Generate React components'} ${outputDirectory || 'infinite-output'} ${count || 'infinite'}`;
     
     // Start the infinite loop
     const sessionInfo = await manager.startInfiniteLoop(command);
