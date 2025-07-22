@@ -2,12 +2,8 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
-// Import the InfiniteLoopManager (need to handle ES modules in CommonJS)
-let InfiniteLoopManager;
-(async () => {
-  const module = await import('file:///Users/michaelkraft/autonomous_vibe_interface/coder1-ide/src/services/InfiniteLoopManager.js');
-  InfiniteLoopManager = module.default;
-})();
+// Import the InfiniteLoopManager
+const InfiniteLoopManager = require('../services/InfiniteLoopManager');
 
 // Global instance
 let infiniteManager = null;
