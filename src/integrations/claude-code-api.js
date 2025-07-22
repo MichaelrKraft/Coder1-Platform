@@ -11,7 +11,7 @@ const { logger } = require('../monitoring/comprehensive-logger');
 class ClaudeCodeAPI {
     constructor(apiKey, options = {}) {
         this.apiKey = apiKey;
-        this.baseURL = options.baseURL || 'https://api.claude.ai';
+        this.baseURL = options.baseURL || 'https://api.anthropic.com';
         this.logger = options.logger || logger;
         this.timeout = options.timeout || 30000;
         
@@ -20,8 +20,9 @@ class ClaudeCodeAPI {
             baseURL: this.baseURL,
             timeout: this.timeout,
             headers: {
-                'Authorization': `Bearer ${this.apiKey}`,
+                'x-api-key': this.apiKey,
                 'Content-Type': 'application/json',
+                'anthropic-version': '2023-06-01',
                 'User-Agent': 'Coder1-Autonomous-Vibe-Interface/1.0'
             }
         });

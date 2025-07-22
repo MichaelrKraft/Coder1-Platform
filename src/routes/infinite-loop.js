@@ -37,8 +37,8 @@ router.post('/start', async (req, res) => {
     const manager = getManager();
     const { specPath, outputDirectory, count, command: userCommand } = req.body;
     
-    // Create command string
-    const command = userCommand || `/infinite ${specPath || 'Generate React components'} ${outputDirectory || 'infinite-output'} ${count || 'infinite'}`;
+    // Create command string  
+    const command = userCommand || `/infinite ${specPath || 'Generate React components'} ${outputDirectory || 'ai-generated-components'} ${count || 'infinite'}`;
     
     // Start the infinite loop
     const sessionInfo = await manager.startInfiniteLoop(command);
