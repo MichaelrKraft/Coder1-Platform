@@ -4,6 +4,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const EventEmitter = require('events');
+
+// Global terminal emitter for real-time output
+global.terminalEmitter = new EventEmitter();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -128,6 +132,24 @@ app.post('/api/generate-prd', (req, res) => {
     }
   });
 });
+
+// Import and use infinite loop routes
+try {
+  const infiniteLoopRoutes = require('./routes/infinite-loop');
+  app.use('/api/infinite', infiniteLoopRoutes);
+  console.log('✅ Infinite loop routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load infinite loop routes:', error.message);
+}
+
+// Import and use other API routes if available
+try {
+  const productCreationRoutes = require('./routes/product-creation-api');
+  app.use('/api', productCreationRoutes);
+  console.log('✅ Product creation routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load product creation routes:', error.message);
+}
 
 // Error handling
 app.use((err, req, res, next) => {
