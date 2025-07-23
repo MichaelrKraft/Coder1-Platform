@@ -453,9 +453,9 @@ class SmartPRDVoice {
         settingsPanel.innerHTML = `
             <div class="voice-settings-header">
                 <span>🎤 Voice Settings</span>
-                <button class="settings-toggle">−</button>
+                <button class="settings-toggle">+</button>
             </div>
-            <div class="voice-settings-content">
+            <div class="voice-settings-content" style="display: none;">
                 <label>
                     <input type="checkbox" id="prdVoiceResponseToggle" ${this.settings.voiceResponseEnabled ? 'checked' : ''}>
                     🔊 Read questions aloud
@@ -507,12 +507,7 @@ class SmartPRDVoice {
             settingsToggle.textContent = isCollapsed ? '−' : '+';
         });
 
-        // Initially collapsed after 5 seconds
-        setTimeout(() => {
-            const content = settingsPanel.querySelector('.voice-settings-content');
-            content.style.display = 'none';
-            settingsToggle.textContent = '+';
-        }, 5000);
+        // Already starts collapsed, no need for timer
     }
 
     setupMessageInputVoice() {

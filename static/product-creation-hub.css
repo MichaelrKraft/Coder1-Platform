@@ -166,6 +166,21 @@ body {
     backface-visibility: hidden !important;
 }
 
+/* Orange glow effect for Enter Coder1 IDE buttons */
+.enter-ide-btn,
+#enterIDE {
+    border: 2px solid #ff8c00 !important;
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.4), 0 0 20px rgba(255, 140, 0, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.enter-ide-btn:hover,
+#enterIDE:hover {
+    border-color: #ff8c00 !important;
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.6), 0 0 30px rgba(255, 140, 0, 0.3), 0 0 45px rgba(255, 140, 0, 0.1) !important;
+    transform: translateY(-2px) !important;
+}
+
 .version {
     font-size: 0.8rem;
     color: var(--text-secondary);
