@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/ide/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="/ide/static/api-config.js?v=6"></script><script defer="defer" src="/ide/static/js/main.a1cfdcd5.js?v=5"></script><link href="/ide/static/css/main.5c128812.css?v=5" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script src="/ide/static/api-injection.js?v=7"></script><script src="/ide/static/parallel-agents-modal.js?v=2"></script><script src="/ide/static/parallel-agents-fix.js?v=1"></script><script src="/ide/static/simple-stop-button.js?v=1"></script><script src="/ide/static/global-logo-final.js"></script><script src="/ide/static/hide-buttons-special-pages.js"></script><script src="/ide/static/cleanup-header-buttons.js"></script><link href="/ide/static/terminal-voice.css?v=15" rel="stylesheet">
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/ide/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="/ide/static/api-config.js?v=6"></script><script defer="defer" src="/ide/static/js/main.a1cfdcd5.js?v=5"></script><link href="/ide/static/css/main.5c128812.css?v=5" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script src="/ide/static/api-injection.js?v=7"></script><script src="/ide/static/parallel-agents-modal.js?v=2"></script><script src="/ide/static/parallel-agents-fix.js?v=1"></script><script src="/ide/static/simple-stop-button.js?v=1"></script><script src="/ide/static/global-logo-final.js?v=2"></script><script src="/ide/static/hide-buttons-special-pages.js"></script><script src="/ide/static/cleanup-header-buttons.js"></script><link href="/ide/static/terminal-voice.css?v=18" rel="stylesheet">
 <script>
 // Immediate SuperClaude hiding and microphone addition
 console.log('🔥 IMMEDIATE: Starting SuperClaude cleanup and microphone setup');
@@ -80,20 +80,62 @@ function addMicrophoneToInput() {
     });
 }
 
+// Function to remove blue X but keep SuperClaude
+function removeBlueXButKeepSuperclaude() {
+    // Find all elements
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(el => {
+        const style = el.getAttribute('style') || '';
+        const text = el.textContent.trim();
+        
+        // Check if it's a blue X but NOT part of SuperClaude
+        if ((text === '×' || text === 'X' || text === 'x') && 
+            (style.includes('color: blue') || style.includes('color:#0000ff') || style.includes('color: rgb(0, 0, 255)')) &&
+            !el.closest('.superclaude-btn') &&
+            !el.closest('[class*="superclaude"]')) {
+            
+            console.log('🚫 Found blue X to remove:', el);
+            el.style.display = 'none';
+        }
+    });
+    
+    // Specifically target preview button area
+    const navItems = document.querySelectorAll('.nav-item-container');
+    navItems.forEach(container => {
+        const buttons = container.querySelectorAll('button');
+        const previewBtn = Array.from(buttons).find(btn => 
+            btn.title === 'Preview' || btn.textContent === 'Preview'
+        );
+        if (previewBtn) {
+            // Look for blue X in this container only
+            const blueElements = container.querySelectorAll('[style*="blue"]');
+            blueElements.forEach(blueEl => {
+                if (blueEl.textContent === '×' || blueEl.textContent === 'X') {
+                    blueEl.style.display = 'none';
+                    console.log('🚫 Removed blue X near preview button');
+                }
+            });
+        }
+    });
+}
+
 // Run immediately
 hideSuperclaude();
 addMicrophoneToInput();
+removeBlueXButKeepSuperclaude();
 
 // Run periodically
 setInterval(() => {
     hideSuperclaude();
     addMicrophoneToInput();
+    removeBlueXButKeepSuperclaude();
 }, 1000);
 
 // Run on DOM changes
 const observer = new MutationObserver(() => {
     hideSuperclaude();
     addMicrophoneToInput();
+    removeBlueXButKeepSuperclaude();
 });
 
 if (document.body) {

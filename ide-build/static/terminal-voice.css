@@ -359,6 +359,25 @@ button[title="SuperClaude Terminal"],
 
 /* Remove the generic SuperClaude hiding rule that was too broad */
 
+/* Hide blue X specifically, but not SuperClaude icons */
+.action-btn:not(.superclaude-btn) > .close-icon,
+.action-btn:not(.superclaude-btn) > [style*="color: blue"] {
+    display: none !important;
+}
+
+/* Target blue X near preview button */
+.nav-item-container:has(button[title="Preview"]) [style*="color: blue"],
+button[title="Preview"] + [style*="color: blue"],
+button[title="Preview"] ~ [style*="color: blue"] {
+    display: none !important;
+}
+
+/* Hide absolutely positioned blue elements that might be X */
+[style*="position: absolute"][style*="color: blue"],
+[style*="position: fixed"][style*="color: blue"] {
+    /* Will be handled by JavaScript to check if it's an X */
+}
+
 /* Blue X handling - removed to prevent white screen */
 
 /* Hide persona text like "Front-end expert" from terminal title */
@@ -521,3 +540,22 @@ textarea {
 .voice-tooltip { z-index: 10001; }
 .voice-transcript { z-index: 10000; }
 .voice-settings { z-index: 10000; }
+
+/* Remove the fixed header CSS - the logo is already fixed positioned */
+/* Let the logo handle its own fixed positioning from global-logo-final.js */
+
+/* Just ensure the Coder1 brand mark stays properly positioned */
+#coder1-brand-mark {
+    position: fixed !important;
+    top: 15px !important;
+    left: 15px !important;
+    width: 140px !important;
+    height: 140px !important;
+    z-index: 2147483647 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    background-image: url('/ide/static/coder1-logo.svg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}

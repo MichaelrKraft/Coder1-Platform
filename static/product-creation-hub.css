@@ -112,12 +112,21 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding-top: 100px; /* Space for fixed header */
 }
 
 /* Header */
 .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     padding: 20px 40px;
     border-bottom: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 .header-content {
@@ -138,6 +147,23 @@ body {
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+/* Force Coder1 logo to stay fixed - direct approach */
+#coder1-homepage-logo {
+    position: fixed !important;
+    top: 5px !important;
+    left: 35px !important;
+    width: 120px !important;
+    height: 120px !important;
+    z-index: 2147483647 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: scale(1.2) translateZ(0) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
 }
 
 .version {

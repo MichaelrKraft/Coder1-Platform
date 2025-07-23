@@ -452,7 +452,7 @@ class SmartPRDVoice {
         settingsPanel.className = 'voice-settings prd-voice-settings';
         settingsPanel.innerHTML = `
             <div class="voice-settings-header">
-                <span>🎤 PRD Voice</span>
+                <span>🎤 Voice Settings</span>
                 <button class="settings-toggle">−</button>
             </div>
             <div class="voice-settings-content">
@@ -587,7 +587,7 @@ class SmartPRDVoice {
             
             .prd-voice-settings {
                 position: fixed;
-                top: 80px;
+                bottom: 20px;
                 right: 20px;
                 background: #1a1b26;
                 border: 1px solid #414868;

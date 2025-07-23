@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Integration Test</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/product-creation-hub.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .voice-test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .message-input-test {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            position: relative;
+        }
+        .input-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            backdrop-filter: blur(5px);
+        }
+        #testMessageInput {
+            width: calc(100% - 100px);
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            resize: none;
+        }
+        .input-controls {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        .voice-input-btn {
+            background: #667eea;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+        }
+        .voice-input-btn:hover {
+            background: #5a6fd8;
+            transform: scale(1.1);
+        }
+        .voice-input-btn.recording {
+            background: #e74c3c !important;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .voice-input-btn.processing {
+            background: #f39c12 !important;
+        }
+        .voice-input-btn.processing i {
+            animation: voiceSpin 1s linear infinite;
+        }
+        .send-btn {
+            background: #2ecc71;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .send-btn:hover {
+            background: #27ae60;
+        }
+        .status {
+            margin-top: 15px;
+            font-style: italic;
+            color: #ecf0f1;
+        }
+        .instructions {
+            background: rgba(52, 152, 219, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        @keyframes voicePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        @keyframes voiceSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎤 Voice Integration Test</h1>
+        <p>Test your voice functionality here!</p>
+
+        <div class="voice-test-section">
+            <h2>SmartPRD Voice Input</h2>
+            <div class="instructions">
+                <h4>Instructions:</h4>
+                <ul style="text-align: left;">
+                    <li><strong>Desktop:</strong> Hold down the microphone button while speaking</li>
+                    <li><strong>Mobile:</strong> Tap the microphone button to toggle recording</li>
+                    <li><strong>Keyboard:</strong> Alt+V to start/stop recording</li>
+                    <li>Try saying: "I want to build a web app for project management"</li>
+                </ul>
+            </div>
+
+            <div class="message-input-test">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="testMessageInput" 
+                        placeholder="Describe your project idea here... or use voice input!"
+                        rows="3"
+                    ></textarea>
+                    <div class="input-controls">
+                        <!-- Voice button will be added here by JavaScript -->
+                        <button class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="voiceStatus" class="status">Voice system ready</div>
+        </div>
+
+        <div class="voice-test-section">
+            <h2>Voice Features</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: left;">
+                <div>
+                    <h4>✅ Implemented</h4>
+                    <ul>
+                        <li>Speech recognition</li>
+                        <li>Push-to-talk (desktop)</li>
+                        <li>Toggle mode (mobile)</li>
+                        <li>Voice confirmations</li>
+                        <li>Transcript display</li>
+                        <li>Settings panel</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>🎯 Features</h4>
+                    <ul>
+                        <li>1.1x speech speed</li>
+                        <li>Female voice preference</li>
+                        <li>Auto-execution</li>
+                        <li>Smart summarization</li>
+                        <li>Error handling</li>
+                        <li>Browser compatibility</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the SmartPRD voice integration -->
+    <script src="/static/smart-prd-voice.js"></script>
+    
+    <script>
+        // Simple status updates
+        function updateStatus(message) {
+            document.getElementById('voiceStatus').textContent = message;
+        }
+        
+        // Override some SmartPRD voice functions for our test page
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                updateStatus('Voice integration loaded - try the microphone button!');
+            }, 1000);
+        });
+        
+        // Test the message input
+        document.querySelector('.send-btn').addEventListener('click', function() {
+            const input = document.getElementById('testMessageInput');
+            if (input.value.trim()) {
+                updateStatus('Message: "' + input.value.trim().substring(0, 50) + (input.value.length > 50 ? '...' : '') + '"');
+                setTimeout(() => {
+                    updateStatus('Voice system ready');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

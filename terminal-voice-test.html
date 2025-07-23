@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Voice Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #1a1b26;
+            color: #c0caf5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .terminal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #24283b;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .terminal-header {
+            background: #414868;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #f7768e;
+        }
+        .terminal-button.yellow { background: #e0af68; }
+        .terminal-button.green { background: #9ece6a; }
+        .terminal-title {
+            margin-left: 10px;
+            color: #c0caf5;
+            font-size: 14px;
+        }
+        .terminal-content {
+            padding: 20px;
+            min-height: 400px;
+            font-family: 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .terminal-line {
+            margin: 10px 0;
+        }
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            background: rgba(65, 72, 104, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        .prompt {
+            color: #7aa2f7;
+            margin-right: 10px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+        .mic-prompt, .voice-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 4px;
+            color: #565f89;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mic-prompt:hover, .voice-toggle-btn:hover {
+            color: #7aa2f7;
+            transform: scale(1.1);
+        }
+        .mic-prompt.recording, .voice-toggle-btn.recording {
+            color: #f7768e !important;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .mic-prompt.processing, .voice-toggle-btn.processing {
+            color: #7aa2f7 !important;
+        }
+        .mic-prompt.processing i, .voice-toggle-btn.processing i {
+            animation: voiceSpin 1s linear infinite;
+        }
+        #terminalCommandInput {
+            background: transparent;
+            border: none;
+            color: #c0caf5;
+            font-family: inherit;
+            font-size: inherit;
+            flex: 1;
+            outline: none;
+            padding: 5px;
+        }
+        .instructions {
+            background: rgba(122, 162, 247, 0.1);
+            border: 1px solid #7aa2f7;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #c0caf5;
+        }
+        .test-commands {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .test-command {
+            background: #414868;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: monospace;
+            color: #c0caf5;
+            border: none;
+        }
+        .test-command:hover {
+            background: #565f89;
+            transform: translateY(-2px);
+        }
+        .status-bar {
+            background: #1a1b26;
+            padding: 10px 20px;
+            border-top: 1px solid #414868;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #565f89;
+        }
+        @keyframes voicePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        @keyframes voiceSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #7aa2f7;">🎤 Terminal Voice Integration Test</h1>
+        <p style="color: #c0caf5;">Test push-to-talk voice commands in the terminal below</p>
+    </div>
+
+    <div class="instructions">
+        <h3 style="color: #7aa2f7; margin-top: 0;">Instructions:</h3>
+        <ul>
+            <li><strong>Desktop:</strong> Hold down the microphone icon while speaking</li>
+            <li><strong>Mobile:</strong> Tap the microphone icon to toggle recording</li>
+            <li><strong>Keyboard shortcut:</strong> Ctrl+Space to record</li>
+            <li><strong>Try commands:</strong> "ls", "pwd", "clear", "whoami", "date"</li>
+        </ul>
+        <div class="test-commands">
+            <button class="test-command" onclick="testCommand('ls')">ls</button>
+            <button class="test-command" onclick="testCommand('pwd')">pwd</button>
+            <button class="test-command" onclick="testCommand('clear')">clear</button>
+            <button class="test-command" onclick="testCommand('whoami')">whoami</button>
+            <button class="test-command" onclick="testCommand('date')">date</button>
+        </div>
+    </div>
+
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-button"></div>
+            <div class="terminal-button yellow"></div>
+            <div class="terminal-button green"></div>
+            <div class="terminal-title">Terminal Voice Test</div>
+        </div>
+        
+        <div class="terminal-content">
+            <div class="terminal-line">Welcome to Voice-Enabled Terminal</div>
+            <div class="terminal-line">Voice integration loaded successfully!</div>
+            <div class="terminal-line" style="color: #565f89;">---</div>
+            <div class="terminal-line">Try speaking a command or type one below:</div>
+            <div class="terminal-line" style="color: #9ece6a;">✅ Speech Recognition: Ready</div>
+            <div class="terminal-line" style="color: #9ece6a;">✅ Voice Synthesis: Ready</div>
+            <div class="terminal-line" style="color: #9ece6a;">✅ Push-to-talk: Ready</div>
+            
+            <div class="terminal-input">
+                <div class="prompt">
+                    <!-- Voice button will replace this $ -->
+                    $
+                </div>
+                <input 
+                    type="text" 
+                    id="terminalCommandInput" 
+                    placeholder="Enter command or use voice..."
+                    autocomplete="off"
+                />
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="voiceStatus">Voice system ready</span>
+            <span>Microphone: <span id="micStatus">Idle</span></span>
+        </div>
+    </div>
+
+    <!-- Load terminal voice CSS and JS -->
+    <link rel="stylesheet" href="/ide-build/static/terminal-voice.css">
+    <script src="/ide-build/static/terminal-voice.js"></script>
+    
+    <script>
+        // Test command function
+        function testCommand(cmd) {
+            const input = document.getElementById('terminalCommandInput');
+            input.value = cmd;
+            input.focus();
+            updateStatus('Test command: ' + cmd);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('voiceStatus').textContent = message;
+        }
+        
+        function updateMicStatus(status) {
+            document.getElementById('micStatus').textContent = status;
+        }
+        
+        // Override terminal voice status updates for our test
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                updateStatus('Terminal voice integration loaded - try the microphone!');
+            }, 1500);
+        });
+        
+        // Monitor the input field for changes
+        document.getElementById('terminalCommandInput').addEventListener('input', function(e) {
+            if (e.target.value) {
+                updateStatus('Command ready: ' + e.target.value);
+            }
+        });
+        
+        // Simulate command execution on Enter
+        document.getElementById('terminalCommandInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                const cmd = e.target.value.trim();
+                updateStatus('Executed: ' + cmd);
+                
+                // Simulate command output
+                const terminal = document.querySelector('.terminal-content');
+                const newLine = document.createElement('div');
+                newLine.className = 'terminal-line';
+                newLine.innerHTML = `<span style="color: #7aa2f7;">$ ${cmd}</span>`;
+                terminal.appendChild(newLine);
+                
+                const output = document.createElement('div');
+                output.className = 'terminal-line';
+                output.style.color = '#c0caf5';
+                output.textContent = `Mock output for: ${cmd}`;
+                terminal.appendChild(output);
+                
+                e.target.value = '';
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                setTimeout(() => {
+                    updateStatus('Voice system ready');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

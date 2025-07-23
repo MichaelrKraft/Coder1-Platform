@@ -320,6 +320,8 @@
                 display: flex;
                 align-items: center;
                 gap: 4px;
+                height: 32px;
+                box-sizing: border-box;
             }
 
             .prd-action-btn.primary {
@@ -344,14 +346,25 @@
             .prd-action-btn.close {
                 background: none;
                 color: #9ca3af;
-                padding: 4px;
-                width: 24px;
-                height: 24px;
+                padding: 0;
+                width: 32px;
+                height: 32px;
                 justify-content: center;
+                margin-left: 8px;
+                flex-shrink: 0;
             }
 
             .prd-action-btn.close:hover {
                 color: #ef4444;
+            }
+
+            .prd-action-btn i {
+                font-size: 14px;
+                line-height: 1;
+            }
+
+            .prd-action-btn.close i {
+                font-size: 16px;
             }
 
             .prd-action-btn.success {

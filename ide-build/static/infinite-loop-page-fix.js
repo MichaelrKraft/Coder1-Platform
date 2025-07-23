@@ -22,12 +22,13 @@ function addStopButtonToPage() {
             const sessionId = sessionIdElement.nextElementSibling?.textContent?.trim();
             console.log('Session ID:', sessionId);
             
-            // Check if status is not "Stopped"
+            // Check if we have a valid session ID (not empty)
             const status = statusElement.nextElementSibling?.textContent?.trim();
             console.log('Current status:', status);
             
-            // Add stop button if session is running
-            if (status && status !== 'Stopped' && sessionId) {
+            // Add stop button if we have a session ID (regardless of status text)
+            // Since status shows "Stopped" even when running, we check for valid session ID
+            if (sessionId && sessionId !== '' && sessionId !== 'null' && sessionId !== 'undefined') {
                 createPageStopButton(sessionId, statusElement.parentElement);
             }
             
@@ -120,11 +121,12 @@ function observeStatusChanges(statusElement, sessionIdElement) {
         
         const existingButton = document.getElementById('infinite-page-stop-btn');
         
-        if (currentStatus === 'Stopped' && existingButton) {
-            // Remove button if status is stopped
+        // Since status always shows "Stopped", check if session ID exists or changes
+        if ((!sessionId || sessionId === '' || sessionId === 'null') && existingButton) {
+            // Remove button if no valid session ID
             existingButton.remove();
-        } else if (currentStatus !== 'Stopped' && !existingButton && sessionId) {
-            // Add button if status is not stopped and button doesn't exist
+        } else if (sessionId && sessionId !== '' && sessionId !== 'null' && !existingButton) {
+            // Add button if valid session ID exists and button doesn't exist
             createPageStopButton(sessionId, statusElement.parentElement);
         }
     });
@@ -156,7 +158,7 @@ function addFloatingStopButton() {
             
             const floatingBtn = document.getElementById('floating-stop-btn');
             
-            if (status !== 'Stopped' && sessionId && !floatingBtn) {
+            if (sessionId && sessionId !== '' && sessionId !== 'null' && !floatingBtn) {
                 // Create floating button
                 const btn = document.createElement('button');
                 btn.id = 'floating-stop-btn';
@@ -206,7 +208,7 @@ function addFloatingStopButton() {
                 };
                 
                 document.body.appendChild(btn);
-            } else if (status === 'Stopped' && floatingBtn) {
+            } else if ((!sessionId || sessionId === '' || sessionId === 'null') && floatingBtn) {
                 floatingBtn.remove();
             }
         }
