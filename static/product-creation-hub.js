@@ -1224,6 +1224,12 @@ class ProductCreationHub {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
         
+        // Check if this is a question message (starts with "Question X of Y:")
+        const isQuestion = sender === 'assistant' && message.match(/^Question \d+ of \d+:/);
+        if (isQuestion) {
+            messageDiv.className += ' question-message glowing-green-border';
+        }
+        
         messageDiv.innerHTML = `
             <div class="message-avatar">
                 <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
