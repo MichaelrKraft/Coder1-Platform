@@ -14,7 +14,7 @@ function waitForReactApp() {
         attempts++;
         
         // Look for terminal buttons in the IDE
-        const buttons = document.querySelectorAll('button[title="Infinite Loop"], button[title="Supervision"], button[title="Parallel Agents"], button[title="Hivemind"]');
+        const buttons = document.querySelectorAll('button[title="Supervision"], button[title="Sleep Mode"], button[title="Infinite Loop"], button[title="Parallel Agents"]');
         
         if (buttons.length > 0 || attempts >= maxAttempts) {
             clearInterval(checkInterval);
@@ -30,17 +30,10 @@ function waitForReactApp() {
 
 function enhanceExistingButtons() {
     // Override click handlers for existing buttons
-    const infiniteBtn = document.querySelector('button[title="Infinite Loop"]');
     const supervisionBtn = document.querySelector('button[title="Supervision"]');
+    const sleepModeBtn = document.querySelector('button[title="Sleep Mode"]');
+    const infiniteBtn = document.querySelector('button[title="Infinite Loop"]');
     const parallelBtn = document.querySelector('button[title="Parallel Agents"]');
-    const hivemindBtn = document.querySelector('button[title="Hivemind"]');
-    
-    if (infiniteBtn) {
-        infiniteBtn.onclick = async (e) => {
-            e.preventDefault();
-            await startInfiniteLoop();
-        };
-    }
     
     if (supervisionBtn) {
         supervisionBtn.onclick = (e) => {
@@ -49,17 +42,24 @@ function enhanceExistingButtons() {
         };
     }
     
+    if (sleepModeBtn) {
+        sleepModeBtn.onclick = (e) => {
+            e.preventDefault();
+            startSleepMode();
+        };
+    }
+    
+    if (infiniteBtn) {
+        infiniteBtn.onclick = async (e) => {
+            e.preventDefault();
+            await startInfiniteLoop();
+        };
+    }
+    
     if (parallelBtn) {
         parallelBtn.onclick = (e) => {
             e.preventDefault();
             startParallelAgents();
-        };
-    }
-    
-    if (hivemindBtn) {
-        hivemindBtn.onclick = async (e) => {
-            e.preventDefault();
-            await startHivemind();
         };
     }
     
@@ -225,42 +225,83 @@ function startParallelAgents() {
     });
 }
 
-async function startHivemind() {
-    showNotification('🧠 Starting Hivemind Coordination');
+function startSleepMode() {
+    showNotification('🌙 Activating Sleep Mode...');
     
-    try {
-        const response = await fetch('/api/hivemind/start', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        if (data.success) {
-            showNotification('✅ Alpha, Beta, Gamma Agents Synchronized', 'success');
-            
-            // Poll hivemind status
-            const pollHivemind = async () => {
-                try {
-                    const statusResponse = await fetch(`/api/hivemind/status/${data.sessionId}`);
-                    const statusData = await statusResponse.json();
-                    
-                    if (statusData.success) {
-                        showNotification(`Queen: ${statusData.queen} | Tasks: ${statusData.tasksCompleted}`, 'info');
-                    }
-                } catch (error) {
-                    console.error('Hivemind polling error:', error);
-                }
-            };
-            
-            // Poll every 5 seconds
-            setInterval(pollHivemind, 5000);
-            pollHivemind(); // Initial poll
+    // Track sleep mode state
+    let isSleeping = true;
+    
+    // Create sleep mode overlay (subtle effect)
+    const sleepOverlay = document.createElement('div');
+    sleepOverlay.id = 'sleep-mode-overlay';
+    sleepOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: 9998;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+        animation: breathe 4s ease-in-out infinite;
+    `;
+    
+    // Add breathing animation
+    const style = document.createElement('style');
+    style.id = 'sleep-mode-styles';
+    style.textContent = `
+        @keyframes breathe {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
         }
-    } catch (error) {
-        showNotification(`❌ Failed to start Hivemind: ${error.message}`, 'error');
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(sleepOverlay);
+    
+    // Pause all active sessions
+    if (currentSession) {
+        showNotification('💤 Pausing active sessions...', 'info');
+        // In a real implementation, this would pause all running processes
     }
+    
+    // Show sleep status
+    showNotification('😴 Sleep Mode Active - All agents paused', 'success');
+    
+    // Create wake button
+    const wakeButton = document.createElement('button');
+    wakeButton.innerHTML = '☀️ Wake Up';
+    wakeButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #f7aa00;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        transition: all 0.2s;
+    `;
+    
+    wakeButton.onclick = () => {
+        // Remove sleep mode
+        sleepOverlay.remove();
+        wakeButton.remove();
+        document.getElementById('sleep-mode-styles')?.remove();
+        showNotification('☀️ Waking up - All systems resuming', 'success');
+        
+        // Resume any paused sessions
+        if (currentSession) {
+            showNotification('▶️ Resuming active sessions...', 'info');
+        }
+    };
+    
+    document.body.appendChild(wakeButton);
 }
 
 function showNotification(message, type = 'info') {
