@@ -1,0 +1,41 @@
+.explorer {
+  height: 100%;
+  background: #1a1b26;
+  color: #c0caf5;
+  padding: 16px;
+}
+
+.explorer-header {
+  margin-bottom: 16px;
+}
+
+.explorer-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.explorer-content {
+  font-size: 14px;
+}
+
+.folder, .file {
+  padding: 4px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.folder:hover, .file:hover {
+  background: #24283b;
+  border-radius: 4px;
+}
+
+.folder-contents {
+  margin-left: 20px;
+}
+
+.folder-icon, .file-icon {
+  font-size: 16px;
+}

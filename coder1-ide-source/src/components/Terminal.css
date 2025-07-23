@@ -1,0 +1,138 @@
+.terminal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a1b26;
+  color: #c0caf5;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #24283b;
+  border-bottom: 1px solid #414868;
+  min-height: 40px;
+}
+
+.terminal-header-left {
+  /* Empty - no SuperClaude Terminal text */
+}
+
+.terminal-header-right {
+  display: flex;
+  gap: 8px;
+}
+
+.terminal-control-btn {
+  padding: 6px 16px;
+  background: #2a2e42;
+  border: 2px solid transparent;
+  color: #c0caf5;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 0 0 0 rgba(255, 158, 0, 0);
+}
+
+/* Orange glow for control buttons */
+.terminal-control-btn.sleep-mode,
+.terminal-control-btn.supervision,
+.terminal-control-btn.parallel-agents,
+.terminal-control-btn.infinite-loop,
+.terminal-control-btn.hivemind {
+  border-color: #ff9e00;
+  box-shadow: 0 0 10px rgba(255, 158, 0, 0.5);
+}
+
+.terminal-control-btn:hover {
+  background: #363a52;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(255, 158, 0, 0.7);
+}
+
+.terminal-control-btn.active {
+  background: #ff9e00;
+  color: #1a1b26;
+  box-shadow: 0 0 20px rgba(255, 158, 0, 0.8);
+}
+
+.terminal-control-btn.stopping {
+  background: #f7768e;
+  color: #1a1b26;
+  box-shadow: 0 0 20px rgba(247, 118, 142, 0.8);
+  animation: pulse 1s infinite;
+}
+
+.terminal-control-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 20px rgba(247, 118, 142, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(247, 118, 142, 1);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(247, 118, 142, 0.8);
+  }
+}
+
+.terminal-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.terminal-line {
+  margin-bottom: 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+}
+
+.terminal-prompt {
+  color: #7aa2f7;
+  margin-right: 8px;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #c0caf5;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+}
+
+/* Scrollbar styling */
+.terminal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+  background: #1a1b26;
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+  background: #414868;
+  border-radius: 4px;
+}
+
+.terminal-content::-webkit-scrollbar-thumb:hover {
+  background: #565f89;
+}

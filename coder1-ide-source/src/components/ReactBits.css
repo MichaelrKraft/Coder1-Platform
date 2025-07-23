@@ -1,0 +1,54 @@
+.react-bits {
+  background: #24283b;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #414868;
+  /* Smaller size for React Bits */
+  max-width: 250px;
+}
+
+.react-bits-header {
+  margin-bottom: 12px;
+}
+
+.react-bits-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #c0caf5;
+  font-weight: 600;
+}
+
+.react-bits-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.react-bit-item {
+  background: #1a1b26;
+  border: 1px solid #414868;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.react-bit-item:hover {
+  background: #2a2e42;
+  border-color: #7aa2f7;
+  transform: translateY(-1px);
+}
+
+.bit-icon {
+  font-size: 16px;
+}
+
+.bit-name {
+  color: #c0caf5;
+  font-weight: 500;
+}
