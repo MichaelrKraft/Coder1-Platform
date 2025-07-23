@@ -142,6 +142,15 @@ try {
   console.warn('⚠️ Failed to load infinite loop routes:', error.message);
 }
 
+// Import and use hivemind routes
+try {
+  const hivemindRoutes = require('./routes/hivemind');
+  app.use('/api/hivemind', hivemindRoutes);
+  console.log('✅ Hivemind routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load hivemind routes:', error.message);
+}
+
 // Import and use other API routes if available
 try {
   const productCreationRoutes = require('./routes/product-creation-api');
