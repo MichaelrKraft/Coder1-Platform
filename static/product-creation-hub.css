@@ -2,14 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-bg: #0a0a0a;
-    --secondary-bg: #1a1a1a;
+    --primary-bg: #1a1a1a;
+    --secondary-bg: #2a2a2a;
     --accent-primary: #8b5cf6;
     --accent-secondary: #10b981;
     --accent-danger: #ef4444;
     --text-primary: #ffffff;
     --text-secondary: #a1a1aa;
-    --glass-bg: rgba(26, 26, 26, 0.6);
+    --glass-bg: rgba(42, 42, 42, 0.6);
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
@@ -42,7 +42,7 @@ body {
     position: absolute;
     border-radius: 50%;
     filter: blur(100px);
-    opacity: 0.4;
+    opacity: 0.6;
     animation: float 20s infinite ease-in-out;
 }
 
@@ -96,6 +96,14 @@ body {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Darker background for Product Creation Wizard */
+#creationWizard.glassmorphism {
+    background: rgba(42, 42, 42, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Container */
@@ -360,7 +368,7 @@ body {
 
 .message-content {
     flex: 1;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
     padding: 15px 20px;
     border-radius: 12px;
     line-height: 1.6;
@@ -437,6 +445,7 @@ body {
 /* Add top spacing for Live PRD Assistant */
 #prdAssistant {
     margin-top: 40px;
+    margin-bottom: 40px;
 }
 
 .panel-header {

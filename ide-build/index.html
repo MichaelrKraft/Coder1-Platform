@@ -1,1 +1,103 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/ide/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="/ide/static/api-config.js?v=6"></script><script defer="defer" src="/ide/static/js/main.a1cfdcd5.js?v=5"></script><link href="/ide/static/css/main.5c128812.css?v=5" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script src="/ide/static/api-injection.js?v=7"></script><script src="/ide/static/parallel-agents-modal.js?v=2"></script><script src="/ide/static/parallel-agents-fix.js?v=1"></script><script src="/ide/static/simple-stop-button.js?v=1"></script><script src="/ide/static/global-logo-final.js"></script><script src="/ide/static/hide-buttons-special-pages.js"></script><script src="/ide/static/cleanup-header-buttons.js"></script><link href="/ide/static/terminal-voice.css" rel="stylesheet"><script src="/ide/static/terminal-voice.js"></script><script src="/ide/static/prd-project-transfer.js"></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/ide/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="/ide/static/api-config.js?v=6"></script><script defer="defer" src="/ide/static/js/main.a1cfdcd5.js?v=5"></script><link href="/ide/static/css/main.5c128812.css?v=5" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script src="/ide/static/api-injection.js?v=7"></script><script src="/ide/static/parallel-agents-modal.js?v=2"></script><script src="/ide/static/parallel-agents-fix.js?v=1"></script><script src="/ide/static/simple-stop-button.js?v=1"></script><script src="/ide/static/global-logo-final.js"></script><script src="/ide/static/hide-buttons-special-pages.js"></script><script src="/ide/static/cleanup-header-buttons.js"></script><link href="/ide/static/terminal-voice.css?v=15" rel="stylesheet">
+<script>
+// Immediate SuperClaude hiding and microphone addition
+console.log('🔥 IMMEDIATE: Starting SuperClaude cleanup and microphone setup');
+
+function hideSuperclaude() {
+    // More targeted approach to avoid breaking the page
+    const elements = document.querySelectorAll('span, div, h1, h2, h3');
+    elements.forEach(el => {
+        if (el.textContent === 'SuperClaude Terminal' && el.children.length === 0) {
+            console.log('🗑️ HIDING SuperClaude Terminal text:', el.tagName);
+            el.style.visibility = 'hidden';
+            el.style.fontSize = '0';
+        }
+        if (el.textContent === 'Front-end expert' && el.children.length === 0) {
+            console.log('🗑️ HIDING persona text:', el.tagName);
+            el.style.visibility = 'hidden';
+            el.style.fontSize = '0';
+        }
+    });
+}
+
+function addMicrophoneToInput() {
+    const inputs = document.querySelectorAll('input, textarea');
+    console.log('🎤 Found inputs:', inputs.length);
+    
+    inputs.forEach((input, i) => {
+        console.log(`Input ${i}:`, input.placeholder, input.className);
+        
+        if (input.type === 'text' || input.tagName === 'TEXTAREA') {
+            if (!input.parentElement.querySelector('.voice-mic-btn')) {
+                console.log('🎤 Adding microphone to input:', input);
+                
+                // Create microphone button
+                const micBtn = document.createElement('button');
+                micBtn.className = 'voice-mic-btn';
+                micBtn.innerHTML = '🎤'; // Use emoji instead of font awesome
+                micBtn.style.cssText = `
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    z-index: 1000;
+                    background: rgba(255, 140, 0, 0.2);
+                    border: 2px solid #ff8c00;
+                    color: #ff8c00;
+                    border-radius: 4px;
+                    width: 26px;
+                    height: 26px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    font-size: 12px;
+                `;
+                
+                // Wrap input if needed
+                if (input.parentElement.style.position !== 'relative') {
+                    input.parentElement.style.position = 'relative';
+                }
+                
+                // Add left padding to input to make room for microphone
+                input.style.paddingLeft = '45px';
+                
+                // Insert microphone button
+                input.parentElement.insertBefore(micBtn, input);
+                
+                // Add click handler
+                micBtn.addEventListener('mousedown', () => {
+                    micBtn.style.background = 'rgba(255, 140, 0, 0.4)';
+                    console.log('🎤 Microphone pressed!');
+                });
+                
+                micBtn.addEventListener('mouseup', () => {
+                    micBtn.style.background = 'rgba(255, 140, 0, 0.2)';
+                    console.log('🎤 Microphone released!');
+                });
+            }
+        }
+    });
+}
+
+// Run immediately
+hideSuperclaude();
+addMicrophoneToInput();
+
+// Run periodically
+setInterval(() => {
+    hideSuperclaude();
+    addMicrophoneToInput();
+}, 1000);
+
+// Run on DOM changes
+const observer = new MutationObserver(() => {
+    hideSuperclaude();
+    addMicrophoneToInput();
+});
+
+if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+</script>
+<script src="/ide/static/terminal-voice.js"></script><script src="/ide/static/prd-project-transfer.js"></script></body></html>
