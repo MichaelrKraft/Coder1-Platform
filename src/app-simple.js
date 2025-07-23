@@ -133,13 +133,25 @@ app.post('/api/generate-prd', (req, res) => {
   });
 });
 
-// Import and use infinite loop routes
+// Import and use infinite loop routes (using simple version to avoid dependency issues)
 try {
-  const infiniteLoopRoutes = require('./routes/infinite-loop');
+  // Try simple version first (no external dependencies)
+  const infiniteLoopRoutes = require('./routes/infinite-loop-simple');
   app.use('/api/infinite', infiniteLoopRoutes);
-  console.log('✅ Infinite loop routes loaded successfully');
+  console.log('✅ Infinite loop routes loaded successfully (simple mode)');
 } catch (error) {
-  console.warn('⚠️ Failed to load infinite loop routes:', error.message);
+  console.error('❌ Failed to load infinite loop routes:');
+  console.error('  Error:', error.message);
+  console.error('  Stack:', error.stack);
+  
+  // Try loading the original version as fallback
+  try {
+    const infiniteLoopRoutes = require('./routes/infinite-loop');
+    app.use('/api/infinite', infiniteLoopRoutes);
+    console.log('✅ Infinite loop routes loaded (original version)');
+  } catch (fallbackError) {
+    console.error('❌ Fallback also failed:', fallbackError.message);
+  }
 }
 
 // Import and use hivemind routes
@@ -148,7 +160,9 @@ try {
   app.use('/api/hivemind', hivemindRoutes);
   console.log('✅ Hivemind routes loaded successfully');
 } catch (error) {
-  console.warn('⚠️ Failed to load hivemind routes:', error.message);
+  console.error('❌ Failed to load hivemind routes:');
+  console.error('  Error:', error.message);
+  console.error('  Stack:', error.stack);
 }
 
 // Import and use other API routes if available
