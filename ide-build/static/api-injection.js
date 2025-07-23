@@ -84,12 +84,85 @@ async function startInfiniteLoop() {
         if (data.success) {
             currentSession = data.sessionId;
             showNotification(`✅ Infinite loop started - Session: ${data.sessionId}`, 'success');
+            
+            // Add stop button functionality
+            addStopButton(data.sessionId);
+            
             startPollingStatus();
         } else {
             showNotification(`❌ Failed: ${data.message}`, 'error');
         }
     } catch (error) {
         showNotification(`❌ Error: ${error.message}`, 'error');
+    }
+}
+
+function addStopButton(sessionId) {
+    // Create floating stop button
+    const stopButton = document.createElement('button');
+    stopButton.id = 'infinite-stop-btn';
+    stopButton.innerHTML = '🛑 Stop Infinite Loop';
+    stopButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #f7768e;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        transition: all 0.2s;
+    `;
+    
+    stopButton.onmouseover = () => {
+        stopButton.style.transform = 'scale(1.05)';
+        stopButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+    };
+    
+    stopButton.onmouseout = () => {
+        stopButton.style.transform = 'scale(1)';
+        stopButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    };
+    
+    stopButton.onclick = async () => {
+        stopButton.disabled = true;
+        stopButton.innerHTML = '⏳ Stopping...';
+        
+        try {
+            const response = await fetch(`/api/infinite/stop/${sessionId}`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                showNotification('✅ Infinite loop stopped successfully', 'success');
+                currentSession = null;
+                stopButton.remove();
+            } else {
+                showNotification(`❌ Failed to stop: ${data.message}`, 'error');
+                stopButton.disabled = false;
+                stopButton.innerHTML = '🛑 Stop Infinite Loop';
+            }
+        } catch (error) {
+            showNotification(`❌ Error stopping: ${error.message}`, 'error');
+            stopButton.disabled = false;
+            stopButton.innerHTML = '🛑 Stop Infinite Loop';
+        }
+    };
+    
+    document.body.appendChild(stopButton);
+}
+
+// Clean up stop button when session ends
+function removeStopButton() {
+    const stopBtn = document.getElementById('infinite-stop-btn');
+    if (stopBtn) {
+        stopBtn.remove();
     }
 }
 
@@ -105,10 +178,15 @@ async function startPollingStatus() {
             
             if (data.status === 'running') {
                 setTimeout(startPollingStatus, 3000);
+            } else {
+                // Session ended, remove stop button
+                removeStopButton();
+                showNotification('✅ Infinite loop completed', 'success');
             }
         }
     } catch (error) {
         console.error('Polling error:', error);
+        removeStopButton();
     }
 }
 
