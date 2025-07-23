@@ -420,6 +420,9 @@ function showParallelAgentsModal() {
     }, 10);
 }
 
+// Expose globally for other scripts
+window.showParallelAgentsModal = showParallelAgentsModal;
+
 // Add CSS styles
 const style = document.createElement('style');
 style.textContent = `
