@@ -1,79 +1,73 @@
-# 🚀 Coder1 Platform - Complete Autonomous Coding Environment
+# CANONICAL Files Directory
 
-A sophisticated dual-mode autonomous coding platform that bridges natural language requirements with executable code through AI-powered workflows.
+## ⚠️ CRITICAL: MODIFY ONLY THESE VERSIONS
 
-## 🌟 Features
+This directory contains the **authoritative, production versions** of all major interface files. 
 
-### Smart PRD Generator
-- **AI-Powered Requirements Analysis** - Transform ideas into detailed specifications
-- **Expert Consultation System** - Multi-persona AI consultations (Technical Architect, UX Designer, etc.)
-- **Automated Wireframe Generation** - Create UI/UX designs from requirements
-- **Project Management** - Version control and export capabilities
+### Purpose
+- **Single Source of Truth**: Eliminates confusion about which files to modify
+- **AI Agent Guidance**: Clear headers help Claude agents identify correct versions
+- **Version Control**: Old versions archived in ARCHIVE/ directory
 
-### Coder1 IDE Integration
-- **Parallel Agentic Coding** - Multiple Claude agents working simultaneously
-- **Infinite Loop Generation** - Unlimited UI component creation
-- **21st.dev Magic Integration** - AI-powered React component generation
-- **Real-time Monitoring** - Execution tracking and results comparison
+### Files in this Directory
 
-## 🚀 Quick Deploy
+#### 1. `homepage.html`
+- **Route**: `/` (root)
+- **Purpose**: Main homepage - Smart PRD & Wireframe Generator with 7-step wizard
+- **Features**: PRD generation, wireframes, expert consultation, version management, optimized spacing
+- **Dependencies**: product-creation-hub.css, product-creation-hub.js, Font Awesome, Google Fonts
 
-### Deploy to Render
-1. Connect this repository to Render
-2. Set environment variables:
-   - `ANTHROPIC_API_KEY` - Your Claude API key
-   - `NODE_ENV` - `production`
-3. Deploy with default Node.js settings
+#### 2. `ide-react.html` 
+- **Route**: `/ide`
+- **Purpose**: Advanced React IDE with supervision controls and native terminal
+- **Features**: Advanced React IDE, supervision button, infinite agent, native terminal with title bar
+- **Dependencies**: React build main.ca49fa02.js (advanced build), voice-interface.js, Socket.IO
 
-### Deploy to Railway
-1. Connect repository to Railway
-2. Add same environment variables
-3. Deploy automatically
+#### 3. `smart-prd-generator.html`
+- **Route**: Served within React IDE
+- **Purpose**: Complete Smart PRD & Wireframe Generator with 7-step wizard
+- **Features**: PRD generation, wireframes, expert consultation, version management
+- **Dependencies**: product-creation-hub.css, product-creation-hub.js, Font Awesome
 
-## 🛠️ Local Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Production mode
-npm start
+### File Headers
+All files contain AI-readable metadata headers:
+```html
+<!-- 
+===============================================================================
+CANONICAL FILE - MODIFY THIS VERSION ONLY
+===============================================================================
+File: [filename]
+Purpose: [description]
+Status: PRODUCTION - Last updated: [date]
+Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
+===============================================================================
+-->
 ```
 
-## 📋 Environment Variables
+### Rules for Claude Agents
+1. **ALWAYS** check for "CANONICAL FILE" header before editing
+2. **NEVER** modify files outside this directory
+3. **NEVER** modify archived versions
+4. **VERIFY** you're working with the official version
+5. **UPDATE** the "Last updated" date when making changes
 
-Required:
-- `ANTHROPIC_API_KEY` - Claude API access
-- `NODE_ENV` - Environment setting
+### Directory Structure
+```
+/Users/michaelkraft/autonomous_vibe_interface/
+├── CANONICAL/          ← MODIFY THESE FILES ONLY
+│   ├── homepage.html
+│   ├── ide-react.html
+│   └── smart-prd-generator.html
+├── ARCHIVE/            ← DO NOT MODIFY (historical reference)
+│   └── [timestamped old versions]
+└── src/
+    └── app.js         ← Routes point to CANONICAL files
+```
 
-Optional:
-- `AIRTOP_API_KEY` - Browser automation
-- `MAGIC_21ST_API_KEY` - 21st.dev Magic integration
+### Routing
+The main Express server (`src/app.js`) has been updated to serve files from this directory:
+- `GET /` → `CANONICAL/homepage.html`
+- `GET /ide` → `CANONICAL/ide-react.html`
 
-## 🎯 API Endpoints
-
-- `GET /` - Smart PRD Generator interface
-- `GET /health` - Server health check
-- `POST /api/agent/analyze-requirements` - Generate intelligent questions
-- `POST /api/agent/generate-enhanced-brief` - Create detailed specifications
-- `GET /api/project/:projectId` - Retrieve project data
-
-## 🤖 AI-Powered Features
-
-- **Requirements Gathering** - 5-question intelligent analysis
-- **Enhanced Brief Generation** - Detailed project specifications
-- **Wireframe Creation** - Automated UI/UX design
-- **Expert Consultations** - Multi-persona AI guidance
-
-## 📄 License
-
-MIT License - Open source autonomous coding platform.
-
----
-
-🤖 Generated with Claude Code
-
-Co-Authored-By: Claude <noreply@anthropic.com># Deployment fix Mon Jul 21 08:53:34 MDT 2025
+### Last Updated
+2025-07-21 - Initial canonical file organization implemented

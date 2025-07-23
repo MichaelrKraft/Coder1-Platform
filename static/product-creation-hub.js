@@ -650,7 +650,7 @@ class ProductCreationHub {
         this.setPRDStatus('in-progress');
 
         try {
-            const response = await fetch('/api/prd/generate', {
+            const response = await fetch('/api/generate-prd', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1224,6 +1224,12 @@ class ProductCreationHub {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
         
+        // Check if this is a question message (starts with "Question X of Y:")
+        const isQuestion = sender === 'assistant' && message.match(/^Question \d+ of \d+:/);
+        if (isQuestion) {
+            messageDiv.className += ' question-message glowing-green-border';
+        }
+        
         messageDiv.innerHTML = `
             <div class="message-avatar">
                 <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
@@ -1523,19 +1529,39 @@ Please analyze this PRD and help me build this project step by step.`;
     }
 
     async exportProject() {
-        if (!this.currentProject) return;
+        if (!this.currentProject) {
+            this.addMessageToChat('No active project to export. Please complete the steps first.', 'assistant');
+            return;
+        }
         
         try {
-            const response = await fetch(`/api/project/export/${this.currentProject.id}`, {
-                method: 'GET'
+            const response = await fetch('/api/project/export', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectId: this.currentProject.id,
+                    format: 'json'
+                })
             });
             
-            if (response.ok) {
-                const blob = await response.blob();
+            const result = await response.json();
+            
+            if (result.success) {
+                // Create a downloadable JSON file with all project data
+                const projectData = {
+                    project: this.currentProject,
+                    prd: this.prdDocument,
+                    wireframes: this.wireframes,
+                    questions: this.questions,
+                    answers: this.answers,
+                    exportedAt: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${this.currentProject.id}-complete-project.zip`;
+                a.download = `${this.currentProject.id}-complete-project.json`;
                 a.click();
                 window.URL.revokeObjectURL(url);
                 
