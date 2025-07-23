@@ -319,12 +319,7 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
-// Check auth status
-if (!authToken) {
-    setTimeout(() => {
-        showNotification('ℹ️ Running in demo mode - full features available with authentication', 'info');
-    }, 2000);
-}
+// Check auth status - removed demo mode notification for cleaner UX
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
