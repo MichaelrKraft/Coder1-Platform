@@ -25,7 +25,7 @@ console.log('Static directory path:', staticPath);
 
 // Main page - PRD Generator (must come BEFORE static files)
 app.get('/', (req, res) => {
-    const filePath = path.join(staticPath, 'product-creation-hub.html');
+    const filePath = path.join(__dirname, '../smart-prd-generator.html');
     console.log('Serving main page from:', filePath);
     res.sendFile(filePath, (err) => {
         if (err) {
@@ -59,7 +59,10 @@ app.get('/platform', (req, res) => {
     });
 });
 
-// Serve IDE static assets first (for CSS, JS files)
+// Serve main static assets (for logo, CSS, JS files)
+app.use('/static', express.static(path.join(__dirname, '../static')));
+
+// Serve IDE static assets (for CSS, JS files)
 app.use('/ide/static', express.static(path.join(__dirname, '../ide-build/static')));
 
 // Test route for debugging
@@ -225,37 +228,81 @@ app.get('/api/personas/available', (req, res) => {
 app.post('/api/consultation/analyze', (req, res) => {
   const { projectId, personas, prdDocument } = req.body;
   
-  // Simulate consultation analysis
+  // Simulate consultation analysis with proper structure
   const consultationResults = {
     success: true,
-    analysis: {
-      consensusLevel: 85,
-      successProbability: 78,
-      criticalFindings: 3,
-      agreements: [
-        'Focus on user-centric design approach',
-        'Implement robust security measures from the start',
-        'Use agile development methodology'
-      ],
-      conflicts: [
-        'Timeline expectations vs. feature complexity',
-        'Performance requirements vs. budget constraints'
-      ],
-      recommendations: {
-        immediate: [
-          'Define MVP scope clearly',
-          'Set up development environment',
-          'Create user personas and journey maps'
+    consultation: {
+      summary: {
+        totalPersonas: personas ? personas.length : 6,
+        criticalFindings: 3,
+        estimatedSuccessProbability: 78,
+        consensusLevel: 85
+      },
+      analysis: {
+        consensusLevel: 85,
+        successProbability: 78,
+        criticalFindings: 3,
+        agreements: [
+          'Focus on user-centric design approach',
+          'Implement robust security measures from the start',
+          'Use agile development methodology',
+          'Prioritize mobile-first responsive design'
         ],
-        shortTerm: [
-          'Develop proof of concept',
-          'Conduct user testing',
-          'Establish monitoring systems'
+        conflicts: [
+          'Timeline expectations vs. feature complexity',
+          'Performance requirements vs. budget constraints',
+          'Scalability needs vs. initial MVP scope'
         ],
-        longTerm: [
-          'Plan for scalability',
-          'Consider international expansion',
-          'Build team expertise'
+        recommendations: {
+          immediate: [
+            'Define MVP scope clearly',
+            'Set up development environment',
+            'Create user personas and journey maps'
+          ],
+          shortTerm: [
+            'Develop proof of concept',
+            'Conduct user testing',
+            'Establish monitoring systems'
+          ],
+          longTerm: [
+            'Plan for scalability',
+            'Consider international expansion',
+            'Build team expertise'
+          ]
+        }
+      },
+      personaInsights: {
+        'ux-designer': {
+          score: 85,
+          concerns: ['User flow complexity', 'Mobile experience'],
+          suggestions: ['Simplify navigation', 'Add user onboarding']
+        },
+        'backend-engineer': {
+          score: 75,
+          concerns: ['Database scaling', 'API performance'],
+          suggestions: ['Use caching strategy', 'Implement rate limiting']
+        },
+        'security-expert': {
+          score: 90,
+          concerns: ['Data encryption', 'Authentication flow'],
+          suggestions: ['Use JWT tokens', 'Implement 2FA']
+        }
+      },
+      risks: {
+        security: [
+          { risk: 'Data breach vulnerability', severity: 'high', mitigation: 'Implement encryption at rest' },
+          { risk: 'API exposure', severity: 'medium', mitigation: 'Use API keys and rate limiting' }
+        ],
+        technical: [
+          { risk: 'Scaling issues', severity: 'medium', mitigation: 'Design for horizontal scaling' },
+          { risk: 'Technical debt', severity: 'low', mitigation: 'Regular refactoring cycles' }
+        ],
+        business: [
+          { risk: 'Market competition', severity: 'high', mitigation: 'Focus on unique value proposition' },
+          { risk: 'User adoption', severity: 'medium', mitigation: 'Implement referral program' }
+        ],
+        operational: [
+          { risk: 'Support scaling', severity: 'low', mitigation: 'Build self-service documentation' }
         ]
       }
     }
@@ -276,17 +323,17 @@ app.post('/api/wireframes/generate', (req, res) => {
         {
           name: 'Homepage',
           htmlFile: '/wireframes/homepage.html',
-          htmlContent: '<div style="padding: 20px; border: 1px solid #ddd;"><h1>Homepage Wireframe</h1><p>Navigation, Hero Section, Features, Footer</p></div>'
+          htmlContent: '<div style="padding: 20px; background: #1a1a1a; border: 2px solid #333; border-radius: 8px; color: #fff;"><h2 style="color: #8b5cf6; margin: 0 0 15px 0;">Homepage Wireframe</h2><div style="display: flex; flex-direction: column; gap: 10px;"><div style="background: #2a2a2a; padding: 10px; border-radius: 4px; text-align: center;">Navigation Bar</div><div style="background: #2a2a2a; padding: 30px; border-radius: 4px; text-align: center;">Hero Section</div><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; text-align: center;">Feature 1</div><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; text-align: center;">Feature 2</div><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; text-align: center;">Feature 3</div></div><div style="background: #2a2a2a; padding: 15px; border-radius: 4px; text-align: center;">Footer</div></div></div>'
         },
         {
           name: 'Dashboard',
           htmlFile: '/wireframes/dashboard.html',
-          htmlContent: '<div style="padding: 20px; border: 1px solid #ddd;"><h1>Dashboard Wireframe</h1><p>Sidebar, Main Content Area, Stats Cards</p></div>'
+          htmlContent: '<div style="padding: 20px; background: #1a1a1a; border: 2px solid #333; border-radius: 8px; color: #fff;"><h2 style="color: #8b5cf6; margin: 0 0 15px 0;">Dashboard Wireframe</h2><div style="display: grid; grid-template-columns: 200px 1fr; gap: 15px; height: 300px;"><div style="background: #2a2a2a; padding: 15px; border-radius: 4px;"><h4 style="margin: 0 0 10px 0; color: #8b5cf6;">Sidebar</h4><div style="display: flex; flex-direction: column; gap: 5px;"><div style="background: #3a3a3a; padding: 8px; border-radius: 4px;">Menu Item 1</div><div style="background: #3a3a3a; padding: 8px; border-radius: 4px;">Menu Item 2</div><div style="background: #3a3a3a; padding: 8px; border-radius: 4px;">Menu Item 3</div></div></div><div style="display: flex; flex-direction: column; gap: 10px;"><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; text-align: center;">Stat Card 1</div><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; text-align: center;">Stat Card 2</div><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; text-align: center;">Stat Card 3</div></div><div style="background: #2a2a2a; padding: 20px; border-radius: 4px; flex: 1;">Main Content Area</div></div></div></div>'
         },
         {
           name: 'User Profile',
           htmlFile: '/wireframes/profile.html',
-          htmlContent: '<div style="padding: 20px; border: 1px solid #ddd;"><h1>User Profile Wireframe</h1><p>Avatar, User Info, Settings, Activity</p></div>'
+          htmlContent: '<div style="padding: 20px; background: #1a1a1a; border: 2px solid #333; border-radius: 8px; color: #fff;"><h2 style="color: #8b5cf6; margin: 0 0 15px 0;">User Profile Wireframe</h2><div style="display: flex; gap: 20px;"><div style="background: #2a2a2a; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">Avatar</div><div style="flex: 1;"><div style="background: #2a2a2a; padding: 15px; border-radius: 4px; margin-bottom: 10px;"><h4 style="margin: 0; color: #8b5cf6;">User Information</h4><p style="margin: 5px 0;">Name, Email, Role</p></div><div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"><div style="background: #2a2a2a; padding: 15px; border-radius: 4px; text-align: center;">Settings</div><div style="background: #2a2a2a; padding: 15px; border-radius: 4px; text-align: center;">Activity Log</div></div></div></div></div>'
         }
       ],
       metadata: {
@@ -325,6 +372,132 @@ app.post('/api/project/export', (req, res) => {
       downloadUrl: `/downloads/project-${projectId}.${format || 'json'}`,
       expiresAt: new Date(Date.now() + 3600000).toISOString()
     }
+  });
+});
+
+// API endpoint for market insights
+app.get('/api/market-insights/:projectId', (req, res) => {
+  const { projectId } = req.params;
+  
+  res.json({
+    success: true,
+    insights: {
+      viability: {
+        score: 85,
+        factors: [
+          'High market demand',
+          'Growing user base',
+          'Clear value proposition'
+        ]
+      },
+      competition: {
+        level: 'Moderate',
+        mainCompetitors: 3,
+        analysis: 'Several established players but room for differentiation'
+      },
+      marketSize: {
+        size: '$2.5B',
+        growth: '15% YoY',
+        targetMarket: 'SMB and Enterprise'
+      }
+    }
+  });
+});
+
+// API endpoint for project intelligence
+app.get('/api/intelligence/:projectId', (req, res) => {
+  const { projectId } = req.params;
+  
+  res.json({
+    success: true,
+    intelligence: {
+      recommendations: [
+        {
+          category: 'Core Features',
+          suggestions: [
+            'Implement user authentication with OAuth 2.0',
+            'Add real-time collaboration features',
+            'Include mobile-responsive design'
+          ]
+        },
+        {
+          category: 'Performance',
+          suggestions: [
+            'Use CDN for static assets',
+            'Implement lazy loading for images',
+            'Add caching strategy'
+          ]
+        },
+        {
+          category: 'Security',
+          suggestions: [
+            'Enable HTTPS everywhere',
+            'Implement rate limiting',
+            'Add input validation'
+          ]
+        }
+      ],
+      marketInsights: {
+        trending: {
+          features: [
+            { feature: 'AI Integration', adoption: 78 },
+            { feature: 'Real-time Updates', adoption: 65 },
+            { feature: 'Dark Mode', adoption: 82 },
+            { feature: 'Mobile App', adoption: 71 }
+          ]
+        }
+      }
+    }
+  });
+});
+
+// API endpoint for iteration plans
+app.get('/api/iterations/:projectId', (req, res) => {
+  const { projectId } = req.params;
+  
+  res.json({
+    success: true,
+    plans: [
+      {
+        id: 'iter-1',
+        name: 'Sprint 1 - Foundation',
+        description: 'Set up basic project structure and core components',
+        status: 'completed',
+        startDate: '2024-01-01',
+        endDate: '2024-01-14',
+        goals: [
+          'Project setup and configuration',
+          'Basic authentication system',
+          'Core UI components'
+        ]
+      },
+      {
+        id: 'iter-2',
+        name: 'Sprint 2 - Core Features',
+        description: 'Implement main functionality and user workflows',
+        status: 'in-progress',
+        startDate: '2024-01-15',
+        endDate: '2024-01-28',
+        goals: [
+          'User dashboard implementation',
+          'Main feature development',
+          'Basic testing setup'
+        ]
+      },
+      {
+        id: 'iter-3',
+        name: 'Sprint 3 - Enhancement',
+        description: 'Polish UI, add advanced features, and optimize performance',
+        status: 'planned',
+        startDate: '2024-01-29',
+        endDate: '2024-02-11',
+        goals: [
+          'UI/UX improvements',
+          'Performance optimization',
+          'Advanced features'
+        ]
+      }
+    ]
   });
 });
 
@@ -369,6 +542,15 @@ try {
   console.error('❌ Failed to load parallel agents routes:');
   console.error('  Error:', error.message);
   console.error('  Stack:', error.stack);
+}
+
+// Import and use voice routes
+try {
+  const voiceRoutes = require('./routes/voice');
+  app.use('/api/voice', voiceRoutes);
+  console.log('✅ Voice routes loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load voice routes:', error.message);
 }
 
 // Import and use other API routes if available
