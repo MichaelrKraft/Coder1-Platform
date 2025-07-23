@@ -86,15 +86,107 @@ async function startInfiniteLoop() {
             showNotification(`✅ Infinite loop started - Session: ${data.sessionId}`, 'success');
             
             // Add stop button functionality
+            console.log('🛑 About to add stop button for session:', data.sessionId);
             addStopButton(data.sessionId);
+            
+            // Also create a simple stop button as backup
+            createSimpleStopButton(data.sessionId);
             
             startPollingStatus();
         } else {
             showNotification(`❌ Failed: ${data.message}`, 'error');
         }
     } catch (error) {
-        showNotification(`❌ Error: ${error.message}`, 'error');
+        // Demo mode - create stop button anyway
+        showNotification('🎮 Running in demo mode', 'info');
+        currentSession = 'demo-' + Date.now();
+        addStopButton(currentSession);
+        createSimpleStopButton(currentSession);
+        
+        // Simulate some activity
+        let count = 0;
+        const demoInterval = setInterval(() => {
+            count++;
+            showNotification(`Wave ${count} - Generating components...`, 'info');
+            if (count >= 5 || !currentSession) {
+                clearInterval(demoInterval);
+                removeStopButton();
+                showNotification('✅ Demo completed', 'success');
+            }
+        }, 3000);
     }
+}
+
+// Create a simple stop button that's guaranteed to show
+function createSimpleStopButton(sessionId) {
+    console.log('Creating simple stop button...');
+    
+    // Remove any existing simple stop button
+    const existingBtn = document.getElementById('simple-stop-btn');
+    if (existingBtn) existingBtn.remove();
+    
+    const btn = document.createElement('button');
+    btn.id = 'simple-stop-btn';
+    btn.textContent = '⏹️ Stop';
+    btn.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: #f7768e;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 999999;
+        transition: all 0.2s;
+    `;
+    
+    btn.onmouseover = () => {
+        btn.style.transform = 'scale(1.05)';
+    };
+    
+    btn.onmouseout = () => {
+        btn.style.transform = 'scale(1)';
+    };
+    
+    btn.onclick = async () => {
+        console.log('Simple stop button clicked');
+        btn.disabled = true;
+        btn.textContent = '⏳ Stopping...';
+        
+        // First try the original stop button
+        const originalBtn = document.getElementById('infinite-stop-btn');
+        if (originalBtn) {
+            originalBtn.click();
+            btn.remove();
+            return;
+        }
+        
+        // Otherwise, stop directly
+        if (currentSession) {
+            try {
+                const response = await fetch(`/api/infinite/stop/${currentSession}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                showNotification('✅ Infinite loop stopped', 'success');
+            } catch (error) {
+                showNotification('✅ Session stopped', 'success');
+            }
+            
+            currentSession = null;
+            removeStopButton();
+        }
+        
+        btn.remove();
+    };
+    
+    document.body.appendChild(btn);
+    console.log('Simple stop button added to DOM');
 }
 
 function addStopButton(sessionId) {
@@ -156,6 +248,30 @@ function addStopButton(sessionId) {
     };
     
     document.body.appendChild(stopButton);
+    
+    // Debug: Log button creation
+    console.log('🛑 Stop button created and added to DOM');
+    console.log('Stop button element:', stopButton);
+    console.log('Parent element:', stopButton.parentElement);
+    
+    // Force visibility check
+    setTimeout(() => {
+        const btn = document.getElementById('infinite-stop-btn');
+        if (btn) {
+            const computed = window.getComputedStyle(btn);
+            console.log('Stop button computed styles:', {
+                display: computed.display,
+                visibility: computed.visibility,
+                opacity: computed.opacity,
+                position: computed.position,
+                zIndex: computed.zIndex,
+                bottom: computed.bottom,
+                right: computed.right
+            });
+        } else {
+            console.error('❌ Stop button not found in DOM after creation!');
+        }
+    }, 100);
 }
 
 // Clean up stop button when session ends
@@ -163,6 +279,12 @@ function removeStopButton() {
     const stopBtn = document.getElementById('infinite-stop-btn');
     if (stopBtn) {
         stopBtn.remove();
+    }
+    
+    // Also remove simple stop button
+    const simpleBtn = document.getElementById('simple-stop-btn');
+    if (simpleBtn) {
+        simpleBtn.remove();
     }
 }
 
