@@ -650,7 +650,7 @@ class ProductCreationHub {
         this.setPRDStatus('in-progress');
 
         try {
-            const response = await fetch('/api/prd/generate', {
+            const response = await fetch('/api/generate-prd', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

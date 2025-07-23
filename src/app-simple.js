@@ -113,25 +113,62 @@ app.get('/health', (req, res) => {
 
 // Basic API endpoint for PRD generation
 app.post('/api/generate-prd', (req, res) => {
-  const { projectName, description } = req.body;
+  const { projectId, originalRequest, questions, answers, sessionId } = req.body;
   
-  // Simple response for now
+  // Generate a comprehensive PRD based on the questions and answers
+  const prdContent = generatePRDContent(originalRequest, questions, answers);
+  
   res.json({
     success: true,
-    prd: {
-      title: projectName,
-      description: description,
+    prdDocument: {
+      id: `prd-${projectId}`,
+      title: `Product Requirements Document - ${originalRequest.substring(0, 50)}`,
+      content: prdContent,
+      metadata: {
+        confidence: 85,
+        completeness: 100,
+        generatedAt: new Date().toISOString(),
+        sessionId: sessionId
+      },
       sections: [
         'Executive Summary',
         'Project Overview',
+        'Target Audience',
+        'Core Features',
         'Technical Requirements',
-        'User Experience',
-        'Timeline & Milestones'
-      ],
-      generatedAt: new Date().toISOString()
+        'Design Requirements',
+        'Timeline & Budget',
+        'Success Metrics'
+      ]
     }
   });
 });
+
+// Helper function to generate PRD content
+function generatePRDContent(originalRequest, questions, answers) {
+  let content = `# Product Requirements Document\n\n`;
+  content += `## Executive Summary\n${originalRequest}\n\n`;
+  
+  content += `## Requirements Analysis\n\n`;
+  
+  // Map questions and answers to PRD sections
+  if (questions && answers) {
+    questions.forEach((q, index) => {
+      if (answers[index]) {
+        content += `### ${q.question}\n`;
+        content += `${answers[index].answer}\n\n`;
+      }
+    });
+  }
+  
+  content += `## Next Steps\n`;
+  content += `1. Review and refine requirements\n`;
+  content += `2. Create detailed technical specifications\n`;
+  content += `3. Design wireframes and mockups\n`;
+  content += `4. Begin development planning\n`;
+  
+  return content;
+}
 
 // Import and use infinite loop routes (using simple version to avoid dependency issues)
 try {
@@ -161,6 +198,17 @@ try {
   console.log('✅ Hivemind routes loaded successfully');
 } catch (error) {
   console.error('❌ Failed to load hivemind routes:');
+  console.error('  Error:', error.message);
+  console.error('  Stack:', error.stack);
+}
+
+// Import and use parallel agents routes
+try {
+  const parallelAgentsRoutes = require('./routes/parallel-agents');
+  app.use('/api/parallel-agents', parallelAgentsRoutes);
+  console.log('✅ Parallel agents routes loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load parallel agents routes:');
   console.error('  Error:', error.message);
   console.error('  Stack:', error.stack);
 }
