@@ -228,6 +228,7 @@ class ProductCreationHub {
         document.getElementById('getHelp')?.addEventListener('click', () => this.getHelp());
 
         // Modal controls
+        document.getElementById('editPRD')?.addEventListener('click', () => this.editPRD());
         document.getElementById('downloadPRD')?.addEventListener('click', () => this.exportPRD());
         document.getElementById('closePRDModal')?.addEventListener('click', () => this.closePRDModal());
         document.getElementById('closeWireframesModal')?.addEventListener('click', () => this.closeWireframesModal());
@@ -249,9 +250,22 @@ class ProductCreationHub {
         document.getElementById('exportVersionHistory')?.addEventListener('click', () => this.exportVersionHistory());
         document.getElementById('rollbackVersion')?.addEventListener('click', () => this.rollbackToSelectedVersion());
 
-        // Version tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchVersionTab(e.target.dataset.tab));
+        // Version management tab switching (only for version modal)
+        document.querySelectorAll('#versionModal .tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.switchVersionTab(e.target.dataset.tab);
+            });
+        });
+        
+        // Consultation tab switching (only for consultation modal)
+        document.querySelectorAll('#consultationModal .tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.switchConsultationTab(e.target.dataset.tab);
+            });
         });
 
         // Expandable sections
@@ -460,6 +474,16 @@ class ProductCreationHub {
         console.log('✅ startWizard proceeding with questions:', this.questions.length);
         this.setStep(2);
         this.updateProgress(25, 'Starting interview process');
+
+        // Load success accelerators data early in the process
+        try {
+            console.log('🔄 Loading Success Accelerators data...');
+            await this.loadMarketInsights();
+            await this.loadProjectIntelligence();
+            console.log('✅ Success Accelerators data loaded');
+        } catch (error) {
+            console.error('⚠️ Failed to load Success Accelerators, continuing anyway:', error);
+        }
 
         // Start the questioning process
         this.addMessageToChat('Perfect! Let\'s gather some details about your project. I\'ll ask you 5 questions to create the best possible requirements document.', 'assistant');
@@ -679,10 +703,6 @@ class ProductCreationHub {
                 document.getElementById('startConsultation').disabled = false;
                 document.getElementById('skipConsultation').disabled = false;
 
-                // Load market insights and intelligence
-                await this.loadMarketInsights();
-                await this.loadProjectIntelligence();
-
                 // Track PRD generation
                 await this.trackEvent('prd_generated', {
                     projectId: this.currentProject.id,
@@ -768,7 +788,15 @@ class ProductCreationHub {
         }
         
         console.log(`✅ Found ${this.wireframes.wireframes.length} wireframes to display`);
+        
+        // Debug: Check the first wireframe content
+        if (this.wireframes.wireframes.length > 0) {
+            console.log('First wireframe HTML content:', this.wireframes.wireframes[0].htmlContent);
+        }
 
+        // Store wireframes data for access in button handlers
+        window.currentWireframes = this.wireframes.wireframes;
+        
         // Populate wireframes content
         content.innerHTML = `
             <div class="wireframes-grid">
@@ -779,7 +807,7 @@ class ProductCreationHub {
                             ${wireframe.htmlContent || '<p>Preview not available</p>'}
                         </div>
                         <div class="wireframe-actions">
-                            <button class="btn secondary" onclick="window.open('${wireframe.htmlFile}', '_blank')">
+                            <button class="btn secondary" onclick="productCreationHub.openWireframeFullView(${index})">
                                 <i class="fas fa-external-link-alt"></i>
                                 Open Full View
                             </button>
@@ -943,17 +971,13 @@ class ProductCreationHub {
         document.getElementById('consultationResults').style.display = 'block';
 
         try {
-            const response = await fetch('/api/personas/consult', {
+            const response = await fetch('/api/consultation/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     projectId: this.currentProject.id,
-                    projectType: this.currentProject.projectType,
-                    requirements: this.answers,
-                    features: this.currentProject.questions || [],
-                    complexity: 'medium',
-                    timeline: '6 weeks',
-                    selectedPersonas: selectedPersonas
+                    personas: selectedPersonas,
+                    prdDocument: this.prdDocument
                 })
             });
 
@@ -1016,14 +1040,14 @@ class ProductCreationHub {
         const agreementsEl = document.getElementById('expertAgreements');
         const conflictsEl = document.getElementById('expertConflicts');
 
-        if (agreementsEl && consultation.crossPersonaAnalysis.agreements) {
-            agreementsEl.innerHTML = consultation.crossPersonaAnalysis.agreements
+        if (agreementsEl && consultation.analysis && consultation.analysis.agreements) {
+            agreementsEl.innerHTML = consultation.analysis.agreements
                 .map(agreement => `<li>${agreement}</li>`)
                 .join('');
         }
 
-        if (conflictsEl && consultation.crossPersonaAnalysis.conflicts) {
-            conflictsEl.innerHTML = consultation.crossPersonaAnalysis.conflicts
+        if (conflictsEl && consultation.analysis && consultation.analysis.conflicts) {
+            conflictsEl.innerHTML = consultation.analysis.conflicts
                 .map(conflict => `<li>${conflict}</li>`)
                 .join('');
         }
@@ -1033,38 +1057,49 @@ class ProductCreationHub {
         const container = document.getElementById('personaInsights');
         if (!container) return;
 
-        container.innerHTML = consultation.personaInsights.map(insight => `
-            <div class="persona-insight">
-                <div class="persona-insight-header">
-                    <div class="persona-insight-title">
-                        <h5>${insight.personaName}</h5>
-                        <span class="insight-priority ${insight.priority}">${insight.priority}</span>
+        // Convert object of persona insights to array format
+        if (consultation.personaInsights && typeof consultation.personaInsights === 'object') {
+            const insightsHTML = Object.entries(consultation.personaInsights).map(([personaId, insight]) => {
+                // Get persona name from ID
+                const personaNames = {
+                    'ux-designer': 'UX Designer',
+                    'backend-engineer': 'Backend Engineer',
+                    'frontend-developer': 'Frontend Developer',
+                    'product-manager': 'Product Manager',
+                    'security-expert': 'Security Expert',
+                    'devops-engineer': 'DevOps Engineer'
+                };
+                
+                return `
+                    <div class="persona-insight">
+                        <div class="persona-insight-header">
+                            <div class="persona-insight-title">
+                                <h5>${personaNames[personaId] || personaId}</h5>
+                                <span class="insight-priority">Score: ${insight.score || 0}%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-section">
+                            <h6>Concerns</h6>
+                            <ul>
+                                ${insight.concerns ? insight.concerns.map(item => `<li>${item}</li>`).join('') : '<li>No concerns identified</li>'}
+                            </ul>
+                        </div>
+                        
+                        <div class="insight-section">
+                            <h6>Suggestions</h6>
+                            <ul>
+                                ${insight.suggestions ? insight.suggestions.map(item => `<li>${item}</li>`).join('') : '<li>No suggestions available</li>'}
+                            </ul>
+                        </div>
                     </div>
-                    <div class="insight-confidence">Confidence: ${insight.confidence}%</div>
-                </div>
-                
-                <div class="insight-section">
-                    <h6>Key Insights</h6>
-                    <ul>
-                        ${insight.insights.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="insight-section">
-                    <h6>Recommendations</h6>
-                    <ul>
-                        ${insight.recommendations.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="insight-section">
-                    <h6>Risk Considerations</h6>
-                    <ul>
-                        ${insight.risks.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-        `).join('');
+                `;
+            }).join('');
+            
+            container.innerHTML = insightsHTML;
+        } else {
+            container.innerHTML = '<p>No persona insights available</p>';
+        }
     }
 
     renderActionsTab(consultation) {
@@ -1072,20 +1107,20 @@ class ProductCreationHub {
         const shortTermEl = document.getElementById('shortTermActions');
         const longTermEl = document.getElementById('longTermActions');
 
-        if (immediateEl && consultation.actionPlan.immediate) {
-            immediateEl.innerHTML = consultation.actionPlan.immediate
+        if (immediateEl && consultation.analysis && consultation.analysis.recommendations && consultation.analysis.recommendations.immediate) {
+            immediateEl.innerHTML = consultation.analysis.recommendations.immediate
                 .map(action => `<li>${action}</li>`)
                 .join('');
         }
 
-        if (shortTermEl && consultation.actionPlan.shortTerm) {
-            shortTermEl.innerHTML = consultation.actionPlan.shortTerm
+        if (shortTermEl && consultation.analysis && consultation.analysis.recommendations && consultation.analysis.recommendations.shortTerm) {
+            shortTermEl.innerHTML = consultation.analysis.recommendations.shortTerm
                 .map(action => `<li>${action}</li>`)
                 .join('');
         }
 
-        if (longTermEl && consultation.actionPlan.longTerm) {
-            longTermEl.innerHTML = consultation.actionPlan.longTerm
+        if (longTermEl && consultation.analysis && consultation.analysis.recommendations && consultation.analysis.recommendations.longTerm) {
+            longTermEl.innerHTML = consultation.analysis.recommendations.longTerm
                 .map(action => `<li>${action}</li>`)
                 .join('');
         }
@@ -1097,27 +1132,27 @@ class ProductCreationHub {
         const businessEl = document.getElementById('businessRisks');
         const operationalEl = document.getElementById('operationalRisks');
 
-        if (securityEl && consultation.riskMatrix.security) {
-            securityEl.innerHTML = consultation.riskMatrix.security
-                .map(risk => `<li>${risk}</li>`)
+        if (securityEl && consultation.risks && consultation.risks.security) {
+            securityEl.innerHTML = consultation.risks.security
+                .map(risk => `<li><strong>${risk.risk}:</strong> ${risk.mitigation} <span class="risk-severity ${risk.severity}">(${risk.severity})</span></li>`)
                 .join('');
         }
 
-        if (technicalEl && consultation.riskMatrix.technical) {
-            technicalEl.innerHTML = consultation.riskMatrix.technical
-                .map(risk => `<li>${risk}</li>`)
+        if (technicalEl && consultation.risks && consultation.risks.technical) {
+            technicalEl.innerHTML = consultation.risks.technical
+                .map(risk => `<li><strong>${risk.risk}:</strong> ${risk.mitigation} <span class="risk-severity ${risk.severity}">(${risk.severity})</span></li>`)
                 .join('');
         }
 
-        if (businessEl && consultation.riskMatrix.business) {
-            businessEl.innerHTML = consultation.riskMatrix.business
-                .map(risk => `<li>${risk}</li>`)
+        if (businessEl && consultation.risks && consultation.risks.business) {
+            businessEl.innerHTML = consultation.risks.business
+                .map(risk => `<li><strong>${risk.risk}:</strong> ${risk.mitigation} <span class="risk-severity ${risk.severity}">(${risk.severity})</span></li>`)
                 .join('');
         }
 
-        if (operationalEl && consultation.riskMatrix.operational) {
-            operationalEl.innerHTML = consultation.riskMatrix.operational
-                .map(risk => `<li>${risk}</li>`)
+        if (operationalEl && consultation.risks && consultation.risks.operational) {
+            operationalEl.innerHTML = consultation.risks.operational
+                .map(risk => `<li><strong>${risk.risk}:</strong> ${risk.mitigation} <span class="risk-severity ${risk.severity}">(${risk.severity})</span></li>`)
                 .join('');
         }
     }
@@ -1177,15 +1212,52 @@ class ProductCreationHub {
     }
 
     applyRecommendations() {
-        if (!this.consultationResult) return;
+        if (!this.consultationResult || !this.prdDocument) return;
 
-        // For MVP, we'll just show a success message
+        // Update PRD with expert recommendations
+        const recommendations = this.consultationResult.analysis.recommendations;
+        const agreements = this.consultationResult.analysis.agreements;
+        const risks = this.consultationResult.risks;
+
+        // Append expert insights to PRD
+        let updatedContent = this.prdDocument.content + '\n\n## Expert Consultation Results\n\n';
+        
+        updatedContent += '### Expert Consensus Areas\n';
+        agreements.forEach(agreement => {
+            updatedContent += `- ${agreement}\n`;
+        });
+        
+        updatedContent += '\n### Immediate Actions (Expert Recommendations)\n';
+        recommendations.immediate.forEach(action => {
+            updatedContent += `- ${action}\n`;
+        });
+        
+        updatedContent += '\n### Risk Mitigation Strategies\n';
+        Object.entries(risks).forEach(([category, riskList]) => {
+            updatedContent += `\n**${category.charAt(0).toUpperCase() + category.slice(1)} Risks:**\n`;
+            riskList.forEach(risk => {
+                updatedContent += `- ${risk.risk}: ${risk.mitigation}\n`;
+            });
+        });
+
+        // Update the PRD document
+        this.prdDocument.content = updatedContent;
+        this.prdDocument.metadata.hasExpertConsultation = true;
+        
+        // Update the PRD preview
+        this.updatePRDPreview(this.prdDocument);
+        
         this.addMessageToChat(
-            'Expert recommendations have been noted and will be incorporated into the project documentation. The most critical items have been highlighted for immediate attention.',
+            'Expert recommendations have been successfully applied to your PRD. The document now includes expert consensus areas, immediate actions, and risk mitigation strategies.',
             'assistant'
         );
 
         this.closeConsultationModal();
+        
+        // Move to next step
+        this.setStep(5);
+        document.getElementById('generateWireframes').disabled = false;
+        document.getElementById('skipWireframes').disabled = false;
     }
 
     async loadMarketInsights() {
@@ -1328,6 +1400,15 @@ class ProductCreationHub {
                 </div>
             </div>
         `;
+        
+        // Auto-expand the section
+        section.classList.remove('collapsed');
+        section.classList.add('expanded');
+        const button = document.querySelector('[data-section="market"]');
+        if (button) {
+            const icon = button.querySelector('i');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
     }
 
     updateRecommendations(recommendations) {
@@ -1339,6 +1420,15 @@ class ProductCreationHub {
         ).join('');
         
         section.innerHTML = `<div style="padding: 15px;">${recList}</div>`;
+        
+        // Auto-expand the section
+        section.classList.remove('collapsed');
+        section.classList.add('expanded');
+        const button = document.querySelector('[data-section="recommendations"]');
+        if (button) {
+            const icon = button.querySelector('i');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
     }
 
     updateTrendingFeatures(trending) {
@@ -1353,6 +1443,15 @@ class ProductCreationHub {
         ).join('');
         
         section.innerHTML = `<div style="padding: 15px;">${featuresList}</div>`;
+        
+        // Auto-expand the section
+        section.classList.remove('collapsed');
+        section.classList.add('expanded');
+        const button = document.querySelector('[data-section="trending"]');
+        if (button) {
+            const icon = button.querySelector('i');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
     }
 
     updateSuccessScore(score) {
@@ -1458,22 +1557,66 @@ class ProductCreationHub {
         }
     }
 
+    editPRD() {
+        if (!this.prdDocument) {
+            this.addMessageToChat('No PRD available to edit. Please generate a PRD first.', 'assistant');
+            return;
+        }
+        
+        // Open PRD modal for editing
+        this.viewFullPRD();
+        
+        // Make content editable
+        const modalContent = document.getElementById('prdModalContent');
+        if (modalContent) {
+            modalContent.contentEditable = true;
+            modalContent.style.border = '2px solid #10b981';
+            modalContent.style.padding = '20px';
+            modalContent.focus();
+            
+            this.addMessageToChat('PRD is now in edit mode. Click anywhere in the document to edit. Changes are saved automatically.', 'assistant');
+            
+            // Save changes on blur
+            modalContent.addEventListener('blur', () => {
+                this.prdDocument.content = modalContent.innerText;
+                modalContent.style.border = 'none';
+                this.updatePRDPreview(this.prdDocument);
+            });
+        }
+    }
+
     async sharePRD() {
-        if (!this.prdDocument) return;
+        if (!this.prdDocument) {
+            this.addMessageToChat('No PRD available to share. Please generate a PRD first.', 'assistant');
+            return;
+        }
         
         try {
-            const response = await fetch(`/api/prd/share/${this.currentProject.id}`, {
-                method: 'POST'
-            });
+            // Create a shareable link (for demo, we'll copy the PRD content)
+            const shareData = {
+                title: this.prdDocument.title,
+                content: this.prdDocument.content,
+                projectId: this.currentProject.id,
+                sharedAt: new Date().toISOString()
+            };
             
-            const result = await response.json();
+            const shareText = `${shareData.title}\n\n${shareData.content}\n\nShared from Coder1 PRD Generator`;
             
-            if (result.success) {
-                navigator.clipboard.writeText(result.shareUrl);
-                alert('Share link copied to clipboard!');
+            // Try to use the Web Share API if available
+            if (navigator.share) {
+                await navigator.share({
+                    title: shareData.title,
+                    text: shareText
+                });
+                this.addMessageToChat('PRD shared successfully!', 'assistant');
+            } else {
+                // Fallback to clipboard
+                await navigator.clipboard.writeText(shareText);
+                this.addMessageToChat('PRD copied to clipboard! You can now paste it anywhere to share.', 'assistant');
             }
         } catch (error) {
             console.error('Share failed:', error);
+            this.addMessageToChat('Unable to share. Please try copying the PRD manually.', 'assistant');
         }
     }
 
@@ -1565,15 +1708,19 @@ Please analyze this PRD and help me build this project step by step.`;
                 a.click();
                 window.URL.revokeObjectURL(url);
                 
-                // Show success message with IDE option
+                // Store comprehensive project data for IDE transfer
+                this.prepareProjectForIDE();
+                
+                // Show transfer message
                 this.addMessageToChat(
-                    '🎉 Project exported successfully! Your complete project documentation is downloaded. ' +
-                    'Would you like to continue working in the Coder1 IDE? Click "Enter Coder1 IDE" in the header to transfer your project.',
+                    '🎉 Project exported successfully! Redirecting you to the Coder1 IDE with your complete PRD ready for Claude Code...',
                     'assistant'
                 );
                 
-                // Store project data for IDE transfer
-                this.prepareProjectForIDE();
+                // Auto-redirect to IDE after short delay to show message
+                setTimeout(() => {
+                    window.location.href = '/ide?project=transfer';
+                }, 2000);
                 
             }
         } catch (error) {
@@ -1621,6 +1768,89 @@ Please analyze this PRD and help me build this project step by step.`;
             'Just tell me what you want to build and I\'ll guide you through the process!',
             'assistant'
         );
+    }
+    
+    openWireframeFullView(index) {
+        if (!window.currentWireframes || !window.currentWireframes[index]) {
+            console.error('Wireframe not found');
+            return;
+        }
+        
+        const wireframe = window.currentWireframes[index];
+        
+        // Create a new window with the wireframe content
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+            // Write the basic HTML structure
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${wireframe.name} - Wireframe</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            background: #0a0a0a;
+                            color: #fff;
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        }
+                        .wireframe-container {
+                            max-width: 1200px;
+                            margin: 0 auto;
+                        }
+                        h1 {
+                            color: #8b5cf6;
+                            margin-bottom: 20px;
+                        }
+                        .close-button {
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            background: #8b5cf6;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 16px;
+                        }
+                        .close-button:hover {
+                            background: #10b981;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <button class="close-button" onclick="window.close()">Close</button>
+                    <div class="wireframe-container">
+                        <h1>${wireframe.name}</h1>
+                        <div id="wireframe-content"></div>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            // Use innerHTML to properly render the HTML content
+            const contentDiv = newWindow.document.getElementById('wireframe-content');
+            if (contentDiv) {
+                // Check if the content is already HTML or needs to be unescaped
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = wireframe.htmlContent;
+                
+                // If the content appears to be escaped, use the text content
+                if (tempDiv.textContent.includes('<div') && !tempDiv.querySelector('div')) {
+                    contentDiv.innerHTML = tempDiv.textContent;
+                } else {
+                    contentDiv.innerHTML = wireframe.htmlContent;
+                }
+            }
+            
+            newWindow.document.close();
+        } else {
+            alert('Please allow pop-ups to view the wireframe in full screen.');
+        }
     }
 
     toggleTheme() {
@@ -1837,14 +2067,14 @@ Please analyze this PRD and help me build this project step by step.`;
     }
 
     switchVersionTab(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        // Update tab buttons (only within version modal)
+        document.querySelectorAll('#versionModal .tab-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.querySelector(`#versionModal [data-tab="${tabName}"]`).classList.add('active');
 
-        // Update tab panels
-        document.querySelectorAll('.tab-panel').forEach(panel => {
+        // Update tab panels (only within version modal)
+        document.querySelectorAll('#versionModal .tab-panel').forEach(panel => {
             panel.classList.remove('active');
         });
         document.getElementById(`${tabName}-panel`).classList.add('active');
@@ -1861,6 +2091,20 @@ Please analyze this PRD and help me build this project step by step.`;
                 this.loadIterationPlans();
                 break;
         }
+    }
+    
+    switchConsultationTab(tabName) {
+        // Update tab buttons (only within consultation modal)
+        document.querySelectorAll('#consultationModal .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`#consultationModal [data-tab="${tabName}"]`).classList.add('active');
+
+        // Update tab panels (only within consultation modal)
+        document.querySelectorAll('#consultationModal .tab-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        document.getElementById(`${tabName}`).classList.add('active');
     }
 
     async loadVersionHistory() {
