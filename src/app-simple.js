@@ -170,6 +170,164 @@ function generatePRDContent(originalRequest, questions, answers) {
   return content;
 }
 
+// API endpoint for available personas
+app.get('/api/personas/available', (req, res) => {
+  res.json({
+    success: true,
+    personas: [
+      {
+        id: 'ux-designer',
+        name: 'UX Designer',
+        color: '#8B5CF6',
+        iconClass: 'fas fa-paint-brush',
+        expertise: ['User Experience', 'Visual Design', 'Prototyping', 'User Research']
+      },
+      {
+        id: 'backend-engineer',
+        name: 'Backend Engineer',
+        color: '#3B82F6',
+        iconClass: 'fas fa-server',
+        expertise: ['API Design', 'Database Architecture', 'Scalability', 'Security']
+      },
+      {
+        id: 'frontend-developer',
+        name: 'Frontend Developer',
+        color: '#10B981',
+        iconClass: 'fas fa-code',
+        expertise: ['React/Vue/Angular', 'Responsive Design', 'Performance', 'Accessibility']
+      },
+      {
+        id: 'product-manager',
+        name: 'Product Manager',
+        color: '#F59E0B',
+        iconClass: 'fas fa-chart-line',
+        expertise: ['Market Analysis', 'User Stories', 'Roadmapping', 'Metrics']
+      },
+      {
+        id: 'security-expert',
+        name: 'Security Expert',
+        color: '#EF4444',
+        iconClass: 'fas fa-shield-alt',
+        expertise: ['Threat Modeling', 'Compliance', 'Encryption', 'Best Practices']
+      },
+      {
+        id: 'devops-engineer',
+        name: 'DevOps Engineer',
+        color: '#6366F1',
+        iconClass: 'fas fa-cogs',
+        expertise: ['CI/CD', 'Infrastructure', 'Monitoring', 'Deployment']
+      }
+    ]
+  });
+});
+
+// API endpoint for persona consultation
+app.post('/api/consultation/analyze', (req, res) => {
+  const { projectId, personas, prdDocument } = req.body;
+  
+  // Simulate consultation analysis
+  const consultationResults = {
+    success: true,
+    analysis: {
+      consensusLevel: 85,
+      successProbability: 78,
+      criticalFindings: 3,
+      agreements: [
+        'Focus on user-centric design approach',
+        'Implement robust security measures from the start',
+        'Use agile development methodology'
+      ],
+      conflicts: [
+        'Timeline expectations vs. feature complexity',
+        'Performance requirements vs. budget constraints'
+      ],
+      recommendations: {
+        immediate: [
+          'Define MVP scope clearly',
+          'Set up development environment',
+          'Create user personas and journey maps'
+        ],
+        shortTerm: [
+          'Develop proof of concept',
+          'Conduct user testing',
+          'Establish monitoring systems'
+        ],
+        longTerm: [
+          'Plan for scalability',
+          'Consider international expansion',
+          'Build team expertise'
+        ]
+      }
+    }
+  };
+  
+  res.json(consultationResults);
+});
+
+// API endpoint for wireframe generation
+app.post('/api/wireframes/generate', (req, res) => {
+  const { projectId, prdDocument } = req.body;
+  
+  // Simulate wireframe generation
+  res.json({
+    success: true,
+    wireframes: {
+      wireframes: [
+        {
+          name: 'Homepage',
+          htmlFile: '/wireframes/homepage.html',
+          htmlContent: '<div style="padding: 20px; border: 1px solid #ddd;"><h1>Homepage Wireframe</h1><p>Navigation, Hero Section, Features, Footer</p></div>'
+        },
+        {
+          name: 'Dashboard',
+          htmlFile: '/wireframes/dashboard.html',
+          htmlContent: '<div style="padding: 20px; border: 1px solid #ddd;"><h1>Dashboard Wireframe</h1><p>Sidebar, Main Content Area, Stats Cards</p></div>'
+        },
+        {
+          name: 'User Profile',
+          htmlFile: '/wireframes/profile.html',
+          htmlContent: '<div style="padding: 20px; border: 1px solid #ddd;"><h1>User Profile Wireframe</h1><p>Avatar, User Info, Settings, Activity</p></div>'
+        }
+      ],
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        totalPages: 3
+      }
+    }
+  });
+});
+
+// API endpoint for version management
+app.get('/api/versions/:projectId', (req, res) => {
+  const { projectId } = req.params;
+  
+  res.json({
+    success: true,
+    versions: [
+      {
+        id: 'v1.0',
+        name: 'Initial Version',
+        createdAt: new Date().toISOString(),
+        description: 'First complete PRD with all requirements'
+      }
+    ]
+  });
+});
+
+// API endpoint for project export
+app.post('/api/project/export', (req, res) => {
+  const { projectId, format } = req.body;
+  
+  res.json({
+    success: true,
+    exportData: {
+      format: format || 'json',
+      downloadUrl: `/downloads/project-${projectId}.${format || 'json'}`,
+      expiresAt: new Date(Date.now() + 3600000).toISOString()
+    }
+  });
+});
+
 // Import and use infinite loop routes (using simple version to avoid dependency issues)
 try {
   // Try simple version first (no external dependencies)

@@ -373,19 +373,31 @@ function showNotification(message, type = 'info') {
 
 // Override the parallel agents button click
 function enhanceParallelAgentsButton() {
+    let attempts = 0;
+    const maxAttempts = 100; // Try for 20 seconds
+    
     const checkInterval = setInterval(() => {
+        attempts++;
         const parallelBtn = document.querySelector('button[title="Parallel Agents"]');
         
         if (parallelBtn) {
             clearInterval(checkInterval);
             
-            // Override click handler
-            parallelBtn.onclick = (e) => {
+            // Remove any existing click handlers
+            const newBtn = parallelBtn.cloneNode(true);
+            parallelBtn.parentNode.replaceChild(newBtn, parallelBtn);
+            
+            // Add our click handler
+            newBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 showParallelAgentsModal();
-            };
+            });
             
             console.log('✅ Parallel Agents button enhanced with modal');
+        } else if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            console.warn('⚠️ Could not find Parallel Agents button after 20 seconds');
         }
     }, 200);
 }
@@ -761,6 +773,33 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Initialize
-enhanceParallelAgentsButton();
-console.log('✅ Parallel Agents Modal Enhancement Ready');
+// Wait for both React app and api-injection.js to be ready
+function initializeWhenReady() {
+    let checkCount = 0;
+    const maxChecks = 100; // 20 seconds
+    
+    const initInterval = setInterval(() => {
+        checkCount++;
+        
+        // Check if the API injection functions exist (from api-injection.js)
+        const apiReady = typeof window.startParallelAgents === 'function';
+        const hasButtons = document.querySelector('button[title="Parallel Agents"]');
+        
+        console.log(`🔍 Check ${checkCount}: API Ready: ${apiReady}, Button exists: ${!!hasButtons}`);
+        
+        if (apiReady && hasButtons) {
+            clearInterval(initInterval);
+            console.log('✅ Both API and buttons ready, enhancing Parallel Agents button...');
+            enhanceParallelAgentsButton();
+        } else if (checkCount >= maxChecks) {
+            clearInterval(initInterval);
+            console.warn('⚠️ Timeout waiting for dependencies');
+            // Try to enhance anyway
+            enhanceParallelAgentsButton();
+        }
+    }, 200);
+}
+
+// Start initialization process
+console.log('🚀 Parallel Agents Modal Enhancement starting...');
+initializeWhenReady();
