@@ -1,1 +1,337 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="./logo192.png"/><link rel="manifest" href="./manifest.json"/><title>React App</title><script defer="defer" src="./static/js/main.50776b76.js"></script><link href="./static/css/main.cba8dcc6.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="./static/api-config.js?v=6"></script><script defer="defer" src="./static/js/main.a1cfdcd5.js?v=11"></script><link href="./static/css/main.5c128812.css?v=11" rel="stylesheet"><link href="./static/terminal-voice.css?v=33" rel="stylesheet">
+<link href="./static/fix-terminal-header.css?v=2" rel="stylesheet">
+</head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><!-- Temporarily disabling scripts to find the issue -->
+<script src="./static/api-injection.js?v=7"></script>
+<script src="./static/parallel-agents-modal.js?v=2"></script>
+<script src="./static/parallel-agents-fix.js?v=1"></script>
+<!-- <script src="./static/simple-stop-button.js?v=1"></script> -->
+<!-- <script src="./static/global-logo-final.js?v=2"></script> -->
+<!-- <script src="./static/hide-buttons-special-pages.js"></script> -->
+<script src="./static/cleanup-header-buttons.js"></script>
+<!-- <script src="./static/special-views-helper.js?v=1"></script> -->
+<script>
+// Minimal SuperClaude and gear icon hiding
+(function() {
+    function hideSuperclaude() {
+        const elements = document.querySelectorAll('*');
+        elements.forEach(el => {
+            const text = el.textContent ? el.textContent.trim() : '';
+            if ((text === 'SuperClaude Terminal' || text.includes('SuperClaude Terminal')) && el.children.length === 0) {
+                el.style.display = 'none';
+            }
+        });
+    }
+    
+    function hideGearIcons() {
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            if (el.classList.contains('settings-section') || 
+                el.classList.contains('settings-btn') || 
+                el.closest('.settings-section')) {
+                return;
+            }
+            
+            const text = el.textContent?.trim() || '';
+            const innerHTML = el.innerHTML || '';
+            
+            if ((text === 'IDE Settings' || text.includes('IDE Settings')) &&
+                !el.closest('.settings-section')) {
+                const rect = el.getBoundingClientRect();
+                if (rect.top > window.innerHeight * 0.7) {
+                    el.remove();
+                }
+            }
+        });
+    }
+    
+    // Run once on load
+    setTimeout(() => {
+        hideSuperclaude();
+        hideGearIcons();
+    }, 1000);
+    
+    // Run periodically but less frequently
+    setInterval(() => {
+        hideSuperclaude();
+        hideGearIcons();
+    }, 30000); // Every 30 seconds instead of 10
+})();
+</script>
+
+<!-- Temporarily disabled the rest of inline script
+
+function hideSuperclaude() {
+    // More aggressive approach to hide SuperClaude elements
+    const elements = document.querySelectorAll('*');
+    elements.forEach(el => {
+        const text = el.textContent ? el.textContent.trim() : '';
+        
+        // Hide SuperClaude Terminal text and icons
+        if ((text === 'SuperClaude Terminal' || text.includes('SuperClaude Terminal')) && el.children.length === 0) {
+            console.log('🗑️ HIDING SuperClaude Terminal text:', el.tagName, text);
+            el.style.display = 'none !important';
+            el.style.visibility = 'hidden !important';
+            el.style.opacity = '0 !important';
+            el.style.fontSize = '0 !important';
+            el.style.height = '0 !important';
+            el.style.width = '0 !important';
+            el.style.margin = '0 !important';
+            el.style.padding = '0 !important';
+        }
+        
+        // Hide persona text
+        if (text === 'Front-end expert' && el.children.length === 0) {
+            console.log('🗑️ HIDING persona text:', el.tagName);
+            el.style.display = 'none !important';
+        }
+        
+        // Hide SuperClaude icon elements
+        if (el.tagName === 'SVG' || el.tagName === 'I') {
+            const parent = el.parentElement;
+            if (parent && (parent.textContent.includes('SuperClaude') || parent.title?.includes('SuperClaude'))) {
+                console.log('🗑️ HIDING SuperClaude icon:', el.tagName);
+                el.style.display = 'none !important';
+            }
+        }
+        
+        // Hide terminal icon if it's part of SuperClaude
+        if (el.classList && (el.classList.contains('terminal-icon') || el.classList.contains('fa-terminal'))) {
+            const parent = el.closest('[title*="SuperClaude"], [aria-label*="SuperClaude"]');
+            if (parent) {
+                console.log('🗑️ HIDING terminal icon in SuperClaude context');
+                el.style.display = 'none !important';
+            }
+        }
+    });
+}
+
+// Removed conflicting microphone function - handled by terminal-voice.js
+
+// Function to remove blue X but keep SuperClaude
+function removeBlueXButKeepSuperclaude() {
+    console.log('🔍 Starting comprehensive blue X removal...');
+    
+    // Find all elements
+    const allElements = document.querySelectorAll('*');
+    let removedCount = 0;
+    
+    allElements.forEach(el => {
+        try {
+            const style = el.getAttribute('style') || '';
+            const computedStyle = window.getComputedStyle(el);
+            const text = (el.textContent || '').trim();
+            const innerHTML = el.innerHTML || '';
+            
+            // Check if element is an X-like character
+            const isXChar = text === '×' || text === 'X' || text === 'x' || text === '✕' || text === '✖' || text === '⨯';
+            
+            // Check if it has blue styling (expanded detection)
+            const hasBlueStyle = 
+                style.includes('blue') ||
+                style.includes('#0000ff') ||
+                style.includes('#00f') ||
+                style.includes('rgb(0') && style.includes('255)') ||
+                style.includes('rgba(0') && style.includes('255') ||
+                computedStyle.color.includes('blue') ||
+                computedStyle.color === 'rgb(0, 0, 255)' ||
+                computedStyle.color.includes('rgba(0') && computedStyle.color.includes('255');
+            
+            // Check if it's positioned like an overlay
+            const isOverlay = 
+                computedStyle.position === 'absolute' || 
+                computedStyle.position === 'fixed' ||
+                parseInt(computedStyle.zIndex) > 100;
+            
+            // Check if it's NOT part of SuperClaude
+            const isNotSuperclaude = 
+                !el.closest('.superclaude-btn') &&
+                !el.closest('[class*="superclaude"]') &&
+                !el.closest('[title*="SuperClaude"]');
+            
+            // Remove if it matches our criteria
+            if (isXChar && hasBlueStyle && isNotSuperclaude) {
+                console.log('🎯 Found blue X element:', {
+                    text,
+                    style: style.substring(0, 100),
+                    computedColor: computedStyle.color,
+                    position: computedStyle.position,
+                    zIndex: computedStyle.zIndex,
+                    parent: el.parentElement?.tagName
+                });
+                
+                el.style.display = 'none !important';
+                el.style.visibility = 'hidden !important';
+                el.style.opacity = '0 !important';
+                el.style.width = '0 !important';
+                el.style.height = '0 !important';
+                el.style.pointerEvents = 'none !important';
+                
+                // Also try to remove it from DOM if it's safe
+                if (el.parentElement && el.parentElement.children.length === 1) {
+                    el.parentElement.style.display = 'none !important';
+                }
+                
+                removedCount++;
+            }
+            
+            // Also check for overlay divs that might contain blue X
+            if (isOverlay && innerHTML.includes('×') && hasBlueStyle && isNotSuperclaude) {
+                console.log('🎯 Found blue X overlay container:', el);
+                el.style.display = 'none !important';
+                removedCount++;
+            }
+        } catch (error) {
+            // Ignore errors from cross-origin iframes or other restricted elements
+        }
+    });
+    
+    // Specifically target any overlays near navigation/preview areas
+    const possibleOverlays = document.querySelectorAll('[style*="position: absolute"], [style*="position: fixed"]');
+    possibleOverlays.forEach(overlay => {
+        const text = (overlay.textContent || '').trim();
+        const style = overlay.getAttribute('style') || '';
+        
+        if ((text === '×' || text === 'X') && 
+            (style.includes('blue') || style.includes('translucent'))) {
+            console.log('🎯 Found positioned overlay with blue X:', overlay);
+            overlay.style.display = 'none !important';
+            removedCount++;
+        }
+    });
+    
+    console.log(`✅ Blue X removal complete. Removed ${removedCount} elements.`);
+}
+
+// Run immediately
+hideSuperclaude();
+removeBlueXButKeepSuperclaude();
+hideGearIcons();
+
+// Function to hide gear icons selectively - NOT our custom Settings section
+function hideGearIcons() {
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(el => {
+        // FIRST: Skip our custom Settings section entirely
+        if (el.classList.contains('settings-section') || 
+            el.classList.contains('settings-btn') || 
+            el.classList.contains('settings-label') || 
+            el.closest('.settings-section')) {
+            return; // Don't touch our custom settings elements
+        }
+        
+        const text = el.textContent?.trim() || '';
+        const title = el.getAttribute('title') || '';
+        const ariaLabel = el.getAttribute('aria-label') || '';
+        const classes = el.className || '';
+        const innerHTML = el.innerHTML || '';
+        
+        // Check for gear-related content but ONLY in terminal area, NOT our settings
+        const isGearIcon = (innerHTML.includes('fa-cog') ||
+                          innerHTML.includes('fa-gear') ||
+                          innerHTML.includes('fa-settings') ||
+                          text === '⚙' ||
+                          text === '🔧') &&
+                          // Additional safety: make sure it's not our settings
+                          !classes.includes('settings-') &&
+                          !innerHTML.includes('Voice Settings') &&
+                          !innerHTML.includes('IDE Settings') &&
+                          !innerHTML.includes('Documentation');
+        
+        // SPECIFIC: Target "IDE Settings" text and icons next to Documentation
+        const isIDESettingsElement = (text.includes('IDE Settings') ||
+                                    text.includes('Settings') ||
+                                    innerHTML.includes('IDE Settings') ||
+                                    (innerHTML.includes('⚙') && text.includes('Settings'))) &&
+                                    !el.closest('.settings-section');
+        
+        if (isGearIcon || isIDESettingsElement) {
+            const rect = el.getBoundingClientRect();
+            // Only hide if it's in the middle/terminal area, NOT bottom-left where our settings are
+            const isInTerminalMiddle = rect.top > window.innerHeight * 0.4 && 
+                                     rect.top < window.innerHeight * 0.9 &&
+                                     rect.left > window.innerWidth * 0.3;
+            
+            // Special case: IDE Settings in bottom area near Documentation
+            const isIDESettingsInBottomArea = isIDESettingsElement && 
+                                             rect.top > window.innerHeight * 0.8 &&
+                                             rect.left > window.innerWidth * 0.1;
+            
+            if (isInTerminalMiddle || isIDESettingsInBottomArea) {
+                console.log('🚫 Hiding gear/IDE settings icon:', el, text);
+                el.style.display = 'none !important';
+                el.style.visibility = 'hidden !important';
+                el.style.opacity = '0 !important';
+                el.style.width = '0 !important';
+                el.style.height = '0 !important';
+                el.remove(); // Actually remove from DOM
+            }
+        }
+    });
+    
+    // Additional specific targeting for IDE Settings gear icon
+    hideIDESettingsSpecifically();
+}
+
+// Specific function to target the IDE Settings gear icon
+function hideIDESettingsSpecifically() {
+    // Look for elements that contain both gear icon and "IDE Settings" text
+    const possibleIDESettings = document.querySelectorAll('*');
+    possibleIDESettings.forEach(el => {
+        // Skip our custom settings
+        if (el.closest('.settings-section')) return;
+        
+        const text = el.textContent?.trim() || '';
+        const innerHTML = el.innerHTML || '';
+        
+        // Target elements with "IDE Settings" text specifically
+        if ((text === 'IDE Settings' || text.includes('IDE Settings')) ||
+            (innerHTML.includes('⚙') && innerHTML.includes('Settings'))) {
+            
+            const rect = el.getBoundingClientRect();
+            
+            // If it's in the bottom area (where settings typically are)
+            if (rect.top > window.innerHeight * 0.7) {
+                console.log('🎯 SPECIFICALLY removing IDE Settings element:', el, text);
+                el.remove();
+            }
+        }
+    });
+}
+
+// Run periodically (reduced frequency to avoid console spam)
+setInterval(() => {
+    hideSuperclaude();
+    removeBlueXButKeepSuperclaude();
+    hideGearIcons();
+}, 10000); // Changed from 1000ms to 10000ms (10 seconds)
+
+// Run on DOM changes
+const observer = new MutationObserver(() => {
+    hideSuperclaude();
+    removeBlueXButKeepSuperclaude();
+});
+
+if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+End of disabled script -->
+<!-- Re-enabling essential scripts only -->
+<script src="./static/terminal-voice.js?v=28"></script>
+<script src="./static/remove-blue-x-aggressive.js?v=1"></script>
+<!-- <script src="./static/special-views-buttons.js?v=7"></script> Disabled - keep only original small buttons -->
+<script src="./static/coder1-special-views.js?v=6"></script>
+<script src="./static/restore-coder1-logo.js?v=12"></script>
+<!-- <script src="./static/hide-terminal-title.js?v=2"></script> Disabled to fix terminal header -->
+<!-- <script src="./static/clean-terminal-header.js?v=1"></script> -->
+<script src="./static/remove-blue-text.js?v=1"></script>
+<script src="./static/hide-blue-coder1-text.js?v=1"></script>
+<script src="./static/remove-coder1-text-aggressively.js?v=1"></script>
+<script src="./static/global-logo-final.js?v=1"></script>
+<script src="./static/simple-text-removal.js?v=1"></script>
+<!-- <script src="./static/fix-all-ui-issues.js?v=1"></script> Disabled - may be causing issues -->
+<!-- <script src="./static/prd-cleanup.js"></script> -->
+<!-- <script src="./static/prd-project-transfer.js"></script> -->
+<!-- <script src="./static/prd-final-working.js"></script> Removed test button -->
+<!-- <script src="./static/context-priming-integration.js?v=1"></script> Disabled - causing layout issues -->
+<!-- <script src="./static/check-terminal-header.js?v=1"></script> Diagnostic complete --></body></html>

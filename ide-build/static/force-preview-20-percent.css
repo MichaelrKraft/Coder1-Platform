@@ -1,0 +1,106 @@
+/* FORCE Preview Panel to 20% Width - Ultimate Override */
+
+/* Find the third panel (preview) and force it to 20% */
+.allotment-module_splitViewContainer__rQnVa > *:nth-child(3),
+.allotment-module_splitViewView__MGZ6O:nth-child(3),
+.Pane:nth-child(3) {
+    width: 20% !important;
+    max-width: 20% !important;
+    min-width: 20% !important;
+    flex: 0 0 20% !important;
+    flex-basis: 20% !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Make the second panel (editor/terminal) take remaining space */
+.allotment-module_splitViewContainer__rQnVa > *:nth-child(2),
+.allotment-module_splitViewView__MGZ6O:nth-child(2),
+.Pane:nth-child(2) {
+    flex: 1 1 auto !important;
+    flex-grow: 1 !important;
+    min-width: 55% !important;
+    width: auto !important;
+}
+
+/* Keep first panel (file explorer) at reasonable size */
+.allotment-module_splitViewContainer__rQnVa > *:nth-child(1),
+.allotment-module_splitViewView__MGZ6O:nth-child(1),
+.Pane:nth-child(1) {
+    width: 25% !important;
+    max-width: 25% !important;
+    flex: 0 0 25% !important;
+}
+
+/* Target any container with an iframe (likely preview) */
+*:has(> iframe) {
+    width: 20% !important;
+    max-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Override inline styles on preview containers */
+[style*="width"]:has(iframe),
+[style*="flex"]:has(iframe),
+div:has(> iframe) {
+    width: 20% !important;
+    max-width: 20% !important;
+    min-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Target by class patterns */
+[class*="preview"]:not(button):not(a),
+[class*="Preview"]:not(button):not(a),
+[class*="output"]:not(button):not(a),
+[class*="Output"]:not(button):not(a),
+[class*="right-panel"],
+[class*="right-pane"] {
+    width: 20% !important;
+    max-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Ensure the split view container uses flex */
+.allotment-module_splitViewContainer__rQnVa {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+}
+
+/* Override any transform-based positioning */
+.allotment-module_splitViewView__MGZ6O[style*="transform"] {
+    position: relative !important;
+    transform: none !important;
+}
+
+/* Target the last child in any flex container that might be panels */
+.allotment-module_splitViewContainer__rQnVa > :last-child,
+[style*="display: flex"] > :last-child:has(iframe),
+[style*="display:flex"] > :last-child:has(iframe) {
+    width: 20% !important;
+    max-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Nuclear option - any div at a certain position */
+@media (min-width: 768px) {
+    body > #root > div > div > div > div:last-child {
+        width: 20% !important;
+        max-width: 20% !important;
+    }
+}
+
+/* Target sash/resizer positions */
+.sash-module_sash__K-9lB.sash-module_vertical__pB-rs:nth-child(2) {
+    left: 80% !important;
+}
+
+/* Override percentage-based widths */
+[style*="width: 50%"]:has(iframe),
+[style*="width:50%"]:has(iframe),
+[style*="width: 33"]:has(iframe),
+[style*="width:33"]:has(iframe) {
+    width: 20% !important;
+    max-width: 20% !important;
+}

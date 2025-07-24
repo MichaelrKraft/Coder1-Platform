@@ -1,0 +1,103 @@
+/* Special View Layout Fix - Fixes layout issues with new build */
+/* Version 2 - Enhanced to handle CSS issues from new build */
+
+/* Ensure proper base layout */
+#root {
+    width: 100vw !important;
+    height: 100vh !important;
+    display: flex !important;
+    overflow: hidden !important;
+}
+
+.App {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.main-container {
+    display: flex !important;
+    flex: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Fix sidebar */
+.sidebar {
+    width: 60px !important;
+    min-width: 60px !important;
+    height: 100% !important;
+    background: #1a1b26 !important;
+    border-right: 1px solid #414868 !important;
+}
+
+/* Fix content area */
+.content-area {
+    flex: 1 !important;
+    display: flex !important;
+    overflow: hidden !important;
+}
+
+.left-panel {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px !important;
+    overflow: hidden !important;
+}
+
+.content-view {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Terminal fixes */
+.terminal {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #1a1b26 !important;
+}
+
+.terminal-header {
+    flex-shrink: 0 !important;
+    min-height: 40px !important;
+}
+
+.terminal-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+/* React Bits fix */
+.react-bits-container {
+    height: 40px !important;
+    margin-bottom: 16px !important;
+    flex-shrink: 0 !important;
+}
+
+/* Explorer panel fixes */
+[class*="explorer"], [class*="Explorer"] {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+/* Fix any broken buttons */
+button {
+    cursor: pointer !important;
+}
+
+/* Special view overlays should be on top */
+.special-view-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+}

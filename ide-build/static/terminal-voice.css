@@ -1,0 +1,785 @@
+/**
+ * Terminal Voice Integration Styles
+ * Styling for voice input/output functionality in the terminal
+ */
+
+/* Voice Button Styles */
+.mic-prompt, .voice-toggle-btn {
+    background: rgba(255, 140, 0, 0.2) !important;
+    border: 2px solid #ff8c00 !important;
+    cursor: pointer;
+    padding: 8px 10px !important;
+    color: #ff8c00 !important;
+    font-size: 20px !important;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px !important;
+    width: 36px !important;
+    height: 36px !important;
+    position: absolute !important;
+    left: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 1000 !important;
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.5) !important;
+}
+
+/* Specific styles for terminal voice button */
+.terminal-voice-btn {
+    background: rgba(255, 140, 0, 0.1) !important;
+    border: 2px solid #ff8c00 !important;
+    color: #ff8c00 !important;
+}
+
+/* Ensure microphone icon is visible */
+.mic-prompt i, .voice-toggle-btn i, .terminal-voice-btn i {
+    font-size: 18px !important;
+    color: inherit !important;
+    display: block !important;
+    line-height: 1 !important;
+}
+
+.mic-prompt:hover, .voice-toggle-btn:hover {
+    background: rgba(255, 140, 0, 0.2) !important;
+    color: #ffa500 !important;
+    transform: translateY(-50%) scale(1.1) !important;
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.7) !important;
+}
+
+.mic-prompt:active, .voice-toggle-btn:active {
+    transform: translateY(-50%) scale(0.95) !important;
+}
+
+/* Recording State */
+.mic-prompt.recording, .voice-toggle-btn.recording {
+    background: rgba(247, 118, 142, 0.2) !important;
+    border-color: #f7768e !important;
+    color: #f7768e !important;
+    animation: voicePulse 1s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(247, 118, 142, 0.7) !important;
+}
+
+.mic-prompt.recording i, .voice-toggle-btn.recording i {
+    color: #f7768e !important;
+    animation: voiceGlow 1s ease-in-out infinite;
+}
+
+/* Processing State */
+.mic-prompt.processing, .voice-toggle-btn.processing {
+    background: rgba(122, 162, 247, 0.2) !important;
+    border-color: #7aa2f7 !important;
+    color: #7aa2f7 !important;
+    box-shadow: 0 0 15px rgba(122, 162, 247, 0.7) !important;
+}
+
+.mic-prompt.processing i, .voice-toggle-btn.processing i {
+    color: #7aa2f7 !important;
+    animation: voiceSpin 1s linear infinite;
+}
+
+/* Voice Animations */
+@keyframes voicePulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: translateY(-50%) scale(1);
+    }
+    50% { 
+        opacity: 0.7; 
+        transform: translateY(-50%) scale(1.1);
+    }
+}
+
+@keyframes voiceGlow {
+    0%, 100% { 
+        text-shadow: 0 0 5px rgba(247, 118, 142, 0.5);
+    }
+    50% { 
+        text-shadow: 0 0 15px rgba(247, 118, 142, 0.8);
+    }
+}
+
+@keyframes voiceSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+/* Voice Tooltip */
+.voice-tooltip {
+    position: fixed;
+    background: #24283b;
+    border: 1px solid #414868;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #a9b1d6;
+    white-space: nowrap;
+    z-index: 10001;
+    animation: fadeIn 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.voice-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #414868;
+}
+
+/* Voice Transcript Display */
+.voice-transcript {
+    position: fixed;
+    background: #1a1b26;
+    border: 1px solid #414868;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #c0caf5;
+    white-space: nowrap;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transcript-text {
+    color: #c0caf5;
+    font-style: italic;
+    margin-right: 8px;
+}
+
+.transcript-confidence {
+    color: #565f89;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* Voice Settings Panel - positioned above Settings section when visible */
+.voice-settings {
+    position: fixed;
+    bottom: 180px; /* Position above Settings section */
+    left: 20px;
+    background: #1a1b26;
+    border: 1px solid #414868;
+    border-radius: 8px;
+    padding: 0;
+    font-size: 13px;
+    z-index: 10000;
+    min-width: 240px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Settings Section - Main container */
+.settings-section {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 9999;
+    min-width: 120px;
+}
+
+/* Settings Label/Header */
+.settings-label {
+    color: #a9b1d6;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding: 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Settings Buttons Container */
+.settings-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Settings Buttons - All buttons in Settings section */
+.settings-btn {
+    background: #1a1b26;
+    border: 1px solid #414868;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: #c0caf5;
+    cursor: pointer;
+    width: 120px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    margin: 0;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.settings-btn span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.settings-btn:hover {
+    background: #24283b;
+    border-color: #7aa2f7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Specific button styling - All buttons now use consistent blue theme */
+.voice-settings-btn,
+.ide-settings-btn,
+.documentation-btn {
+    border-color: #7aa2f7;
+    background: rgba(122, 162, 247, 0.1);
+}
+
+/* Context Priming Button - subtle green accent */
+.context-priming-btn {
+    background: #1a1b26 !important;
+    border-color: #10b981 !important;
+}
+
+.context-priming-btn:hover {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+.voice-settings-btn:hover,
+.ide-settings-btn:hover,
+.documentation-btn:hover {
+    border-color: #bb9af7;
+    background: rgba(122, 162, 247, 0.2);
+    box-shadow: 0 4px 12px rgba(122, 162, 247, 0.3);
+}
+
+/* Remove old toggle button styles - replaced by .settings-btn */
+
+.voice-settings-header {
+    background: #24283b;
+    padding: 12px 16px;
+    border-bottom: 1px solid #414868;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.voice-settings-header span {
+    color: #c0caf5;
+    font-weight: 600;
+}
+
+.settings-toggle {
+    background: none;
+    border: none;
+    color: #565f89;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.settings-toggle:hover {
+    color: #7aa2f7;
+}
+
+.voice-settings-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.voice-settings-content label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #a9b1d6;
+    cursor: pointer;
+    font-size: 13px;
+    transition: color 0.2s;
+}
+
+.voice-settings-content label:hover {
+    color: #c0caf5;
+}
+
+.voice-settings-content input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #7aa2f7;
+    cursor: pointer;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .voice-settings {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: unset;
+    }
+    
+    .voice-transcript {
+        left: 10px !important;
+        right: 10px;
+        max-width: unset;
+        width: calc(100vw - 20px);
+    }
+    
+    .voice-tooltip {
+        left: 50% !important;
+        transform: translateX(-50%);
+        max-width: 250px;
+    }
+    
+    .mic-prompt, .voice-toggle-btn {
+        padding: 4px 6px;
+        font-size: 16px;
+        min-width: 24px;
+        min-height: 24px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .mic-prompt.recording, .voice-toggle-btn.recording {
+        color: #ff0066 !important;
+        background: rgba(255, 0, 102, 0.1);
+        border-radius: 4px;
+    }
+    
+    .voice-tooltip {
+        background: #000;
+        border-color: #fff;
+        color: #fff;
+    }
+    
+    .voice-transcript {
+        background: #000;
+        border-color: #fff;
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .mic-prompt, .voice-toggle-btn,
+    .voice-tooltip, .voice-transcript,
+    .voice-settings {
+        animation: none;
+        transition: none;
+    }
+    
+    .mic-prompt.recording, .voice-toggle-btn.recording {
+        animation: none;
+        opacity: 0.8;
+    }
+    
+    .mic-prompt.processing i, .voice-toggle-btn.processing i {
+        animation: none;
+    }
+}
+
+/* Focus styles for accessibility */
+.mic-prompt:focus, .voice-toggle-btn:focus {
+    outline: 2px solid #7aa2f7;
+    outline-offset: 2px;
+}
+
+.settings-toggle:focus {
+    outline: 2px solid #7aa2f7;
+    outline-offset: 1px;
+}
+
+/* Dark theme compatibility */
+@media (prefers-color-scheme: dark) {
+    .voice-tooltip {
+        background: #1a1b26;
+        border-color: #414868;
+    }
+    
+    .voice-transcript {
+        background: #24283b;
+        border-color: #414868;
+    }
+    
+    .voice-settings {
+        background: #1a1b26;
+        border-color: #414868;
+    }
+}
+
+/* Hide React Bits panel */
+.react-bits-section,
+.react-bits {
+    display: none !important;
+}
+
+/* Hide SuperClaude Terminal title text in header area */
+.header-left span,
+.title-bar span,
+.window-title span,
+[class*="title"] span,
+[class*="header"] span {
+    /* Will be hidden by JavaScript if contains "SuperClaude Terminal" */
+}
+
+/* More specific targeting */
+button[title="SuperClaude Terminal"],
+*[title="SuperClaude Terminal"],
+*[aria-label="SuperClaude Terminal"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Remove the generic SuperClaude hiding rule that was too broad */
+
+/* Hide blue X specifically, but not SuperClaude icons */
+.action-btn:not(.superclaude-btn) > .close-icon,
+.action-btn:not(.superclaude-btn) > [style*="color: blue"],
+.action-btn:not(.superclaude-btn) > [style*="color:#0000ff"],
+.action-btn:not(.superclaude-btn) > [style*="color:#00f"],
+.action-btn:not(.superclaude-btn) > [style*="rgb(0"][style*="255)"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Target any X-like character with blue styling */
+[style*="color: blue"]:not(.superclaude-btn):not([class*="superclaude"]),
+[style*="color:#0000ff"]:not(.superclaude-btn):not([class*="superclaude"]),
+[style*="color:#00f"]:not(.superclaude-btn):not([class*="superclaude"]),
+[style*="rgb(0"][style*="255)"]:not(.superclaude-btn):not([class*="superclaude"]),
+[style*="rgba(0"][style*="255"]:not(.superclaude-btn):not([class*="superclaude"]) {
+    /* Check content via JavaScript */
+}
+
+/* Hide overlay elements with blue X */
+[style*="position: absolute"][style*="blue"],
+[style*="position: fixed"][style*="blue"],
+[style*="position: absolute"][style*="translucent"],
+[style*="position: fixed"][style*="translucent"],
+.overlay[style*="blue"],
+.modal-overlay[style*="blue"],
+.popup-overlay[style*="blue"] {
+    /* Will be checked by JavaScript for X content */
+}
+
+/* Specific targeting for navigation area blue X */
+.nav-item-container [style*="blue"]:empty,
+.header-nav [style*="blue"]:empty,
+.header-center [style*="blue"]:empty,
+[class*="nav"] [style*="blue"]:empty,
+[class*="preview"] + [style*="blue"],
+[class*="preview"] ~ [style*="blue"],
+button[title*="Preview"] + *[style*="blue"],
+button[title*="Preview"] ~ *[style*="blue"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Force hide any element that looks like a blue X overlay */
+body > [style*="position: absolute"][style*="blue"],
+body > [style*="position: fixed"][style*="blue"],
+#root > [style*="position: absolute"][style*="blue"],
+#root > [style*="position: fixed"][style*="blue"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -9999 !important;
+}
+
+/* Blue X handling - removed to prevent white screen */
+
+/* Hide persona text like "Front-end expert" from terminal title */
+.persona-text,
+.expert-text,
+[class*="persona"],
+[class*="expert"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Space out terminal header buttons better */
+.terminal-header,
+.header-controls,
+.terminal-title-bar,
+[class*="header"],
+[class*="title-bar"] {
+    gap: 15px !important;
+}
+
+/* Target the specific button container in terminal header */
+.terminal-header .button-group,
+.header-controls .button-group,
+.terminal-controls,
+[class*="controls"] {
+    gap: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Individual button spacing in terminal header */
+.terminal-header button,
+.header-controls button,
+.terminal-title-bar button,
+[class*="header"] button,
+[class*="title"] button {
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+}
+
+/* First button shouldn't have left margin */
+.terminal-header button:first-child,
+.header-controls button:first-child,
+.terminal-title-bar button:first-child,
+[class*="header"] button:first-child,
+[class*="title"] button:first-child {
+    margin-left: 0 !important;
+}
+
+/* Last button shouldn't have right margin */
+.terminal-header button:last-child,
+.header-controls button:last-child,
+.terminal-title-bar button:last-child,
+[class*="header"] button:last-child,
+[class*="title"] button:last-child {
+    margin-right: 0 !important;
+}
+
+/* Orange glow border for navigation buttons on hover - ULTRA SPECIFIC */
+html body .header-center .header-nav .nav-item:hover,
+html body [class*="header"] [class*="nav"] button:hover,
+html body button[class*="nav-item"]:hover,
+html body .nav-item:hover,
+html body button:hover[class*="nav"],
+html body div[class*="nav"] button:hover {
+    border: 2px solid #ff8c00 !important;
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.8) !important, 0 0 30px rgba(255, 140, 0, 0.4) !important;
+    background: #333 !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+}
+
+/* Catch-all for any buttons in header area */
+html body [class*="header"] button:hover {
+    border: 2px solid #ff8c00 !important;
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.8) !important, 0 0 30px rgba(255, 140, 0, 0.4) !important;
+}
+
+/* Add padding below terminal text boxes */
+.terminal-voice-wrapper,
+.terminal-input,
+input[type="text"],
+textarea {
+    margin-bottom: 10px !important;
+    padding-bottom: 5px !important;
+}
+
+/* Fix terminal input box sizing */
+.terminal-input input[type="text"],
+.terminal-input textarea {
+    min-height: 32px !important;
+    line-height: 32px !important;
+    padding: 4px 8px !important;
+    padding-left: 50px !important; /* Space for microphone */
+    box-sizing: border-box !important;
+}
+
+/* Terminal input wrapper */
+.terminal-voice-wrapper {
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Additional spacing for terminal area */
+.xterm-helpers,
+.terminal,
+[class*="terminal"] {
+    padding-bottom: 10px !important;
+}
+
+/* Terminal integration specific styles */
+.terminal-input .prompt {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.terminal-input .mic-prompt,
+.terminal-input .voice-toggle-btn {
+    margin-left: 2px;
+    vertical-align: middle;
+}
+
+/* Ensure voice button doesn't interfere with terminal styling */
+.terminal-input {
+    position: relative;
+}
+
+/* Terminal input wrapper for proper microphone positioning */
+.terminal-input-wrapper {
+    position: relative !important;
+    display: inline-block !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+}
+
+/* Ensure the input inside wrapper takes full width */
+.terminal-input-wrapper input,
+.terminal-input-wrapper textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+}
+
+/* Fix terminal wrapper black background issue */
+.terminal-wrapper {
+    background: transparent !important;
+}
+
+/* Remove any black overlays that might be appearing */
+.allotment-module_splitView__L-yRc,
+.allotment-module_splitViewView__MGZ6O {
+    background: transparent !important;
+}
+
+/* Ensure no black panels appear over content */
+.Pane {
+    background: transparent !important;
+}
+
+/* Voice status indicator (optional enhancement) */
+.voice-status {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    font-size: 11px;
+    color: #565f89;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.voice-status.active {
+    opacity: 1;
+}
+
+/* Loading states */
+.voice-loading {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid transparent;
+    border-top: 2px solid #7aa2f7;
+    border-radius: 50%;
+    animation: voiceSpin 1s linear infinite;
+    margin-right: 4px;
+}
+
+/* Success/error states */
+.voice-success {
+    color: #9ece6a !important;
+    animation: voicePulse 0.5s ease-out;
+}
+
+.voice-error {
+    color: #f7768e !important;
+    animation: voiceShake 0.5s ease-out;
+}
+
+@keyframes voiceShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* Ensure proper z-index stacking */
+.voice-tooltip { z-index: 10001; }
+.voice-transcript { z-index: 10000; }
+.voice-settings { z-index: 10000; }
+
+/* Remove the fixed header CSS - the logo is already fixed positioned */
+/* Let the logo handle its own fixed positioning from global-logo-final.js */
+
+/* Just ensure the Coder1 brand mark stays properly positioned */
+#coder1-brand-mark {
+    position: fixed !important;
+    top: 15px !important;
+    left: 15px !important;
+    width: 140px !important;
+    height: 140px !important;
+    z-index: 2147483647 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    background-image: url('/ide/static/coder1-logo.svg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}

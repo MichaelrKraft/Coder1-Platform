@@ -1,0 +1,127 @@
+/* Fix Panel Widths - Make right preview panel 20% and middle section wider */
+
+/* Target the allotment split views */
+.allotment-module_splitView__L-yRc {
+    /* Force specific sizing for the panels */
+}
+
+/* Target the last child which should be the preview panel */
+.allotment-module_splitViewView__MGZ6O:last-child,
+.allotment-module_splitView__L-yRc > .allotment-module_splitViewContainer__rQnVa > .allotment-module_splitViewView__MGZ6O:last-child {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex: 0 0 20% !important;
+    flex-basis: 20% !important;
+    flex-grow: 0 !important;
+}
+
+/* Make the middle section (editor/terminal) take up more space */
+.allotment-module_splitViewView__MGZ6O:nth-child(2),
+.allotment-module_splitView__L-yRc > .allotment-module_splitViewContainer__rQnVa > .allotment-module_splitViewView__MGZ6O:nth-child(2) {
+    flex: 1 1 auto !important;
+    flex-grow: 1 !important;
+    min-width: 60% !important;
+}
+
+/* Target panes more specifically */
+.Pane:last-child {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+.Pane:nth-child(2) {
+    flex: 1 1 auto !important;
+    min-width: 60% !important;
+}
+
+/* Override any inline styles with more specific selectors */
+div[style*="width"]:has(iframe),
+div[style*="flex"]:has(iframe) {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Target the preview iframe container */
+iframe,
+[class*="preview"] iframe,
+[class*="output"] iframe {
+    max-width: 100% !important;
+}
+
+/* Ensure the main content area uses remaining space */
+.main-content > div:first-child {
+    display: flex !important;
+    flex: 1 !important;
+}
+
+/* Force horizontal layout for the main container */
+.allotment-module_horizontal__7doS8 > .allotment-module_splitViewContainer__rQnVa {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+/* Target React's resizable panels if they exist */
+[data-orientation="horizontal"] > [data-panel-size] {
+    /* Target the last panel (preview) */
+    &:last-child {
+        max-width: 20% !important;
+        width: 20% !important;
+        flex: 0 0 20% !important;
+    }
+    
+    /* Target the middle panel (editor) */
+    &:nth-child(2) {
+        flex: 1 1 auto !important;
+        min-width: 60% !important;
+    }
+}
+
+/* Override split percentages */
+[style*="width: 33.33"],
+[style*="width:33.33"],
+[style*="width: 50%"],
+[style*="width:50%"] {
+    /* If it contains preview elements, limit to 20% */
+    &:has(iframe),
+    &:has([class*="preview"]),
+    &:has([class*="output"]) {
+        width: 20% !important;
+        max-width: 20% !important;
+    }
+}
+
+/* Aggressive override for any element that might be the preview panel */
+.allotment-module_splitViewView__MGZ6O {
+    /* Check position and content */
+    &:has(iframe) {
+        max-width: 20% !important;
+        width: 20% !important;
+        flex: 0 0 20% !important;
+    }
+}
+
+/* Target based on position in DOM */
+.allotment-module_splitViewContainer__rQnVa > div:last-child {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+.allotment-module_splitViewContainer__rQnVa > div:nth-child(2) {
+    flex: 1 1 auto !important;
+    min-width: 60% !important;
+}
+
+/* Override any transform or left positioning */
+[style*="transform"],
+[style*="left"] {
+    /* Reset positioning for preview panels */
+    &:has(iframe) {
+        transform: none !important;
+        left: auto !important;
+        right: 0 !important;
+        width: 20% !important;
+    }
+}

@@ -1,0 +1,99 @@
+/* Force 80/20 Terminal Layout */
+
+/* Target common preview panel patterns */
+[class*="preview"],
+[class*="output"],
+[class*="result"],
+[id*="preview"],
+[id*="output"],
+[id*="result"],
+.preview-panel,
+.preview-pane,
+.output-panel,
+.output-pane {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex: 0 0 20% !important;
+    flex-basis: 20% !important;
+    flex-grow: 0 !important;
+}
+
+/* Target common editor/terminal patterns */
+[class*="editor"]:not([class*="preview"]),
+[class*="terminal"]:not([class*="preview"]),
+[class*="code"]:not([class*="preview"]),
+[id*="editor"]:not([id*="preview"]),
+[id*="terminal"]:not([id*="preview"]),
+[id*="code"]:not([id*="preview"]),
+.editor-panel,
+.editor-pane,
+.terminal-panel,
+.terminal-pane,
+.code-panel,
+.code-pane {
+    min-width: 75% !important;
+    flex: 1 1 auto !important;
+    flex-grow: 1 !important;
+}
+
+/* Target flex containers that might have panels */
+.flex-container > :last-child[class*="preview"],
+.flex-layout > :last-child[class*="preview"],
+[style*="display: flex"] > :last-child[class*="preview"],
+[style*="display:flex"] > :last-child[class*="preview"] {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Target grid layouts */
+[style*="display: grid"],
+[style*="display:grid"],
+.grid-container,
+.grid-layout {
+    grid-template-columns: 1fr 4fr 1fr !important; /* Assuming file tree, editor, preview */
+}
+
+/* More specific React panel selectors */
+[data-panel*="preview"],
+[data-panel-type*="preview"],
+.react-resizable-panel:last-child {
+    max-width: 20% !important;
+    width: 20% !important;
+    flex-basis: 20% !important;
+}
+
+[data-panel*="editor"],
+[data-panel*="code"],
+[data-panel-type*="editor"],
+[data-panel-type*="code"] {
+    min-width: 75% !important;
+    flex: 1 1 auto !important;
+}
+
+/* Ensure terminal is visible and expanded */
+.terminal,
+.terminal-container,
+[class*="terminal"] {
+    min-height: 300px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+}
+
+/* Override any inline styles on panels */
+@media screen and (min-width: 768px) {
+    /* Only apply on desktop */
+    div[style*="width: 50%"],
+    div[style*="width:50%"],
+    div[style*="flex: 0 0 50%"],
+    div[style*="flex:0 0 50%"] {
+        /* Check if it's likely a preview panel */
+        &:has(.preview),
+        &:has([class*="preview"]),
+        &:has([class*="output"]) {
+            width: 20% !important;
+            flex: 0 0 20% !important;
+            max-width: 20% !important;
+        }
+    }
+}
