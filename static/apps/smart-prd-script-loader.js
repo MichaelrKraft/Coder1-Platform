@@ -12,12 +12,14 @@ class SmartPRDScriptLoader {
         // Define module dependencies
         this.dependencies = {
             'modules/error-handler.js': [],
+            'modules/timer-manager.js': ['modules/error-handler.js'],
             'modules/session-manager.js': ['modules/error-handler.js'],
-            'modules/api-client.js': ['modules/error-handler.js'],
-            'modules/wizard-controller.js': ['modules/session-manager.js', 'modules/error-handler.js'],
-            'modules/ui-components.js': ['modules/error-handler.js'],
-            'product-creation-hub-refactored.js': [
+            'modules/api-client.js': ['modules/error-handler.js', 'modules/timer-manager.js'],
+            'modules/wizard-controller.js': ['modules/session-manager.js', 'modules/error-handler.js', 'modules/timer-manager.js'],
+            'modules/ui-components.js': ['modules/error-handler.js', 'modules/timer-manager.js'],
+            'apps/product-creation-hub-refactored.js': [
                 'modules/error-handler.js',
+                'modules/timer-manager.js',
                 'modules/session-manager.js',
                 'modules/api-client.js', 
                 'modules/wizard-controller.js',
@@ -84,11 +86,12 @@ class SmartPRDScriptLoader {
     async loadAllModules() {
         const loadOrder = [
             'modules/error-handler.js',
+            'modules/timer-manager.js',
             'modules/session-manager.js',
             'modules/api-client.js',
             'modules/wizard-controller.js', 
             'modules/ui-components.js',
-            'product-creation-hub-refactored.js'
+            'apps/product-creation-hub-refactored.js'
         ];
         
         try {

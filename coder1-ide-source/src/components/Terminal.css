@@ -91,12 +91,15 @@
   overflow-y: auto;
   font-size: 14px;
   line-height: 1.5;
+  min-width: 0;
+  width: 100%;
 }
 
 .terminal-line {
   margin-bottom: 4px;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .terminal-input-line {

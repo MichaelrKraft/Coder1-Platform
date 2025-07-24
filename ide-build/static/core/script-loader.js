@@ -8,12 +8,12 @@ class ScriptLoader {
         this.version = Date.now();
         this.loadedScripts = new Set();
         this.dependencies = {
-            'api-config.js': [],
-            'terminal-voice.js': ['api-config.js'],
-            'api-injection.js': ['api-config.js'],
-            'parallel-agents-modal.js': ['api-injection.js'],
-            'coder1-special-views.js': ['api-injection.js'],
-            'ui-cleanup-unified.js': []
+            'config/api-config.js': [],
+            'features/terminal-voice.js': ['config/api-config.js'],
+            'config/api-injection.js': ['config/api-config.js'],
+            'features/parallel-agents-modal.js': ['config/api-injection.js'],
+            'features/coder1-special-views.js': ['config/api-injection.js'],
+            'core/ui-cleanup-unified.js': []
         };
     }
     
@@ -48,12 +48,12 @@ class ScriptLoader {
     
     async loadAllScripts() {
         const scriptOrder = [
-            'ui-cleanup-unified.js',
-            'api-config.js',
-            'terminal-voice.js',
-            'api-injection.js',
-            'parallel-agents-modal.js',
-            'coder1-special-views.js'
+            'core/ui-cleanup-unified.js',
+            'config/api-config.js',
+            'features/terminal-voice.js',
+            'config/api-injection.js',
+            'features/parallel-agents-modal.js',
+            'features/coder1-special-views.js'
         ];
         
         try {

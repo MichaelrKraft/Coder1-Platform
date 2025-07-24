@@ -26,14 +26,20 @@ class APIClient {
         
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), this.requestTimeout);
+            const timeoutId = window.TimerManager ? 
+                window.TimerManager.setTimeout(() => controller.abort(), this.requestTimeout) :
+                setTimeout(() => controller.abort(), this.requestTimeout);
             
             const response = await fetch(url, {
                 ...config,
                 signal: controller.signal
             });
             
-            clearTimeout(timeoutId);
+            if (window.TimerManager) {
+                window.TimerManager.clearTimeout(timeoutId);
+            } else {
+                clearTimeout(timeoutId);
+            }
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);

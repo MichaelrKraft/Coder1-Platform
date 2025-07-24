@@ -1,13 +1,14 @@
 /* Enhanced React Bits with better layout and animations */
 .react-bits {
   background: #111827;
-  width: 350px;
+  width: 280px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   font-family: 'Inter', sans-serif;
   border-left: 1px solid #374151;
   overflow: hidden;
+  font-size: 12px;
 }
 
 /* Custom animations for components */

@@ -101,9 +101,15 @@ class UIComponents {
                 'assistant'
             );
             
-            setTimeout(() => {
-                window.WizardController.startQuestionFlow();
-            }, 1500);
+            if (window.TimerManager) {
+                window.TimerManager.setTimeout(() => {
+                    window.WizardController.startQuestionFlow();
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    window.WizardController.startQuestionFlow();
+                }, 1500);
+            }
         }
     }
     
@@ -187,9 +193,15 @@ class UIComponents {
         document.body.appendChild(toast);
         
         // Auto remove after 3 seconds
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
+        if (window.TimerManager) {
+            window.TimerManager.setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        } else {
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
     }
     
     updateStepProgress(step, total, percentage) {
@@ -246,9 +258,15 @@ class UIComponents {
         const element = document.getElementById(elementId);
         if (element) {
             element.classList.add('success-highlight');
-            setTimeout(() => {
-                element.classList.remove('success-highlight');
-            }, 2000);
+            if (window.TimerManager) {
+                window.TimerManager.setTimeout(() => {
+                    element.classList.remove('success-highlight');
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    element.classList.remove('success-highlight');
+                }, 2000);
+            }
         }
     }
 }

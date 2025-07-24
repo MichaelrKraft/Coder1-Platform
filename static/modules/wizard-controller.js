@@ -99,7 +99,11 @@ class WizardController {
         
         // Ask next question or complete
         if (this.answers.length < this.questions.length) {
-            setTimeout(() => this.askNextQuestion(), 1000);
+            if (window.TimerManager) {
+                window.TimerManager.setTimeout(() => this.askNextQuestion(), 1000);
+            } else {
+                setTimeout(() => this.askNextQuestion(), 1000);
+            }
         } else {
             this.completeQuestionFlow();
         }

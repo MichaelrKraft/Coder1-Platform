@@ -1,8 +1,9 @@
-name: Deploy to GitHub Pages
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -23,20 +24,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
-      - name: Build site
-        run: |
-          mkdir -p _site
-          cp -r . _site/
-          rm -rf _site/.git _site/.github _site/node_modules _site/coder1-ide-source/node_modules
-          touch _site/.nojekyll
-          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        
+        with:
+          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
