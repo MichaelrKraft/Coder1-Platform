@@ -13,6 +13,7 @@ class SmartPRDScriptLoader {
         this.dependencies = {
             'modules/error-handler.js': [],
             'modules/timer-manager.js': ['modules/error-handler.js'],
+            'modules/bundle-optimizer.js': ['modules/error-handler.js'],
             'modules/session-manager.js': ['modules/error-handler.js'],
             'modules/api-client.js': ['modules/error-handler.js', 'modules/timer-manager.js'],
             'modules/wizard-controller.js': ['modules/session-manager.js', 'modules/error-handler.js', 'modules/timer-manager.js'],
@@ -20,6 +21,7 @@ class SmartPRDScriptLoader {
             'apps/product-creation-hub-refactored.js': [
                 'modules/error-handler.js',
                 'modules/timer-manager.js',
+                'modules/bundle-optimizer.js',
                 'modules/session-manager.js',
                 'modules/api-client.js', 
                 'modules/wizard-controller.js',
@@ -87,6 +89,7 @@ class SmartPRDScriptLoader {
         const loadOrder = [
             'modules/error-handler.js',
             'modules/timer-manager.js',
+            'modules/bundle-optimizer.js',
             'modules/session-manager.js',
             'modules/api-client.js',
             'modules/wizard-controller.js', 
