@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Build Test</title>
+    <style>
+        body {
+            margin: 0;
+            background: #1a1b26;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .debug {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: red;
+            padding: 10px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug">Debug: Page loaded, checking React...</div>
+    <div id="root">
+        <div style="padding: 20px; color: white;">
+            <h1>Fallback Content - React should replace this</h1>
+            <p>If you can see this, React is not mounting properly.</p>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Page loaded, about to load React...');
+        
+        // Monitor for React mounting
+        const observer = new MutationObserver(() => {
+            const root = document.getElementById('root');
+            if (root && root.innerHTML.includes('App')) {
+                console.log('React mounted successfully!');
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+        
+        // Load the React bundle
+        const script = document.createElement('script');
+        script.src = './ide-build/static/js/main.e3574567.js';
+        script.onload = () => console.log('React script loaded');
+        script.onerror = (e) => console.error('React script failed to load:', e);
+        document.head.appendChild(script);
+        
+        // Load the CSS
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = './ide-build/static/css/main.02d4727b.css';
+        css.onload = () => console.log('CSS loaded');
+        css.onerror = (e) => console.error('CSS failed to load:', e);
+        document.head.appendChild(css);
+    </script>
+</body>
+</html>

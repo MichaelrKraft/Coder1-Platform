@@ -88,8 +88,17 @@ const Terminal: React.FC<TerminalProps> = ({
             '📋 Component copied to clipboard (simulated)'
           );
           
-          // TODO: Integrate with ReactBits component to show in UI
-          // For now, we'll just show in terminal
+          // Integrate with ReactBits component
+          if (data.component.metadata?.reactBitsMatch) {
+            const event = new CustomEvent('terminal-ui-select', {
+              detail: { 
+                componentName: data.component.metadata.reactBitsMatch,
+                category: data.customizations?.detected || 'buttons'
+              }
+            });
+            window.dispatchEvent(event);
+            newHistory.push('🎨 Component automatically selected in React Bits panel');
+          }
         } else {
           newHistory[newHistory.length - 1] = `❌ Error: ${data.error || 'Failed to generate component'}`;
         }

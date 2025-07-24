@@ -6,7 +6,7 @@ File: smart-prd-generator.html
 Purpose: Complete Smart PRD & Wireframe Generator with 7-step wizard
 Status: PRODUCTION - Last updated: 2025-07-21
 Features: PRD generation, wireframes, expert consultation, version management, optimized spacing
-Dependencies: product-creation-hub.css, product-creation-hub.js, Font Awesome, Google Fonts
+Dependencies: product-creation-hub.css, modular JS architecture (smart-prd-script-loader.js), Font Awesome, Google Fonts
 Route: Served within React IDE at /ide
 Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
 ===============================================================================
@@ -990,9 +990,8 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
         </div>
     </div>
 
-    <script src="utils.js"></script>
-    <script src="product-creation-hub.js"></script>
-    <!-- Logo now in header, no need for separate script -->
+    <!-- Modular Architecture - Automated Script Loading -->
+    <script src="static/smart-prd-script-loader.js"></script>
     <script src="/static/smart-prd-voice.js"></script>
     <!-- Logo is now in the fixed header, no additional positioning needed -->
 </body>

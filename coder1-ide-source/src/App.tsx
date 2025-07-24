@@ -28,34 +28,32 @@ function App() {
         <Sidebar activeView={activeView} setActiveView={setActiveView} />
         
         <div className="content-area">
-          <div className="left-panel">
-            <ReactBits />
-            <div className="content-view">
-              {activeView === 'explorer' && <Explorer />}
-              {activeView === 'terminal' && (
-                <Terminal 
-                  isSleepMode={isSleepMode}
-                  setIsSleepMode={setIsSleepMode}
-                  isSupervisionOn={isSupervisionOn}
-                  setIsSupervisionOn={setIsSupervisionOn}
-                  isInfiniteLoop={isInfiniteLoop}
-                  setIsInfiniteLoop={(value, sessionId) => {
-                    setIsInfiniteLoop(value);
-                    if (value && sessionId) {
-                      setInfiniteSessionId(sessionId);
-                    } else if (!value) {
-                      setInfiniteSessionId(null);
-                    }
-                  }}
-                  isParallelAgents={isParallelAgents}
-                  setIsParallelAgents={setIsParallelAgents}
-                  onHivemindClick={() => setShowHivemind(true)}
-                  hivemindActive={hivemindSessionId !== null}
-                  agentCount={activeAgentCount}
-                />
-              )}
-              {activeView === 'preview' && <Preview />}
-            </div>
+          <ReactBits />
+          <div className="main-content">
+            {activeView === 'explorer' && <Explorer />}
+            {activeView === 'terminal' && (
+              <Terminal 
+                isSleepMode={isSleepMode}
+                setIsSleepMode={setIsSleepMode}
+                isSupervisionOn={isSupervisionOn}
+                setIsSupervisionOn={setIsSupervisionOn}
+                isInfiniteLoop={isInfiniteLoop}
+                setIsInfiniteLoop={(value, sessionId) => {
+                  setIsInfiniteLoop(value);
+                  if (value && sessionId) {
+                    setInfiniteSessionId(sessionId);
+                  } else if (!value) {
+                    setInfiniteSessionId(null);
+                  }
+                }}
+                isParallelAgents={isParallelAgents}
+                setIsParallelAgents={setIsParallelAgents}
+                onHivemindClick={() => setShowHivemind(true)}
+                hivemindActive={hivemindSessionId !== null}
+                agentCount={activeAgentCount}
+              />
+            )}
+            {activeView === 'preview' && <Preview />}
           </div>
         </div>
       </div>

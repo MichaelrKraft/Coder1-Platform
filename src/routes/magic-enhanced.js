@@ -1071,7 +1071,8 @@ router.post('/ui', async (req, res) => {
           componentType: component.name,
           category: category,
           source: 'react-bits-library',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          reactBitsMatch: component.name
         }
       },
       customizations: {
