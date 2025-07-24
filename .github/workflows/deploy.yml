@@ -1,85 +1,42 @@
-name: Deploy Coder1 Platform
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Checkout
+        uses: actions/checkout@v4
         
-    - name: Install main dependencies
-      run: npm install --production || echo "Main npm install failed, continuing..."
-      
-    - name: Build React IDE (if possible)
-      run: |
-        if [ -f "coder1-ide-source/package.json" ]; then
-          cd coder1-ide-source
-          npm install || echo "IDE npm install failed, continuing..."
-          npm run build || echo "IDE build failed, using existing build..."
-          cd ..
-        fi
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
         
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-      
-    - name: Prepare deployment files
-      run: |
-        mkdir -p _site
+      - name: Build site
+        run: |
+          mkdir -p _site
+          cp -r . _site/
+          rm -rf _site/.git _site/.github _site/node_modules _site/coder1-ide-source/node_modules
+          touch _site/.nojekyll
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         
-        # Copy all HTML files
-        find . -maxdepth 1 -name "*.html" -exec cp {} _site/ \;
-        
-        # Copy directories if they exist
-        [ -d "static" ] && cp -r static _site/
-        [ -d "ide-build" ] && cp -r ide-build _site/
-        [ -d "projects" ] && cp -r projects _site/
-        [ -d "src" ] && cp -r src _site/
-        
-        # Create .nojekyll file
-        touch _site/.nojekyll
-        
-        # Create index.html if it doesn't exist
-        if [ ! -f "_site/index.html" ]; then
-          echo '<!DOCTYPE html>
-        <html><head><title>Coder1 Platform</title>
-        <style>body{font-family:system-ui;background:linear-gradient(135deg,#667eea,#764ba2);color:white;text-align:center;padding:50px;}
-        .links{margin:30px 0;}.link{background:rgba(255,255,255,0.2);padding:10px 20px;margin:10px;border-radius:8px;color:white;text-decoration:none;display:inline-block;}
-        .link:hover{background:rgba(255,255,255,0.3);}</style></head>
-        <body><h1>🚀 Coder1 Platform</h1><div class="links">
-        <a href="smart-prd-generator.html" class="link">📋 Smart PRD Generator</a>
-        <a href="ide-build/index.html" class="link">💻 React IDE</a>
-        <a href="homepage.html" class="link">🏠 Homepage</a>
-        </div></body></html>' > _site/index.html
-        fi
-        
-        echo "Files to deploy:"
-        find _site -type f -name "*.html" | head -10
-        
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
-      with:
-        path: '_site'
-        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
