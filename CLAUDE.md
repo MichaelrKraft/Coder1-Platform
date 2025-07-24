@@ -2,6 +2,28 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ CRITICAL: IDE Build Directory - DO NOT MODIFY
+
+**The `ide-build/` directory contains the WORKING production IDE and must NOT be modified directly.**
+
+### Important Context (2025-01-24):
+- The IDE in `ide-build/` is the working version with all features (terminal buttons, logo, settings, etc.)
+- This was restored from commit `f4bd7dd` after previous attempts to "fix" it actually broke it
+- The IDE uses specific files: `main.5c128812.css` and `main.a1cfdcd5.js` 
+- It includes many custom scripts for UI enhancements, logos, and terminal features
+
+### DO NOT:
+- ❌ Replace `ide-build/index.html` with a basic React build
+- ❌ Delete or modify the custom scripts in `ide-build/static/`
+- ❌ Try to "clean up" or "simplify" the IDE build
+- ❌ Copy files from `coder1-ide-source/build/` directly to `ide-build/`
+
+### DO:
+- ✅ If the IDE appears broken, check git history before making changes
+- ✅ The working IDE is deployed at: https://michaelrkraft.github.io/Coder1-Platform/ide-build/
+- ✅ If you need to modify the IDE, work in `coder1-ide-source/` and build properly
+- ✅ Always preserve the custom scripts and enhancements in the production build
+
 ## Development Commands
 
 ### ⚠️ CRITICAL NETWORKING ISSUE - READ THIS FIRST
