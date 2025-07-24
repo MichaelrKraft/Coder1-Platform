@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IDE Debug</title>
+    <link href="./ide-build/static/css/main.cba8dcc6.css" rel="stylesheet">
+    <style>
+        /* Debug styles to ensure proper layout */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        /* Debug outline to see element boundaries */
+        .debug * {
+            outline: 1px solid red;
+        }
+        
+        /* Layout fix for common issues */
+        #root {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    
+    <!-- Debug info -->
+    <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; font-family: monospace; z-index: 10000;">
+        <button onclick="document.body.classList.toggle('debug')">Toggle Debug Outlines</button>
+        <div>Window: <span id="windowSize"></span></div>
+        <div>Root: <span id="rootSize"></span></div>
+    </div>
+    
+    <script>
+        // Debug info updater
+        function updateDebugInfo() {
+            document.getElementById('windowSize').textContent = `${window.innerWidth}x${window.innerHeight}`;
+            const root = document.getElementById('root');
+            if (root) {
+                document.getElementById('rootSize').textContent = `${root.offsetWidth}x${root.offsetHeight}`;
+            }
+        }
+        
+        window.addEventListener('resize', updateDebugInfo);
+        setInterval(updateDebugInfo, 1000);
+        updateDebugInfo();
+    </script>
+    
+    <!-- Load React app -->
+    <script defer src="./ide-build/static/js/main.50776b76.js"></script>
+</body>
+</html>
