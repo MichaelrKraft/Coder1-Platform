@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>IDE Loading Test</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1b26;
+            color: #c0caf5;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #24283b;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #414868;
+        }
+        .test-result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #10b98133;
+            border-color: #10b981;
+            color: #10b981;
+        }
+        .error {
+            background: #f7768e33;
+            border-color: #f7768e;
+            color: #f7768e;
+        }
+        .test-link {
+            color: #7aa2f7;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .test-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 IDE Loading Diagnostic</h1>
+        <p>This page tests if the IDE assets are loading correctly.</p>
+        
+        <div class="test-result success">
+            <strong>✅ Basic HTML/CSS:</strong> This page loads correctly with dark theme styling
+        </div>
+        
+        <div id="js-test" class="test-result error">
+            <strong>❌ JavaScript Test:</strong> JavaScript not working
+        </div>
+        
+        <div id="css-test" class="test-result error">
+            <strong>❌ CSS Asset Test:</strong> Loading...
+        </div>
+        
+        <div id="react-test" class="test-result error">
+            <strong>❌ React Test:</strong> Loading...
+        </div>
+        
+        <h3>🔗 Asset Links:</h3>
+        <ul>
+            <li><a href="ide-build/static/css/main.b23767f1.css" class="test-link" target="_blank">Main CSS File</a></li>
+            <li><a href="ide-build/static/js/main.50776b76.js" class="test-link" target="_blank">Main JS File</a></li>
+            <li><a href="ide-build/index.html" class="test-link" target="_blank">IDE Page</a></li>
+        </ul>
+        
+        <h3>🔍 Quick Fixes:</h3>
+        <ol>
+            <li>Try refreshing the IDE page with <strong>Ctrl+F5</strong> (hard refresh)</li>
+            <li>Check browser console for errors (F12 → Console)</li>
+            <li>Try the <a href="ide-build/index.html" class="test-link">IDE link</a> from here</li>
+        </ol>
+    </div>
+
+    <script>
+        // Test basic JavaScript
+        document.getElementById('js-test').innerHTML = '<strong>✅ JavaScript Test:</strong> JavaScript is working!';
+        document.getElementById('js-test').className = 'test-result success';
+        
+        // Test CSS loading
+        fetch('ide-build/static/css/main.b23767f1.css')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('css-test').innerHTML = '<strong>✅ CSS Asset Test:</strong> Main CSS file loads correctly';
+                    document.getElementById('css-test').className = 'test-result success';
+                } else {
+                    throw new Error('CSS failed to load');
+                }
+            })
+            .catch(error => {
+                document.getElementById('css-test').innerHTML = '<strong>❌ CSS Asset Test:</strong> Main CSS file failed to load';
+            });
+            
+        // Test JS loading
+        fetch('ide-build/static/js/main.50776b76.js')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('react-test').innerHTML = '<strong>✅ React Test:</strong> Main JS file loads correctly';
+                    document.getElementById('react-test').className = 'test-result success';
+                } else {
+                    throw new Error('JS failed to load');
+                }
+            })
+            .catch(error => {
+                document.getElementById('react-test').innerHTML = '<strong>❌ React Test:</strong> Main JS file failed to load';
+            });
+    </script>
+</body>
+</html>
