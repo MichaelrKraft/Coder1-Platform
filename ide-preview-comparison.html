@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDE Version Comparison</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #c0caf5;
+        }
+        
+        h1 {
+            color: #8b5cf6;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .version {
+            background: #1a1b26;
+            border: 1px solid #414868;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .version h2 {
+            color: #ff9e00;
+            margin-top: 0;
+        }
+        
+        .info {
+            background: #24283b;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #7c3aed;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+        
+        button.secondary {
+            background: #ff9e00;
+        }
+        
+        button.secondary:hover {
+            background: #ff6b00;
+            box-shadow: 0 0 20px rgba(255, 158, 0, 0.5);
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #414868;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .warning {
+            background: rgba(247, 118, 142, 0.1);
+            border: 1px solid #f7768e;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 IDE Version Comparison</h1>
+    
+    <div class="warning">
+        ⚠️ The original version's assets (CSS/JS files) are missing from the current repository. 
+        We need to recover them from git history or rebuild from source.
+    </div>
+    
+    <div class="comparison">
+        <div class="version">
+            <h2>📦 Current Deployed Version</h2>
+            <div class="info">
+                <strong>Status:</strong> Layout broken ("jacked up")<br>
+                <strong>CSS:</strong> main.cba8dcc6.css<br>
+                <strong>JS:</strong> main.50776b76.js<br>
+                <strong>Issue:</strong> Missing proper layout structure
+            </div>
+            <iframe src="./ide-build/index.html" class="preview-frame"></iframe>
+        </div>
+        
+        <div class="version">
+            <h2>✨ Original Working Version</h2>
+            <div class="info">
+                <strong>Status:</strong> Should have 3-panel layout<br>
+                <strong>CSS:</strong> main.5c128812.css (missing)<br>
+                <strong>JS:</strong> main.a1cfdcd5.js (missing)<br>
+                <strong>Expected:</strong> Left: React Bits | Center: Terminal/Editor | Right: Preview
+            </div>
+            <div style="background: #24283b; height: 600px; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                <p style="text-align: center; color: #565f89;">
+                    Original files not found in current repository.<br>
+                    Need to restore from git history.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="button-container">
+        <button onclick="window.location.href='./ide-build/index.html'">
+            View Current (Broken) IDE
+        </button>
+        <button class="secondary" onclick="window.location.href='./test-ide-reactbits-enhanced.html'">
+            View Test Design Reference
+        </button>
+    </div>
+    
+    <div style="max-width: 800px; margin: 40px auto; text-align: center;">
+        <h3 style="color: #7aa2f7;">🎯 Next Steps</h3>
+        <p>To restore the original working IDE, we need to:</p>
+        <ol style="text-align: left; display: inline-block;">
+            <li>Find the exact commit with main.5c128812.css and main.a1cfdcd5.js files</li>
+            <li>Or rebuild from the React source in coder1-ide-source/</li>
+            <li>Ensure the 3-panel layout is properly restored</li>
+            <li>Remove all the conflicting fix attempts</li>
+        </ol>
+    </div>
+</body>
+</html>
