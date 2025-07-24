@@ -28,7 +28,6 @@ function App() {
         <Sidebar activeView={activeView} setActiveView={setActiveView} />
         
         <div className="content-area">
-          <ReactBits />
           <div className="main-content">
             {activeView === 'explorer' && <Explorer />}
             {activeView === 'terminal' && (
@@ -55,6 +54,7 @@ function App() {
             )}
             {activeView === 'preview' && <Preview />}
           </div>
+          <ReactBits />
         </div>
       </div>
       
