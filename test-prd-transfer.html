@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PRD Transfer</title>
+    <style>
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1b26;
+            color: #c0caf5;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: rgba(26, 27, 38, 0.95);
+            border: 1px solid #414558;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        h1 {
+            color: #7c3aed;
+            margin-bottom: 8px;
+        }
+        
+        .status {
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-family: Monaco, Menlo, monospace;
+            font-size: 14px;
+        }
+        
+        .success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        
+        .info {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid #8b5cf6;
+            color: #8b5cf6;
+        }
+        
+        button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 8px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #8b5cf6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        
+        .storage-viewer {
+            background: #0d1117;
+            border: 1px solid #414558;
+            border-radius: 6px;
+            padding: 16px;
+            font-family: Monaco, Menlo, monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 16px 0;
+        }
+        
+        .link-section {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid #8b5cf6;
+            border-radius: 8px;
+        }
+        
+        a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h1>PRD Transfer Test Page</h1>
+        <p>This page helps test the PRD transfer functionality without needing the backend.</p>
+        
+        <div class="status info">
+            ℹ️ This page simulates what happens when you click "Enter Coder1 IDE" after generating a PRD.
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Actions</h2>
+        
+        <button onclick="createTestPRD()">
+            1. Create Test PRD Data
+        </button>
+        
+        <button onclick="goToIDE()">
+            2. Go to IDE with Transfer
+        </button>
+        
+        <button onclick="clearData()">
+            Clear All Data
+        </button>
+        
+        <button onclick="viewStorage()">
+            View LocalStorage
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Current LocalStorage</h2>
+        <div id="storageViewer" class="storage-viewer">
+            Click "View LocalStorage" to see current data...
+        </div>
+    </div>
+    
+    <div class="test-section link-section">
+        <h2>Direct Links</h2>
+        <p>After creating test data, you can also use these direct links:</p>
+        <ul>
+            <li><a href="http://127.0.0.1:8892/ide-build/index.html?project=transfer" target="_blank">IDE with Transfer Parameter (Full URL)</a></li>
+            <li><a href="http://127.0.0.1:8892/ide-build/index.html" target="_blank">IDE without Parameter (Full URL)</a></li>
+        </ul>
+        <p><strong>Note:</strong> If you get a blank screen, check the browser console (F12) for errors.</p>
+    </div>
+    
+    <script>
+        function createTestPRD() {
+            const testProject = {
+                id: `project-${Date.now()}`,
+                title: "Test PRD Project",
+                originalRequest: "Build a modern task management application with real-time collaboration features",
+                projectType: "web-application",
+                timestamp: new Date().toISOString(),
+                questions: [
+                    { question: "Who is your target audience and what are their main needs?" },
+                    { question: "What are the core features your project must have?" },
+                    { question: "What platforms should your project support (web, mobile, desktop)?" },
+                    { question: "Do you have any specific design preferences or branding requirements?" },
+                    { question: "What is your timeline and budget for this project?" }
+                ],
+                answers: [
+                    "Remote teams and freelancers who need to collaborate efficiently across time zones",
+                    "Task creation/assignment, real-time updates, file sharing, time tracking, and team chat",
+                    "Web (primary), with mobile responsive design. Native mobile apps in phase 2",
+                    "Clean, minimal design with dark mode support. Professional but friendly. Blue/purple accent colors",
+                    "MVP in 3 months, $50k budget for initial development"
+                ],
+                prd: {
+                    content: `# Product Requirements Document\n\n## Project Overview\nA modern task management application designed for remote teams...\n\n## Target Audience\n- Remote teams\n- Freelancers\n- Small to medium businesses\n\n## Core Features\n1. Task Management\n2. Real-time Collaboration\n3. File Sharing\n4. Time Tracking\n5. Team Communication`,
+                    generated: true,
+                    timestamp: new Date().toISOString()
+                },
+                consultation: {
+                    analysis: {
+                        successProbability: 85,
+                        agreements: ["Clear scope", "Realistic timeline", "Strong market need"]
+                    }
+                },
+                marketInsights: {
+                    viability: { score: 92 },
+                    competition: { level: "Medium" },
+                    marketSize: { size: "Large" }
+                },
+                status: 'ready-for-development'
+            };
+            
+            // Store the project data
+            localStorage.setItem('productCreationProject', JSON.stringify(testProject));
+            localStorage.setItem('projectTransferReady', 'true');
+            
+            // Also store panel state as expanded
+            localStorage.removeItem('prdPanelCollapsed');
+            
+            // Also prepare Context Priming data
+            const prdContent = formatPRDForContext(testProject);
+            const contextPrimingData = {
+                files: [{
+                    name: 'project-prd.md',
+                    content: prdContent,
+                    size: new Blob([prdContent]).size,
+                    type: 'text/markdown',
+                    autoLoaded: true
+                }]
+            };
+            localStorage.setItem('contextPrimingAutoLoad', JSON.stringify(contextPrimingData));
+            localStorage.setItem('contextPrimingReady', 'true');
+            
+            document.getElementById('storageViewer').textContent = 
+                `✅ Test PRD created!\n\nProject ID: ${testProject.id}\nTitle: ${testProject.title}\n\nLocalStorage keys set:\n- productCreationProject\n- projectTransferReady\n- contextPrimingAutoLoad\n- contextPrimingReady`;
+            
+            alert('Test PRD data created! Now click "Go to IDE with Transfer"');
+        }
+        
+        function formatPRDForContext(project) {
+            let content = `# ${project.title}\n\n`;
+            content += `## Original Request\n${project.originalRequest}\n\n`;
+            
+            if (project.questions && project.answers) {
+                content += `## Requirements Q&A\n\n`;
+                project.questions.forEach((q, i) => {
+                    content += `**Q${i + 1}: ${q.question}**\n`;
+                    content += `A: ${project.answers[i] || 'No answer provided'}\n\n`;
+                });
+            }
+            
+            if (project.prd && project.prd.content) {
+                content += `## Product Requirements Document\n${project.prd.content}\n\n`;
+            }
+            
+            return content;
+        }
+        
+        function goToIDE() {
+            const projectData = localStorage.getItem('productCreationProject');
+            const transferReady = localStorage.getItem('projectTransferReady');
+            
+            if (!projectData || transferReady !== 'true') {
+                alert('Please create test PRD data first!');
+                return;
+            }
+            
+            // Navigate to IDE with transfer parameter
+            // Using full URL to ensure proper parameter passing
+            window.location.href = 'http://127.0.0.1:8892/ide-build/index.html?project=transfer';
+        }
+        
+        function clearData() {
+            localStorage.removeItem('productCreationProject');
+            localStorage.removeItem('projectTransferReady');
+            localStorage.removeItem('contextPrimingAutoLoad');
+            localStorage.removeItem('contextPrimingReady');
+            localStorage.removeItem('prdPanelCollapsed');
+            
+            document.getElementById('storageViewer').textContent = '✅ All PRD transfer data cleared!';
+        }
+        
+        function viewStorage() {
+            const keys = [
+                'productCreationProject',
+                'projectTransferReady',
+                'contextPrimingAutoLoad',
+                'contextPrimingReady',
+                'prdPanelCollapsed'
+            ];
+            
+            let output = 'LocalStorage Contents:\n\n';
+            
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    output += `${key}:\n`;
+                    try {
+                        const parsed = JSON.parse(value);
+                        output += JSON.stringify(parsed, null, 2);
+                    } catch {
+                        output += value;
+                    }
+                    output += '\n\n';
+                } else {
+                    output += `${key}: (not set)\n\n`;
+                }
+            });
+            
+            document.getElementById('storageViewer').textContent = output;
+        }
+        
+        // Auto-view storage on load
+        viewStorage();
+    </script>
+</body>
+</html>

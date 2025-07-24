@@ -260,6 +260,7 @@ body {
     background: rgba(255, 255, 255, 0.15);
 }
 
+.context-priming-btn,
 .ide-enter-btn {
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     border: none;
@@ -274,9 +275,19 @@ body {
     gap: 8px;
 }
 
+.context-priming-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.context-priming-btn:hover,
 .ide-enter-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.context-priming-btn:hover {
+    border: 2px solid #ff8c00;
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.8), 0 0 40px rgba(255, 140, 0, 0.4);
 }
 
 .status-indicator {

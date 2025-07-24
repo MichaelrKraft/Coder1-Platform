@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal AI Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+        .terminal {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .output {
+            min-height: 200px;
+            background: #000;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        input {
+            width: 100%;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .status {
+            color: #10b981;
+            margin: 10px 0;
+        }
+        .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <h1>🤖 Claude Terminal AI Test</h1>
+        <p>AI Chat Mode: Type naturally. Bash Mode: Prefix with $</p>
+        
+        <div class="output" id="output">Welcome to Coder1 Terminal - AI Chat Mode
+Just type naturally to chat with AI, or use $ prefix for bash commands
+Examples: "create a landing page" or "$ npm install"
+
+</div>
+        
+        <input type="text" id="input" placeholder="Type a message or $ for bash command" autofocus>
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const sessionId = `terminal-${Date.now()}`;
+        let isProcessing = false;
+
+        document.getElementById('input').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter' && !isProcessing) {
+                const input = e.target.value.trim();
+                if (!input) return;
+
+                const output = document.getElementById('output');
+                const status = document.getElementById('status');
+                
+                // Add user input to output
+                output.textContent += `$ ${input}\n`;
+                e.target.value = '';
+
+                // Check for bash commands
+                if (input.startsWith('$')) {
+                    const bashCmd = input.substring(1).trim();
+                    if (bashCmd === 'clear') {
+                        output.textContent = '';
+                        return;
+                    }
+                    output.textContent += `Executing: ${bashCmd}\n[Bash command execution not implemented]\n\n`;
+                    return;
+                }
+
+                // AI Chat mode
+                isProcessing = true;
+                status.textContent = 'AI is processing...';
+                output.textContent += 'AI is processing...\n';
+
+                try {
+                    // Try Node.js server first, then fallback to mock
+                    let response;
+                    try {
+                        response = await fetch('http://127.0.0.1:8893/api/terminal/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                message: input,
+                                sessionId: sessionId,
+                                context: 'terminal'
+                            })
+                        });
+                    } catch (nodeError) {
+                        // Fallback to mock response
+                        const mockResponse = getMockResponse(input);
+                        output.textContent = output.textContent.replace('AI is processing...\n', `${mockResponse}\n\n`);
+                        status.textContent = 'Using mock mode (Node.js server not accessible)';
+                        isProcessing = false;
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Replace "AI is processing..." with actual response
+                        output.textContent = output.textContent.replace('AI is processing...\n', `${data.response || 'Done.'}\n`);
+                        
+                        // Handle tool calls
+                        if (data.toolCalls && data.toolCalls.length > 0) {
+                            for (const tool of data.toolCalls) {
+                                output.textContent += `[Tool: ${tool.type}] ${JSON.stringify(tool.args)}\n`;
+                            }
+                        }
+                        output.textContent += '\n';
+                        status.textContent = 'Ready';
+                    } else {
+                        output.textContent = output.textContent.replace('AI is processing...\n', `Error: ${data.error || 'Failed to process request'}\n\n`);
+                        status.textContent = 'Error occurred';
+                        status.className = 'status error';
+                    }
+                } catch (error) {
+                    output.textContent = output.textContent.replace('AI is processing...\n', `Error: ${error.message}\n\n`);
+                    status.textContent = 'Network error';
+                    status.className = 'status error';
+                } finally {
+                    isProcessing = false;
+                    output.scrollTop = output.scrollHeight;
+                }
+            }
+        });
+
+        function getMockResponse(input) {
+            const lower = input.toLowerCase();
+            if (lower.includes('create') && lower.includes('file')) {
+                return 'Mock: Would create file (Claude API working but using fallback)';
+            }
+            if (lower.includes('hello') || lower.includes('hi')) {
+                return 'Hello! Claude terminal is working in mock mode.';
+            }
+            if (lower.includes('help')) {
+                return 'Commands: create file, edit file, search. Prefix with $ for bash.';
+            }
+            return 'Mock response. Try connecting to Node.js server for real Claude API.';
+        }
+    </script>
+</body>
+</html>

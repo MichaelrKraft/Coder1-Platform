@@ -1,0 +1,112 @@
+/* IDE Layout Fix - Restores proper layout after CSS conflicts */
+
+/* Reset overly aggressive global styles */
+#root {
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* Fix main container layout */
+.main-container {
+    display: flex !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+}
+
+/* Fix sidebar */
+.sidebar {
+    width: 60px !important;
+    min-width: 60px !important;
+    height: 100vh !important;
+    background: #1a1b26 !important;
+    border-right: 1px solid #414868 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+}
+
+/* Fix content area */
+.content-area {
+    flex: 1 !important;
+    display: flex !important;
+    overflow: hidden !important;
+    background: #0a0a0f !important;
+}
+
+/* Fix left panel */
+.left-panel {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px !important;
+    overflow: hidden !important;
+}
+
+/* Fix terminal container */
+.terminal {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #1a1b26 !important;
+}
+
+/* Fix React Bits height */
+.react-bits-container {
+    height: 40px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Fix content view */
+.content-view {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Remove any unwanted overlays */
+.prd-transfer-panel,
+.prd-notification,
+[class*="popup"],
+[class*="modal-overlay"] {
+    display: none !important;
+}
+
+/* Fix settings section position */
+.settings-section {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    z-index: 100 !important;
+}
+
+/* Ensure proper button styling in terminal header */
+.terminal-header {
+    min-height: 40px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+}
+
+.terminal-header-right {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+/* Fix any body overflow issues */
+body {
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Hide any elements that shouldn't be visible */
+.prd-transfer-notification,
+.context-priming-panel,
+.superclaude-panel {
+    display: none !important;
+}

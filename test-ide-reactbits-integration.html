@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Bits IDE Integration Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    <style>
+        /* Glassmorphism and animations */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.2);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.7);
+        }
+        
+        /* Terminal styles */
+        .terminal {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .terminal-line {
+            padding: 2px 0;
+        }
+        
+        .terminal-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+        
+        /* Code editor styles */
+        .code-editor {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+        
+        /* Animation keyframes */
+        @keyframes gradient-x {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(10px, 10px); }
+            50% { transform: translate(0, 20px); }
+            75% { transform: translate(-10px, 10px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        /* Apply animations */
+        .animate-gradient-x {
+            background-size: 200% 100%;
+            animation: gradient-x 3s ease infinite;
+        }
+        
+        .animate-shimmer {
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-grid-move {
+            animation: grid-move 20s ease-in-out infinite;
+        }
+    </style>
+    <script>
+        // Tailwind config for custom animations
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'shimmer': 'shimmer 2s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'grid-move': 'grid-move 20s ease-in-out infinite',
+                        'typewriter': 'typewriter 2s steps(20) infinite'
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Left Panel: Component Browser -->
+        <div class="w-80 glass border-r border-gray-700 overflow-hidden flex flex-col">
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-700">
+                <h2 class="text-xl font-bold text-purple-400">🎨 React Bits</h2>
+                <p class="text-sm text-gray-400 mt-1">53 Components • 11 Categories</p>
+                
+                <!-- Search -->
+                <div class="mt-3 relative">
+                    <input 
+                        type="text" 
+                        id="componentSearch"
+                        placeholder="Search components..."
+                        class="w-full px-3 py-2 bg-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                    <i class="ph-magnifying-glass absolute right-3 top-2.5 text-gray-500"></i>
+                </div>
+            </div>
+            
+            <!-- Component Categories -->
+            <div class="flex-1 overflow-y-auto p-4" id="componentList">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+            
+        </div>
+        
+        <!-- Center Panel: Terminal & Code -->
+        <div class="flex-1 flex flex-col">
+            <!-- Terminal -->
+            <div class="h-1/2 glass border-b border-gray-700 flex flex-col">
+                <div class="px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-gray-300">Terminal</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="clearTerminal()" class="text-xs text-gray-400 hover:text-gray-200">Clear</button>
+                        <button onclick="showHelp()" class="text-xs text-gray-400 hover:text-gray-200">Help</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 terminal" id="terminal">
+                    <div class="terminal-line">Welcome to React Bits IDE Test</div>
+                    <div class="terminal-line">Type <span class="text-purple-400">/ui</span> followed by a description to generate components</div>
+                    <div class="terminal-line">Example: <span class="text-green-400">/ui create a glowing purple button</span></div>
+                    <div class="terminal-line"></div>
+                </div>
+                <div class="p-4 border-t border-gray-700">
+                    <div class="flex items-center">
+                        <span class="terminal-prompt mr-2">$</span>
+                        <input 
+                            type="text" 
+                            id="terminalInput"
+                            class="flex-1 bg-transparent outline-none terminal"
+                            placeholder="Type a command..."
+                            autofocus
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Code Editor -->
+            <div class="h-1/2 glass flex flex-col">
+                <div class="px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-gray-300">Code</h3>
+                    <div class="flex space-x-2">
+                        <select id="codeVariant" class="text-xs bg-gray-800 rounded px-2 py-1">
+                            <option value="typescript">TypeScript + Tailwind</option>
+                            <option value="javascript">JavaScript + Tailwind</option>
+                            <option value="typescript-css">TypeScript + CSS</option>
+                            <option value="javascript-css">JavaScript + CSS</option>
+                        </select>
+                        <button onclick="copyCode()" class="text-xs bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded">Copy</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto p-4 code-editor bg-gray-950" id="codeEditor">
+                    <pre><code id="codeContent" class="text-gray-300">// Select a component or use /ui command to generate code</code></pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel: Preview -->
+        <div class="w-96 glass border-l border-gray-700 flex flex-col">
+            <div class="px-4 py-2 border-b border-gray-700">
+                <h3 class="text-sm font-semibold text-gray-300">Preview</h3>
+            </div>
+            <div class="flex-1 p-8 flex items-center justify-center" id="preview">
+                <div class="text-center text-gray-500">
+                    <i class="ph-eye text-4xl mb-2"></i>
+                    <p>Component preview will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Component library - all 53 components
+        const componentLibrary = [
+            {
+                name: 'Buttons',
+                icon: '🔘',
+                components: [
+                    {
+                        name: 'Glowing Button',
+                        preview: '<button class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 animate-pulse-glow">Click Me</button>',
+                        code: `export const GlowingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 animate-pulse"
+    >
+      {children}
+    </button>
+  );
+};`
+                    },
+                    {
+                        name: 'Gradient Button',
+                        preview: '<button class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105">Gradient Magic</button>',
+                        code: `export const GradientButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
+    >
+      {children}
+    </button>
+  );
+};`
+                    },
+                    {
+                        name: 'Outline Button',
+                        preview: '<button class="px-6 py-3 border-2 border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white font-medium rounded-lg transition-all duration-300">Outline Style</button>',
+                        code: `export const OutlineButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 border-2 border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white font-medium rounded-lg transition-all duration-300"
+    >
+      {children}
+    </button>
+  );
+};`
+                    },
+                    {
+                        name: 'Glass Button',
+                        preview: '<button class="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white/20">Glass Effect</button>',
+                        code: `export const GlassButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white/20"
+    >
+      {children}
+    </button>
+  );
+};`
+                    },
+                    {
+                        name: 'Floating Button',
+                        preview: '<button class="px-6 py-3 bg-purple-600 text-white font-medium rounded-full shadow-lg transition-all duration-300 animate-float">Floating</button>',
+                        code: `export const FloatingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-purple-600 text-white font-medium rounded-full shadow-lg transition-all duration-300 animate-float"
+    >
+      {children}
+    </button>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Text Effects',
+                icon: '📝',
+                components: [
+                    {
+                        name: 'Shiny Text',
+                        preview: '<h2 class="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x" style="background-size: 200% 100%">Shiny Text Effect</h2>',
+                        code: `export const ShinyText = ({ children, className = '' }) => {
+  return (
+    <span className={\`inline-block \${className}\`}>
+      <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">
+        {children}
+      </span>
+    </span>
+  );
+};`
+                    },
+                    {
+                        name: 'Typewriter Text',
+                        preview: '<div id="typewriter-preview" class="text-2xl font-mono text-green-400"></div>',
+                        code: `export const TypewriterText = ({ text, speed = 100 }) => {
+  const [displayText, setDisplayText] = useState('');
+  
+  useEffect(() => {
+    let index = 0;
+    const timer = setInterval(() => {
+      if (index < text.length) {
+        setDisplayText(prev => prev + text[index]);
+        index++;
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+    
+    return () => clearInterval(timer);
+  }, [text, speed]);
+  
+  return <span className="font-mono">{displayText}<span className="animate-pulse">|</span></span>;
+};`
+                    },
+                    {
+                        name: 'Gradient Text',
+                        preview: '<h2 class="text-4xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Gradient Text</h2>',
+                        code: `export const GradientText = ({ children, className = '' }) => {
+  return (
+    <span className={\`bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent \${className}\`}>
+      {children}
+    </span>
+  );
+};`
+                    },
+                    {
+                        name: 'Glitch Text',
+                        preview: '<h2 class="text-3xl font-bold relative" data-text="Glitch Effect"><span class="animate-pulse text-purple-400">Glitch Effect</span></h2>',
+                        code: `export const GlitchText = ({ children }) => {
+  return (
+    <h2 className="text-3xl font-bold relative glitch" data-text={children}>
+      <span className="animate-pulse">{children}</span>
+    </h2>
+  );
+};`
+                    },
+                    {
+                        name: 'Neon Text',
+                        preview: '<h2 class="text-4xl font-bold text-pink-500" style="text-shadow: 0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899">Neon Glow</h2>',
+                        code: `export const NeonText = ({ children, color = 'pink' }) => {
+  const colors = {
+    pink: '#ec4899',
+    purple: '#a855f7',
+    blue: '#3b82f6'
+  };
+  
+  return (
+    <h2 
+      className="text-4xl font-bold"
+      style={{
+        color: colors[color],
+        textShadow: \`0 0 10px \${colors[color]}, 0 0 20px \${colors[color]}, 0 0 30px \${colors[color]}\`
+      }}
+    >
+      {children}
+    </h2>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Cards',
+                icon: '🃏',
+                components: [
+                    {
+                        name: 'Glass Card',
+                        preview: `<div class="p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+                            <h3 class="text-xl font-semibold mb-2">Glass Card</h3>
+                            <p class="text-gray-300">Beautiful glassmorphism effect with backdrop blur</p>
+                        </div>`,
+                        code: `export const GlassCard = ({ title, description }) => {
+  return (
+    <div className="p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl hover:bg-white/20 transition-all">
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-300">{description}</p>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Gradient Card',
+                        preview: `<div class="p-6 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+                            <h3 class="text-xl font-semibold mb-2">Gradient Card</h3>
+                            <p class="text-gray-300">Subtle gradient background with border</p>
+                        </div>`,
+                        code: `export const GradientCard = ({ title, description }) => {
+  return (
+    <div className="p-6 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-pink-500/30 transition-all">
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-300">{description}</p>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Hover Card',
+                        preview: `<div class="p-6 rounded-xl bg-gray-800 border border-gray-700 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:-translate-y-1">
+                            <h3 class="text-xl font-semibold mb-2">Hover Card</h3>
+                            <p class="text-gray-400">Hover for elevation effect</p>
+                        </div>`,
+                        code: `export const HoverCard = ({ title, description }) => {
+  return (
+    <div className="p-6 rounded-xl bg-gray-800 border border-gray-700 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:-translate-y-1">
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-400">{description}</p>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Neon Card',
+                        preview: `<div class="p-6 rounded-xl bg-gray-900 border-2 border-purple-500 shadow-lg shadow-purple-500/50" style="box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), inset 0 0 20px rgba(168, 85, 247, 0.1)">
+                            <h3 class="text-xl font-semibold mb-2 text-purple-400">Neon Card</h3>
+                            <p class="text-gray-300">Glowing neon border effect</p>
+                        </div>`,
+                        code: `export const NeonCard = ({ title, description }) => {
+  return (
+    <div 
+      className="p-6 rounded-xl bg-gray-900 border-2 border-purple-500"
+      style={{
+        boxShadow: '0 0 20px rgba(168, 85, 247, 0.5), inset 0 0 20px rgba(168, 85, 247, 0.1)'
+      }}
+    >
+      <h3 className="text-xl font-semibold mb-2 text-purple-400">{title}</h3>
+      <p className="text-gray-300">{description}</p>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: '3D Card',
+                        preview: `<div class="p-6 rounded-xl bg-gray-800 transform transition-all duration-300 hover:rotate-3" style="transform-style: preserve-3d; perspective: 1000px;">
+                            <h3 class="text-xl font-semibold mb-2">3D Card</h3>
+                            <p class="text-gray-400">Hover for 3D rotation</p>
+                        </div>`,
+                        code: `export const Card3D = ({ title, description }) => {
+  return (
+    <div 
+      className="p-6 rounded-xl bg-gray-800 transform transition-all duration-300 hover:rotate-3"
+      style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
+    >
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-400">{description}</p>
+    </div>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Loaders',
+                icon: '⏳',
+                components: [
+                    {
+                        name: 'Pulse Loader',
+                        preview: '<div class="flex space-x-2"><div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div><div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse delay-75"></div><div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse delay-150"></div></div>',
+                        code: `export const PulseLoader = () => {
+  return (
+    <div className="flex space-x-2">
+      <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+      <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse delay-75"></div>
+      <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse delay-150"></div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Spin Loader',
+                        preview: '<div class="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>',
+                        code: `export const SpinLoader = ({ size = 'md' }) => {
+  const sizes = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+  
+  return (
+    <div className={\`\${sizes[size]} border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin\`}></div>
+  );
+};`
+                    },
+                    {
+                        name: 'Dots Loader',
+                        preview: '<div class="flex space-x-1"><div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div><div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div><div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div></div>',
+                        code: `export const DotsLoader = () => {
+  return (
+    <div className="flex space-x-1">
+      {[0, 150, 300].map((delay, i) => (
+        <div
+          key={i}
+          className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"
+          style={{ animationDelay: \`\${delay}ms\` }}
+        />
+      ))}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Ring Loader',
+                        preview: '<div class="relative w-12 h-12"><div class="absolute inset-0 border-4 border-purple-200 rounded-full"></div><div class="absolute inset-0 border-4 border-purple-600 rounded-full animate-spin" style="border-top-color: transparent; border-right-color: transparent; border-bottom-color: transparent"></div></div>',
+                        code: `export const RingLoader = () => {
+  return (
+    <div className="relative w-12 h-12">
+      <div className="absolute inset-0 border-4 border-purple-200 rounded-full"></div>
+      <div className="absolute inset-0 border-4 border-purple-600 rounded-full animate-spin border-t-transparent border-r-transparent border-b-transparent"></div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Bar Loader',
+                        preview: '<div class="flex space-x-1"><div class="w-1 h-8 bg-purple-500 animate-pulse"></div><div class="w-1 h-8 bg-purple-500 animate-pulse" style="animation-delay: 100ms"></div><div class="w-1 h-8 bg-purple-500 animate-pulse" style="animation-delay: 200ms"></div><div class="w-1 h-8 bg-purple-500 animate-pulse" style="animation-delay: 300ms"></div><div class="w-1 h-8 bg-purple-500 animate-pulse" style="animation-delay: 400ms"></div></div>',
+                        code: `export const BarLoader = () => {
+  return (
+    <div className="flex space-x-1">
+      {[0, 100, 200, 300, 400].map((delay, i) => (
+        <div
+          key={i}
+          className="w-1 h-8 bg-purple-500 animate-pulse"
+          style={{ animationDelay: \`\${delay}ms\` }}
+        />
+      ))}
+    </div>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Backgrounds',
+                icon: '🎨',
+                components: [
+                    {
+                        name: 'Gradient Background',
+                        preview: '<div class="h-32 rounded-lg bg-gradient-to-br from-purple-600 via-pink-500 to-red-500"></div>',
+                        code: `export const GradientBackground = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500">
+      {children}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Animated Gradient',
+                        preview: '<div class="h-32 rounded-lg bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 animate-gradient-x" style="background-size: 200% 200%"></div>',
+                        code: `export const AnimatedGradient = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }}>
+      {children}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Mesh Gradient',
+                        preview: '<div class="h-32 rounded-lg relative overflow-hidden bg-purple-900"><div class="absolute inset-0 bg-gradient-to-r from-pink-500/30 to-purple-500/30 blur-3xl"></div><div class="absolute inset-0 bg-gradient-to-l from-blue-500/20 to-green-500/20 blur-3xl"></div></div>',
+                        code: `export const MeshGradient = ({ children }) => {
+  return (
+    <div className="min-h-screen relative overflow-hidden bg-purple-900">
+      <div className="absolute inset-0 bg-gradient-to-r from-pink-500/30 to-purple-500/30 blur-3xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-l from-blue-500/20 to-green-500/20 blur-3xl"></div>
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Particle Background',
+                        preview: '<div class="h-32 rounded-lg bg-gray-900 relative overflow-hidden"><div class="absolute w-2 h-2 bg-purple-500 rounded-full animate-float" style="top: 20%; left: 10%"></div><div class="absolute w-3 h-3 bg-pink-500 rounded-full animate-float" style="top: 60%; left: 70%; animation-delay: 1s"></div><div class="absolute w-2 h-2 bg-blue-500 rounded-full animate-float" style="top: 40%; left: 40%; animation-delay: 2s"></div></div>',
+                        code: `export const ParticleBackground = ({ children }) => {
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    size: Math.random() * 3 + 1,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    delay: Math.random() * 5
+  }));
+  
+  return (
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="absolute bg-purple-500 rounded-full animate-float"
+          style={{
+            width: \`\${p.size}rem\`,
+            height: \`\${p.size}rem\`,
+            top: \`\${p.y}%\`,
+            left: \`\${p.x}%\`,
+            animationDelay: \`\${p.delay}s\`
+          }}
+        />
+      ))}
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Grid Background',
+                        preview: '<div class="h-32 rounded-lg bg-gray-900 relative overflow-hidden"><div class="absolute inset-0" style="background-image: linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px); background-size: 20px 20px"></div></div>',
+                        code: `export const GridBackground = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gray-900 relative">
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px)',
+          backgroundSize: '20px 20px'
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Forms',
+                icon: '📋',
+                components: [
+                    {
+                        name: 'Glass Input',
+                        preview: '<input type="text" placeholder="Enter text..." class="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400">',
+                        code: `export const GlassInput = ({ placeholder, value, onChange }) => {
+  return (
+    <input
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
+    />
+  );
+};`
+                    },
+                    {
+                        name: 'Floating Label Input',
+                        preview: '<div class="relative"><input type="text" placeholder=" " class="peer px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"><label class="absolute left-4 top-2 text-gray-400 transition-all peer-placeholder-shown:top-2 peer-focus:-top-6 peer-focus:text-purple-500 peer-focus:text-sm">Email</label></div>',
+                        code: `export const FloatingLabelInput = ({ label, value, onChange }) => {
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        placeholder=" "
+        value={value}
+        onChange={onChange}
+        className="peer px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"
+      />
+      <label className="absolute left-4 top-2 text-gray-400 transition-all peer-placeholder-shown:top-2 peer-focus:-top-6 peer-focus:text-purple-500 peer-focus:text-sm">
+        {label}
+      </label>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Toggle Switch',
+                        preview: '<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"><div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div></label>',
+                        code: `export const ToggleSwitch = ({ checked, onChange }) => {
+  return (
+    <label className="relative inline-flex items-center cursor-pointer">
+      <input 
+        type="checkbox" 
+        className="sr-only peer"
+        checked={checked}
+        onChange={onChange}
+      />
+      <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+    </label>
+  );
+};`
+                    },
+                    {
+                        name: 'Select Dropdown',
+                        preview: '<select class="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"><option>Option 1</option><option>Option 2</option><option>Option 3</option></select>',
+                        code: `export const SelectDropdown = ({ options, value, onChange }) => {
+  return (
+    <select
+      value={value}
+      onChange={onChange}
+      className="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"
+    >
+      {options.map(opt => (
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      ))}
+    </select>
+  );
+};`
+                    },
+                    {
+                        name: 'Checkbox',
+                        preview: '<label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="w-5 h-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500 focus:ring-2"><span class="text-gray-300">I agree to terms</span></label>',
+                        code: `export const Checkbox = ({ label, checked, onChange }) => {
+  return (
+    <label className="flex items-center space-x-2 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="w-5 h-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500 focus:ring-2"
+      />
+      <span className="text-gray-300">{label}</span>
+    </label>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Navigation',
+                icon: '🧭',
+                components: [
+                    {
+                        name: 'Tab Navigation',
+                        preview: '<div class="flex space-x-1 bg-gray-800 p-1 rounded-lg"><button class="px-4 py-2 bg-purple-600 text-white rounded-md">Tab 1</button><button class="px-4 py-2 text-gray-400 hover:text-white rounded-md">Tab 2</button><button class="px-4 py-2 text-gray-400 hover:text-white rounded-md">Tab 3</button></div>',
+                        code: `export const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
+  return (
+    <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.id)}
+          className={\`px-4 py-2 rounded-md transition-all \${
+            activeTab === tab.id 
+              ? 'bg-purple-600 text-white' 
+              : 'text-gray-400 hover:text-white'
+          }\`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Breadcrumb',
+                        preview: '<nav class="flex items-center space-x-2 text-sm"><a href="#" class="text-gray-400 hover:text-white">Home</a><span class="text-gray-600">/</span><a href="#" class="text-gray-400 hover:text-white">Products</a><span class="text-gray-600">/</span><span class="text-purple-400">Details</span></nav>',
+                        code: `export const Breadcrumb = ({ items }) => {
+  return (
+    <nav className="flex items-center space-x-2 text-sm">
+      {items.map((item, index) => (
+        <React.Fragment key={index}>
+          {index > 0 && <span className="text-gray-600">/</span>}
+          {item.active ? (
+            <span className="text-purple-400">{item.label}</span>
+          ) : (
+            <a href={item.href} className="text-gray-400 hover:text-white">
+              {item.label}
+            </a>
+          )}
+        </React.Fragment>
+      ))}
+    </nav>
+  );
+};`
+                    },
+                    {
+                        name: 'Pagination',
+                        preview: '<div class="flex items-center space-x-2"><button class="px-3 py-1 bg-gray-800 text-gray-400 rounded hover:bg-gray-700">←</button><button class="px-3 py-1 bg-purple-600 text-white rounded">1</button><button class="px-3 py-1 bg-gray-800 text-gray-400 rounded hover:bg-gray-700">2</button><button class="px-3 py-1 bg-gray-800 text-gray-400 rounded hover:bg-gray-700">3</button><button class="px-3 py-1 bg-gray-800 text-gray-400 rounded hover:bg-gray-700">→</button></div>',
+                        code: `export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  return (
+    <div className="flex items-center space-x-2">
+      <button 
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-3 py-1 bg-gray-800 text-gray-400 rounded hover:bg-gray-700 disabled:opacity-50"
+      >
+        ←
+      </button>
+      {Array.from({ length: totalPages }, (_, i) => (
+        <button
+          key={i + 1}
+          onClick={() => onPageChange(i + 1)}
+          className={\`px-3 py-1 rounded \${
+            currentPage === i + 1
+              ? 'bg-purple-600 text-white'
+              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+          }\`}
+        >
+          {i + 1}
+        </button>
+      ))}
+      <button 
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="px-3 py-1 bg-gray-800 text-gray-400 rounded hover:bg-gray-700 disabled:opacity-50"
+      >
+        →
+      </button>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Side Navigation',
+                        preview: '<div class="w-64 bg-gray-800 p-4 rounded-lg"><a href="#" class="block px-4 py-2 text-purple-400 bg-purple-900/30 rounded">Dashboard</a><a href="#" class="block px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded mt-1">Projects</a><a href="#" class="block px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded mt-1">Settings</a></div>',
+                        code: `export const SideNavigation = ({ items, activeItem }) => {
+  return (
+    <div className="w-64 bg-gray-800 p-4 rounded-lg">
+      {items.map(item => (
+        <a
+          key={item.id}
+          href={item.href}
+          className={\`block px-4 py-2 rounded mt-1 transition-all \${
+            activeItem === item.id
+              ? 'text-purple-400 bg-purple-900/30'
+              : 'text-gray-400 hover:text-white hover:bg-gray-700'
+          }\`}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Menu Button',
+                        preview: '<button class="p-2 hover:bg-gray-800 rounded-lg transition-colors"><div class="w-6 h-0.5 bg-gray-400 mb-1.5"></div><div class="w-6 h-0.5 bg-gray-400 mb-1.5"></div><div class="w-6 h-0.5 bg-gray-400"></div></button>',
+                        code: `export const MenuButton = ({ onClick, isOpen }) => {
+  return (
+    <button 
+      onClick={onClick}
+      className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+    >
+      <div className={\`w-6 h-0.5 bg-gray-400 mb-1.5 transition-all \${isOpen ? 'rotate-45 translate-y-2' : ''}\`}></div>
+      <div className={\`w-6 h-0.5 bg-gray-400 mb-1.5 transition-all \${isOpen ? 'opacity-0' : ''}\`}></div>
+      <div className={\`w-6 h-0.5 bg-gray-400 transition-all \${isOpen ? '-rotate-45 -translate-y-2' : ''}\`}></div>
+    </button>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Layout',
+                icon: '📐',
+                components: [
+                    {
+                        name: 'Section Container',
+                        preview: '<div class="max-w-6xl mx-auto px-4 py-16"><h2 class="text-3xl font-bold mb-4">Section Title</h2><p class="text-gray-400">Section content goes here</p></div>',
+                        code: `export const SectionContainer = ({ title, children }) => {
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-16">
+      <h2 className="text-3xl font-bold mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Grid Layout',
+                        preview: '<div class="grid grid-cols-3 gap-4"><div class="bg-gray-800 p-4 rounded">Item 1</div><div class="bg-gray-800 p-4 rounded">Item 2</div><div class="bg-gray-800 p-4 rounded">Item 3</div></div>',
+                        code: `export const GridLayout = ({ columns = 3, gap = 4, children }) => {
+  return (
+    <div className={\`grid grid-cols-\${columns} gap-\${gap}\`}>
+      {children}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Flex Container',
+                        preview: '<div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg"><span>Left Content</span><span>Right Content</span></div>',
+                        code: `export const FlexContainer = ({ justify = 'between', align = 'center', children }) => {
+  return (
+    <div className={\`flex items-\${align} justify-\${justify} p-4 bg-gray-800 rounded-lg\`}>
+      {children}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Split Layout',
+                        preview: '<div class="grid grid-cols-2 gap-8 h-32"><div class="bg-purple-900/20 rounded-lg p-4">Left Panel</div><div class="bg-pink-900/20 rounded-lg p-4">Right Panel</div></div>',
+                        code: `export const SplitLayout = ({ left, right }) => {
+  return (
+    <div className="grid grid-cols-2 gap-8 h-full">
+      <div className="bg-purple-900/20 rounded-lg p-4">{left}</div>
+      <div className="bg-pink-900/20 rounded-lg p-4">{right}</div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Stack Layout',
+                        preview: '<div class="space-y-4"><div class="bg-gray-800 p-4 rounded">Stack Item 1</div><div class="bg-gray-800 p-4 rounded">Stack Item 2</div><div class="bg-gray-800 p-4 rounded">Stack Item 3</div></div>',
+                        code: `export const StackLayout = ({ spacing = 4, children }) => {
+  return (
+    <div className={\`space-y-\${spacing}\`}>
+      {React.Children.map(children, child => (
+        <div className="bg-gray-800 p-4 rounded">{child}</div>
+      ))}
+    </div>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Interactive',
+                icon: '🎯',
+                components: [
+                    {
+                        name: 'Tooltip',
+                        preview: '<div class="relative inline-block group"><button class="px-4 py-2 bg-purple-600 rounded">Hover me</button><div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Tooltip text</div></div>',
+                        code: `export const Tooltip = ({ children, text }) => {
+  return (
+    <div className="relative inline-block group">
+      {children}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+        {text}
+      </div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Modal',
+                        preview: '<div class="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style="position: relative; width: 100%; height: 200px;"><div class="bg-gray-800 rounded-lg p-6 max-w-md w-full"><h3 class="text-xl font-bold mb-4">Modal Title</h3><p class="text-gray-400 mb-4">Modal content goes here</p><button class="px-4 py-2 bg-purple-600 rounded">Close</button></div></div>',
+                        code: `export const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full">
+        <h3 className="text-xl font-bold mb-4">{title}</h3>
+        {children}
+        <button 
+          onClick={onClose}
+          className="px-4 py-2 bg-purple-600 rounded mt-4"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Accordion',
+                        preview: '<div class="space-y-2"><div class="bg-gray-800 rounded-lg"><button class="w-full px-4 py-3 text-left flex items-center justify-between"><span>Accordion Item 1</span><span>▼</span></button><div class="px-4 pb-3 text-gray-400">Content for item 1</div></div><div class="bg-gray-800 rounded-lg"><button class="w-full px-4 py-3 text-left flex items-center justify-between"><span>Accordion Item 2</span><span>►</span></button></div></div>',
+                        code: `export const Accordion = ({ items }) => {
+  const [openIndex, setOpenIndex] = useState(0);
+  
+  return (
+    <div className="space-y-2">
+      {items.map((item, index) => (
+        <div key={index} className="bg-gray-800 rounded-lg">
+          <button 
+            onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+            className="w-full px-4 py-3 text-left flex items-center justify-between"
+          >
+            <span>{item.title}</span>
+            <span>{openIndex === index ? '▼' : '►'}</span>
+          </button>
+          {openIndex === index && (
+            <div className="px-4 pb-3 text-gray-400">{item.content}</div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Dropdown Menu',
+                        preview: '<div class="relative"><button class="px-4 py-2 bg-gray-800 rounded flex items-center space-x-2"><span>Options</span><span>▼</span></button><div class="absolute top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-xl"><a href="#" class="block px-4 py-2 hover:bg-gray-700">Option 1</a><a href="#" class="block px-4 py-2 hover:bg-gray-700">Option 2</a><a href="#" class="block px-4 py-2 hover:bg-gray-700">Option 3</a></div></div>',
+                        code: `export const DropdownMenu = ({ label, items }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <div className="relative">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="px-4 py-2 bg-gray-800 rounded flex items-center space-x-2"
+      >
+        <span>{label}</span>
+        <span>{isOpen ? '▼' : '►'}</span>
+      </button>
+      {isOpen && (
+        <div className="absolute top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-xl">
+          {items.map((item, index) => (
+            <a 
+              key={index}
+              href={item.href}
+              className="block px-4 py-2 hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Copy Button',
+                        preview: '<button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded flex items-center space-x-2"><span>Copy to clipboard</span><svg width="16" height="16" fill="currentColor"><path d="M13 0H6a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/></svg></button>',
+                        code: `export const CopyButton = ({ text, onCopy }) => {
+  const [copied, setCopied] = useState(false);
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    onCopy?.();
+    setTimeout(() => setCopied(false), 2000);
+  };
+  
+  return (
+    <button 
+      onClick={handleCopy}
+      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded flex items-center space-x-2"
+    >
+      <span>{copied ? 'Copied!' : 'Copy to clipboard'}</span>
+      <svg width="16" height="16" fill="currentColor">
+        <path d="M13 0H6a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+      </svg>
+    </button>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Data',
+                icon: '📊',
+                components: [
+                    {
+                        name: 'Progress Bar',
+                        preview: '<div class="w-full bg-gray-700 rounded-full h-2.5"><div class="bg-purple-600 h-2.5 rounded-full" style="width: 70%"></div></div>',
+                        code: `export const ProgressBar = ({ value, max = 100 }) => {
+  const percentage = (value / max) * 100;
+  
+  return (
+    <div className="w-full bg-gray-700 rounded-full h-2.5">
+      <div 
+        className="bg-purple-600 h-2.5 rounded-full transition-all duration-300"
+        style={{ width: \`\${percentage}%\` }}
+      />
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Stats Card',
+                        preview: '<div class="bg-gray-800 rounded-lg p-6"><div class="text-gray-400 text-sm">Total Revenue</div><div class="text-3xl font-bold mt-1">$12,345</div><div class="text-green-400 text-sm mt-2">↑ 12% from last month</div></div>',
+                        code: `export const StatsCard = ({ label, value, change, positive = true }) => {
+  return (
+    <div className="bg-gray-800 rounded-lg p-6">
+      <div className="text-gray-400 text-sm">{label}</div>
+      <div className="text-3xl font-bold mt-1">{value}</div>
+      <div className={\`text-sm mt-2 \${positive ? 'text-green-400' : 'text-red-400'}\`}>
+        {positive ? '↑' : '↓'} {change}
+      </div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Badge',
+                        preview: '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-200">New</span>',
+                        code: `export const Badge = ({ children, variant = 'default' }) => {
+  const variants = {
+    default: 'bg-purple-900 text-purple-200',
+    success: 'bg-green-900 text-green-200',
+    warning: 'bg-yellow-900 text-yellow-200',
+    error: 'bg-red-900 text-red-200'
+  };
+  
+  return (
+    <span className={\`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium \${variants[variant]}\`}>
+      {children}
+    </span>
+  );
+};`
+                    },
+                    {
+                        name: 'Table',
+                        preview: '<div class="overflow-hidden rounded-lg border border-gray-700"><table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-800"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th></tr></thead><tbody class="bg-gray-900 divide-y divide-gray-800"><tr><td class="px-6 py-4 text-sm">John Doe</td><td class="px-6 py-4 text-sm"><span class="text-green-400">Active</span></td></tr></tbody></table></div>',
+                        code: `export const Table = ({ columns, data }) => {
+  return (
+    <div className="overflow-hidden rounded-lg border border-gray-700">
+      <table className="min-w-full divide-y divide-gray-700">
+        <thead className="bg-gray-800">
+          <tr>
+            {columns.map(col => (
+              <th key={col.key} className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                {col.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="bg-gray-900 divide-y divide-gray-800">
+          {data.map((row, i) => (
+            <tr key={i}>
+              {columns.map(col => (
+                <td key={col.key} className="px-6 py-4 text-sm">
+                  {row[col.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Chart Placeholder',
+                        preview: '<div class="bg-gray-800 rounded-lg p-6 h-64 flex items-center justify-center"><div class="text-center"><div class="text-4xl mb-2">📊</div><p class="text-gray-400">Chart goes here</p></div></div>',
+                        code: `export const ChartPlaceholder = ({ title, height = '16rem' }) => {
+  return (
+    <div 
+      className="bg-gray-800 rounded-lg p-6 flex items-center justify-center"
+      style={{ height }}
+    >
+      <div className="text-center">
+        <div className="text-4xl mb-2">📊</div>
+        <p className="text-gray-400">{title || 'Chart goes here'}</p>
+      </div>
+    </div>
+  );
+};`
+                    }
+                ]
+            },
+            {
+                name: 'Media',
+                icon: '🖼️',
+                components: [
+                    {
+                        name: 'Image Card',
+                        preview: '<div class="bg-gray-800 rounded-lg overflow-hidden"><div class="h-48 bg-gradient-to-br from-purple-500 to-pink-500"></div><div class="p-4"><h3 class="font-semibold">Image Title</h3><p class="text-gray-400 text-sm mt-1">Image description</p></div></div>',
+                        code: `export const ImageCard = ({ imageUrl, title, description }) => {
+  return (
+    <div className="bg-gray-800 rounded-lg overflow-hidden">
+      <div className="h-48 bg-gradient-to-br from-purple-500 to-pink-500">
+        {imageUrl && <img src={imageUrl} alt={title} className="w-full h-full object-cover" />}
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold">{title}</h3>
+        <p className="text-gray-400 text-sm mt-1">{description}</p>
+      </div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Avatar',
+                        preview: '<div class="flex items-center space-x-3"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500"></div><div><div class="font-semibold">User Name</div><div class="text-sm text-gray-400">user@example.com</div></div></div>',
+                        code: `export const Avatar = ({ src, name, email, size = 'md' }) => {
+  const sizes = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+  
+  return (
+    <div className="flex items-center space-x-3">
+      <div className={\`\${sizes[size]} rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden\`}>
+        {src && <img src={src} alt={name} className="w-full h-full object-cover" />}
+      </div>
+      {name && (
+        <div>
+          <div className="font-semibold">{name}</div>
+          {email && <div className="text-sm text-gray-400">{email}</div>}
+        </div>
+      )}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Video Player',
+                        preview: '<div class="bg-gray-900 rounded-lg overflow-hidden"><div class="aspect-video bg-gray-800 flex items-center justify-center"><button class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"><svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg></button></div></div>',
+                        code: `export const VideoPlayer = ({ videoUrl, thumbnail }) => {
+  const [playing, setPlaying] = useState(false);
+  
+  return (
+    <div className="bg-gray-900 rounded-lg overflow-hidden">
+      <div className="aspect-video bg-gray-800 flex items-center justify-center relative">
+        {!playing ? (
+          <>
+            {thumbnail && <img src={thumbnail} alt="Video thumbnail" className="absolute inset-0 w-full h-full object-cover" />}
+            <button 
+              onClick={() => setPlaying(true)}
+              className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 relative z-10"
+            >
+              <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+              </svg>
+            </button>
+          </>
+        ) : (
+          <video src={videoUrl} controls autoPlay className="w-full h-full" />
+        )}
+      </div>
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Gallery',
+                        preview: '<div class="grid grid-cols-3 gap-2"><div class="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded"></div><div class="aspect-square bg-gradient-to-br from-blue-500 to-green-500 rounded"></div><div class="aspect-square bg-gradient-to-br from-yellow-500 to-red-500 rounded"></div><div class="aspect-square bg-gradient-to-br from-purple-500 to-blue-500 rounded"></div><div class="aspect-square bg-gradient-to-br from-green-500 to-yellow-500 rounded"></div><div class="aspect-square bg-gradient-to-br from-red-500 to-purple-500 rounded"></div></div>',
+                        code: `export const Gallery = ({ images, columns = 3 }) => {
+  return (
+    <div className={\`grid grid-cols-\${columns} gap-2\`}>
+      {images.map((image, index) => (
+        <div key={index} className="aspect-square rounded overflow-hidden">
+          <img 
+            src={image.url} 
+            alt={image.alt || \`Image \${index + 1}\`}
+            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+          />
+        </div>
+      ))}
+    </div>
+  );
+};`
+                    },
+                    {
+                        name: 'Icon Box',
+                        preview: '<div class="p-6 bg-gray-800 rounded-lg text-center"><div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4"><span class="text-2xl">🚀</span></div><h3 class="font-semibold">Feature Title</h3><p class="text-gray-400 text-sm mt-2">Feature description goes here</p></div>',
+                        code: `export const IconBox = ({ icon, title, description }) => {
+  return (
+    <div className="p-6 bg-gray-800 rounded-lg text-center hover:bg-gray-750 transition-colors">
+      <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span className="text-2xl">{icon}</span>
+      </div>
+      <h3 className="font-semibold">{title}</h3>
+      <p className="text-gray-400 text-sm mt-2">{description}</p>
+    </div>
+  );
+};`
+                    }
+                ]
+            }
+        ];
+
+        let currentComponent = null;
+        let terminalHistory = [];
+
+        // Initialize component list
+        function initializeComponents() {
+            const listEl = document.getElementById('componentList');
+            listEl.innerHTML = '';
+            
+            componentLibrary.forEach((category, catIndex) => {
+                const categoryEl = document.createElement('div');
+                categoryEl.className = 'mb-6';
+                categoryEl.innerHTML = `
+                    <h3 class="text-sm font-semibold text-gray-400 mb-2 flex items-center">
+                        <span class="mr-2">${category.icon}</span>
+                        ${category.name}
+                        <span class="ml-auto text-xs">${category.components.length}</span>
+                    </h3>
+                    <div class="space-y-1" id="category-${catIndex}"></div>
+                `;
+                listEl.appendChild(categoryEl);
+                
+                const categoryList = document.getElementById(`category-${catIndex}`);
+                category.components.forEach((component, compIndex) => {
+                    const componentEl = document.createElement('button');
+                    componentEl.className = 'w-full text-left px-3 py-2 rounded hover:bg-gray-700 transition-colors text-sm';
+                    componentEl.textContent = component.name;
+                    componentEl.onclick = () => selectComponent(catIndex, compIndex);
+                    categoryList.appendChild(componentEl);
+                });
+            });
+        }
+
+        // Select component
+        function selectComponent(catIndex, compIndex) {
+            const component = componentLibrary[catIndex].components[compIndex];
+            currentComponent = component;
+            
+            // Update preview
+            document.getElementById('preview').innerHTML = `
+                <div class="w-full">
+                    ${component.preview}
+                </div>
+            `;
+            
+            // Update code
+            updateCode(component.code);
+            
+            // Initialize special animations
+            if (component.name === 'Typewriter Text') {
+                initTypewriter();
+            }
+            
+            // Add to terminal
+            addToTerminal(`Selected component: ${component.name}`);
+        }
+
+        // Update code display
+        function updateCode(code) {
+            const codeEl = document.getElementById('codeContent');
+            const variant = document.getElementById('codeVariant').value;
+            
+            let displayCode = code;
+            
+            // Convert based on variant
+            if (variant.includes('javascript')) {
+                displayCode = convertToJavaScript(code);
+            }
+            if (variant.includes('css')) {
+                displayCode = convertToCSSModules(code);
+            }
+            
+            codeEl.textContent = displayCode;
+        }
+
+        // Terminal functions
+        function addToTerminal(text) {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+            terminalHistory.push(text);
+        }
+
+        function clearTerminal() {
+            document.getElementById('terminal').innerHTML = '';
+            terminalHistory = [];
+            addToTerminal('Terminal cleared');
+        }
+
+        function showHelp() {
+            addToTerminal('Available commands:');
+            addToTerminal('  /ui <description> - Generate a UI component');
+            addToTerminal('  clear - Clear terminal');
+            addToTerminal('  help - Show this help message');
+        }
+
+        // Handle terminal input
+        document.getElementById('terminalInput').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const input = e.target.value.trim();
+                if (!input) return;
+                
+                addToTerminal(`$ ${input}`);
+                e.target.value = '';
+                
+                if (input === 'clear') {
+                    clearTerminal();
+                } else if (input === 'help') {
+                    showHelp();
+                } else if (input.startsWith('/ui ')) {
+                    await handleUICommand(input.substring(4));
+                } else {
+                    addToTerminal(`Unknown command: ${input}`);
+                }
+            }
+        });
+
+        // Handle /ui command
+        async function handleUICommand(description) {
+            addToTerminal('🎨 Generating component...');
+            
+            try {
+                // Call Magic API
+                const response = await fetch('/api/magic/ui', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: description })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.component) {
+                    addToTerminal('✅ Component generated successfully!');
+                    addToTerminal(`Type: ${data.customizations?.detected || 'custom'}`);
+                    addToTerminal(`Category: ${data.customizations?.category || 'unknown'}`);
+                    
+                    // Update code display
+                    updateCode(data.component.code);
+                    
+                    // Try to find and preview matching component
+                    const componentType = data.customizations?.detected;
+                    let found = false;
+                    
+                    componentLibrary.forEach((cat, catIdx) => {
+                        cat.components.forEach((comp, compIdx) => {
+                            if (comp.name.toLowerCase().includes(componentType)) {
+                                selectComponent(catIdx, compIdx);
+                                found = true;
+                            }
+                        });
+                    });
+                    
+                    if (!found) {
+                        // Show generic preview
+                        document.getElementById('preview').innerHTML = `
+                            <div class="text-center">
+                                <p class="text-gray-400 mb-4">Generated ${componentType} component</p>
+                                <div class="p-4 bg-gray-800 rounded">
+                                    <p class="text-sm text-gray-500">Preview not available for custom components</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    addToTerminal(`❌ Error: ${data.error || 'Failed to generate component'}`);
+                    // Fallback to local generation
+                    generateLocalComponent(description);
+                }
+            } catch (error) {
+                addToTerminal(`❌ Error: ${error.message}`);
+                // Fallback to local generation
+                generateLocalComponent(description);
+            }
+        }
+
+        // Local component generation fallback
+        function generateLocalComponent(description) {
+            const desc = description.toLowerCase();
+            
+            // Find best matching component
+            let bestMatch = null;
+            let bestScore = 0;
+            
+            componentLibrary.forEach((cat, catIdx) => {
+                cat.components.forEach((comp, compIdx) => {
+                    const compName = comp.name.toLowerCase();
+                    let score = 0;
+                    
+                    // Check for keyword matches
+                    const keywords = compName.split(' ');
+                    keywords.forEach(keyword => {
+                        if (desc.includes(keyword)) score += 2;
+                    });
+                    
+                    // Check for category match
+                    if (desc.includes(cat.name.toLowerCase())) score += 1;
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = { catIdx, compIdx, component: comp };
+                    }
+                });
+            });
+            
+            if (bestMatch) {
+                addToTerminal('✅ Found similar component');
+                selectComponent(bestMatch.catIdx, bestMatch.compIdx);
+            } else {
+                addToTerminal('❌ No matching component found');
+                addToTerminal('💡 Try: button, card, loader, form, navigation, etc.');
+            }
+        }
+
+        // Copy code to clipboard
+        function copyCode() {
+            const code = document.getElementById('codeContent').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                addToTerminal('✅ Code copied to clipboard');
+            }).catch(() => {
+                addToTerminal('❌ Failed to copy code');
+            });
+        }
+
+        // Convert TypeScript to JavaScript
+        function convertToJavaScript(code) {
+            return code
+                .replace(/: React\.FC<\w+>/g, '')
+                .replace(/: React\.ReactNode/g, '')
+                .replace(/: string/g, '')
+                .replace(/: number/g, '')
+                .replace(/: boolean/g, '')
+                .replace(/: any/g, '')
+                .replace(/interface \w+ {[^}]*}/g, '')
+                .replace(/export const (\w+): React\.FC = /g, 'export const $1 = ');
+        }
+
+        // Convert to CSS Modules
+        function convertToCSSModules(code) {
+            return code.replace(/className="([^"]*)"/g, 'className={styles.$1}')
+                      .replace(/className={\`([^`]*)\`}/g, 'className={styles.$1}');
+        }
+
+        // Initialize typewriter animation
+        function initTypewriter() {
+            const el = document.getElementById('typewriter-preview');
+            if (!el) return;
+            
+            const text = 'This is a typewriter effect!';
+            let index = 0;
+            
+            const type = () => {
+                if (index < text.length) {
+                    el.textContent = text.substring(0, index + 1) + '|';
+                    index++;
+                    setTimeout(type, 100);
+                } else {
+                    // Blink cursor
+                    setInterval(() => {
+                        el.textContent = text + (el.textContent.endsWith('|') ? '' : '|');
+                    }, 500);
+                }
+            };
+            
+            type();
+        }
+
+        // Search components
+        document.getElementById('componentSearch').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const allButtons = document.querySelectorAll('#componentList button');
+            
+            allButtons.forEach(btn => {
+                const matches = btn.textContent.toLowerCase().includes(query);
+                btn.style.display = matches ? 'block' : 'none';
+            });
+            
+            // Update category visibility
+            document.querySelectorAll('#componentList > div').forEach(cat => {
+                const hasVisible = Array.from(cat.querySelectorAll('button')).some(
+                    btn => btn.style.display !== 'none'
+                );
+                cat.style.display = hasVisible ? 'block' : 'none';
+            });
+        });
+
+
+        // Code variant change
+        document.getElementById('codeVariant').addEventListener('change', () => {
+            if (currentComponent) {
+                updateCode(currentComponent.code);
+            }
+        });
+
+        // Initialize
+        initializeComponents();
+        
+        // Make functions global
+        window.clearTerminal = clearTerminal;
+        window.showHelp = showHelp;
+        window.copyCode = copyCode;
+    </script>
+</body>
+</html>

@@ -4,12 +4,22 @@
   padding: 12px;
   margin-bottom: 16px;
   border: 1px solid #414868;
-  /* Smaller size for React Bits */
-  max-width: 250px;
+  max-width: 320px;
+  height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .react-bits-header {
   margin-bottom: 12px;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
 .react-bits-header h3 {
@@ -19,36 +29,256 @@
   font-weight: 600;
 }
 
+.magic-badge {
+  font-size: 12px;
+  padding: 2px 6px;
+  background: #7aa2f7;
+  border-radius: 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.search-input {
+  width: 100%;
+  padding: 6px 10px;
+  background: #1a1b26;
+  border: 1px solid #414868;
+  border-radius: 6px;
+  color: #c0caf5;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #7aa2f7;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #414868 transparent;
+}
+
+.category-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-tabs::-webkit-scrollbar-thumb {
+  background: #414868;
+  border-radius: 2px;
+}
+
+.category-tab {
+  padding: 4px 8px;
+  background: #1a1b26;
+  border: 1px solid #414868;
+  border-radius: 4px;
+  color: #9aa5ce;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.category-tab:hover {
+  background: #2a2e42;
+  border-color: #565f89;
+}
+
+.category-tab.active {
+  background: #7aa2f7;
+  border-color: #7aa2f7;
+  color: #1a1b26;
+}
+
+.tab-icon {
+  font-size: 14px;
+}
+
+.tab-name {
+  font-weight: 500;
+}
+
 .react-bits-content {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #414868 transparent;
+}
+
+.react-bits-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.react-bits-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.react-bits-content::-webkit-scrollbar-thumb {
+  background: #414868;
+  border-radius: 3px;
 }
 
 .react-bit-item {
   background: #1a1b26;
   border: 1px solid #414868;
   border-radius: 6px;
-  padding: 8px;
+  padding: 10px;
+  margin-bottom: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .react-bit-item:hover {
   background: #2a2e42;
   border-color: #7aa2f7;
-  transform: translateY(-1px);
+  transform: translateX(2px);
+}
+
+.react-bit-item.selected {
+  background: #2a2e42;
+  border-color: #bb9af7;
+  box-shadow: 0 0 0 1px #bb9af7;
 }
 
 .bit-icon {
-  font-size: 16px;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.bit-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .bit-name {
   color: #c0caf5;
   font-weight: 500;
+  font-size: 13px;
+}
+
+.bit-description {
+  color: #565f89;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* Component Preview */
+.component-preview {
+  background: #1a1b26;
+  border: 1px solid #414868;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.preview-header h4 {
+  margin: 0;
+  font-size: 13px;
+  color: #c0caf5;
+  font-weight: 600;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.action-btn {
+  padding: 4px 8px;
+  background: #24283b;
+  border: 1px solid #414868;
+  border-radius: 4px;
+  color: #9aa5ce;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: #2a2e42;
+  border-color: #565f89;
+}
+
+.action-btn.primary {
+  background: #7aa2f7;
+  border-color: #7aa2f7;
+  color: #1a1b26;
+  font-weight: 500;
+}
+
+.action-btn.primary:hover {
+  background: #89b4fa;
+  border-color: #89b4fa;
+}
+
+.preview-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  padding: 20px;
+  background: #24283b;
+  border-radius: 6px;
+  border: 1px solid #414868;
+}
+
+.code-preview {
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.code-preview code {
+  color: #c0caf5;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.loading {
+  text-align: center;
+  color: #565f89;
+  padding: 20px;
+  font-size: 12px;
+}
+
+/* Animation classes for Tailwind previews */
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
 }

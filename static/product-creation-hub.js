@@ -18,6 +18,7 @@ class ProductCreationHub {
         this.projectIntelligence = null;
         this.eventListenersInitialized = false;
         this.isProcessing = false;
+        this.readyForQuestions = false;
         
         console.log('🔧 Initial state:', {
             sessionId: this.sessionId,
@@ -281,6 +282,9 @@ class ProductCreationHub {
         // Theme toggle
         document.getElementById('themeToggle')?.addEventListener('click', () => this.toggleTheme());
         
+        // Context Priming button
+        document.getElementById('contextPriming')?.addEventListener('click', () => this.openContextPriming());
+        
         // IDE Enter button
         document.getElementById('enterIDE')?.addEventListener('click', () => this.enterIDE());
         
@@ -357,24 +361,29 @@ class ProductCreationHub {
         if (!this.currentProject) {
             console.log('🚀 Processing initial project description - CONFIRMED');
             
-            // Skip API call and go straight to questions
-            this.currentProject = {
-                id: `project-${Date.now()}`,
-                originalRequest: message,
-                projectType: 'web-application',
-            };
-            
-            console.log('✅ Project created:', this.currentProject);
-            
-            // Ensure questions are properly initialized
-            const defaultQuestions = this.getDefaultQuestions();
-            console.log('📋 Default questions loaded:', defaultQuestions);
-            
-            // Validate that questions are properly formatted
-            if (!defaultQuestions || !Array.isArray(defaultQuestions) || defaultQuestions.length === 0) {
-                console.error('❌ getDefaultQuestions returned invalid data:', defaultQuestions);
-                this.addMessageToChat('Sorry, there was an error initializing the question system. Please refresh the page and try again.', 'assistant');
-                this.isProcessing = processingFlag;
+            try {
+                // Skip API call and go straight to questions
+                this.currentProject = {
+                    id: `project-${Date.now()}`,
+                    originalRequest: message,
+                    projectType: 'web-application',
+                };
+                
+                console.log('✅ Project created:', this.currentProject);
+                
+                // Move to step 2 now that we're starting the questions
+                this.setStep(2);
+                this.updateProgress(25, 'Answer 5 questions');
+                
+                // Ensure questions are properly initialized
+                const defaultQuestions = this.getDefaultQuestions();
+                console.log('📋 Default questions loaded:', defaultQuestions);
+                
+                // Validate that questions are properly formatted
+                if (!defaultQuestions || !Array.isArray(defaultQuestions) || defaultQuestions.length === 0) {
+                    console.error('❌ getDefaultQuestions returned invalid data:', defaultQuestions);
+                    this.addMessageToChat('Sorry, there was an error initializing the question system. Please refresh the page and try again.', 'assistant');
+                    this.isProcessing = processingFlag;
                 return;
             }
             
@@ -404,49 +413,36 @@ class ProductCreationHub {
 
             this.updateProgress(10, 'Project idea captured');
             
-            // Start questioning immediately - simplified approach
-            console.log('🚀 Starting wizard immediately...');
+            // Move to step 2 and show welcome message
+            console.log('🎯 About to call setStep(2)...');
+            setTimeout(() => {
+                this.setStep(2);
+                this.updateProgress(25, 'Answer 5 questions');
+                console.log('✅ setStep(2) called after delay');
+            }, 50);
             
-            // IMPORTANT FIX NOTE (2025-01-20): 
-            // The original complex async flow through startWizard() -> askNextQuestion() 
-            // had timing/race condition issues causing "Cannot read properties of undefined" errors.
-            // The direct approach below bypasses all complex logic and works reliably.
-            // 
-            // SOLUTION: Instead of complex flows, directly:
-            // 1. Set waitingForAnswer = true
-            // 2. Add question to chat immediately
-            // 3. Let handleUserAnswer() process the response
-            //
-            // This fix resolved multiple failed debugging attempts and should be preserved.
+            this.addMessageToChat(
+                'Perfect! I understand your project. Let\'s gather some details to create the best possible requirements document.',
+                'assistant'
+            );
             
-            // Try direct approach first - THIS IS THE WORKING SOLUTION
-            try {
-                console.log('🧪 TESTING: Direct question approach');
-                console.log('🔧 Setting waitingForAnswer to true');
+            // Add the first question after a brief delay
+            setTimeout(() => {
                 this.waitingForAnswer = true;
-                console.log('💬 Adding question to chat');
                 this.addMessageToChat('Question 1 of 5: Who is your target audience and what are their main needs?', 'assistant');
-                console.log('✅ Direct question added successfully, waitingForAnswer:', this.waitingForAnswer);
-                console.log('🏁 Resetting processing flag and returning');
-                this.isProcessing = processingFlag;
-                return;
-            } catch (directError) {
-                console.error('❌ Direct approach failed:', directError);
-                console.error('❌ Error details:', directError.stack);
-            }
-            
-            // Fallback to original approach
-            try {
-                await this.startWizard();
-                console.log('✅ startWizard completed');
-            } catch (wizardError) {
-                console.error('❌ startWizard failed:', wizardError);
-                this.addMessageToChat('There was an error starting the questions. Let me try a different approach.', 'assistant');
                 
-                // Manual fallback
-                this.waitingForAnswer = true;
-                this.addMessageToChat('Question 1 of 5: Who is your target audience and what are their main needs?', 'assistant');
-            }
+                // Clear the input field for Question 1
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) {
+                    messageInput.value = '';
+                    messageInput.placeholder = '';
+                    messageInput.focus();
+                }
+            }, 500);
+            
+            console.log('🏁 Resetting processing flag and returning');
+            this.isProcessing = processingFlag;
+            return;
         }
         
         // Reset processing flag
@@ -474,16 +470,6 @@ class ProductCreationHub {
         console.log('✅ startWizard proceeding with questions:', this.questions.length);
         this.setStep(2);
         this.updateProgress(25, 'Starting interview process');
-
-        // Load success accelerators data early in the process
-        try {
-            console.log('🔄 Loading Success Accelerators data...');
-            await this.loadMarketInsights();
-            await this.loadProjectIntelligence();
-            console.log('✅ Success Accelerators data loaded');
-        } catch (error) {
-            console.error('⚠️ Failed to load Success Accelerators, continuing anyway:', error);
-        }
 
         // Start the questioning process
         this.addMessageToChat('Perfect! Let\'s gather some details about your project. I\'ll ask you 5 questions to create the best possible requirements document.', 'assistant');
@@ -513,6 +499,7 @@ class ProductCreationHub {
             questionsType: typeof this.questions,
             isArray: Array.isArray(this.questions)
         });
+        
         
         // IMMEDIATE: Force reinitialization every time to bypass any corruption
         console.log('🔧 FORCE reinitializing questions to ensure they exist');
@@ -576,6 +563,16 @@ class ProductCreationHub {
             `Question ${currentQuestionIndex + 1} of ${this.questions.length}: ${question.question}`,
             'assistant'
         );
+
+        // Clear the input field AFTER displaying the question
+        setTimeout(() => {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.value = '';
+                messageInput.placeholder = '';
+                messageInput.focus();
+            }
+        }, 100);
 
         // Update step progress
         this.updateQuestionProgress(currentQuestionIndex, this.questions.length);
@@ -709,6 +706,17 @@ class ProductCreationHub {
                     contentLength: this.prdDocument.content.length,
                     confidence: this.prdDocument.metadata.confidence
                 });
+
+                // Load Success Accelerators after PRD is generated
+                try {
+                    console.log('🔄 Loading Success Accelerators data after PRD generation...');
+                    await this.loadMarketInsights();
+                    await this.loadProjectIntelligence();
+                    console.log('✅ Success Accelerators data loaded successfully');
+                } catch (error) {
+                    console.error('⚠️ Failed to load Success Accelerators:', error);
+                    // Don't block the flow if accelerators fail to load
+                }
 
             } else {
                 throw new Error(result.error || 'Failed to generate PRD');
@@ -1318,14 +1326,21 @@ class ProductCreationHub {
     }
 
     setStep(stepNumber) {
+        console.log(`🎯 setStep(${stepNumber}) called`);
+        
         // Update wizard steps visual state
-        document.querySelectorAll('.wizard-step').forEach((step, index) => {
+        const wizardSteps = document.querySelectorAll('.wizard-step');
+        console.log(`📊 Found ${wizardSteps.length} wizard steps`);
+        
+        wizardSteps.forEach((step, index) => {
             step.classList.remove('active', 'completed');
             
             if (index + 1 === stepNumber) {
                 step.classList.add('active');
+                console.log(`✅ Set step ${index + 1} as active`);
             } else if (index + 1 < stepNumber) {
                 step.classList.add('completed');
+                console.log(`✅ Set step ${index + 1} as completed`);
             }
         });
         
@@ -1888,7 +1903,60 @@ Please analyze this PRD and help me build this project step by step.`;
         localStorage.setItem('productCreationProject', JSON.stringify(projectData));
         localStorage.setItem('projectTransferReady', 'true');
         
+        // Prepare PRD for Context Priming
+        if (this.prdDocument) {
+            const prdContent = this.formatPRDForContext();
+            const contextPrimingData = {
+                files: [{
+                    name: 'project-prd.md',
+                    content: prdContent,
+                    size: new Blob([prdContent]).size,
+                    type: 'text/markdown',
+                    isVirtual: true,
+                    autoLoaded: true
+                }],
+                timestamp: new Date().toISOString(),
+                projectId: this.currentProject.id
+            };
+            localStorage.setItem('contextPrimingAutoLoad', JSON.stringify(contextPrimingData));
+            localStorage.setItem('contextPrimingReady', 'true');
+        }
+        
         console.log('Project data prepared for IDE transfer:', projectData);
+    }
+    
+    formatPRDForContext() {
+        if (!this.prdDocument) return '';
+        
+        let content = `# ${this.prdDocument.title || 'Product Requirements Document'}\n\n`;
+        content += `**Generated:** ${new Date().toISOString()}\n\n`;
+        content += `## Project Overview\n${this.currentProject.originalRequest}\n\n`;
+        
+        if (this.questions && this.answers.length > 0) {
+            content += `## Requirements Gathering Q&A\n\n`;
+            this.answers.forEach((answer, index) => {
+                content += `**Q${index + 1}:** ${this.questions[index].question}\n`;
+                content += `**A${index + 1}:** ${answer.answer}\n\n`;
+            });
+        }
+        
+        content += `## Full PRD Content\n\n${this.prdDocument.content}`;
+        
+        if (this.wireframes && this.wireframes.length > 0) {
+            content += `\n\n## Wireframes\n\n`;
+            this.wireframes.forEach((wireframe, index) => {
+                content += `### ${wireframe.title || `Wireframe ${index + 1}`}\n`;
+                content += `- Type: ${wireframe.type}\n`;
+                content += `- Description: ${wireframe.description || 'N/A'}\n\n`;
+            });
+        }
+        
+        return content;
+    }
+    
+    openContextPriming() {
+        // Navigate to Context Priming page
+        window.location.href = '/context-priming';
     }
     
     enterIDE() {

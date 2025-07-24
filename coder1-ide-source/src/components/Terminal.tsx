@@ -8,7 +8,7 @@ interface TerminalProps {
   isSupervisionOn: boolean;
   setIsSupervisionOn: (value: boolean) => void;
   isInfiniteLoop: boolean;
-  setIsInfiniteLoop: (value: boolean) => void;
+  setIsInfiniteLoop: (value: boolean, sessionId?: string | null) => void;
   isParallelAgents: boolean;
   setIsParallelAgents: (value: boolean) => void;
   onHivemindClick?: () => void;
@@ -33,7 +33,8 @@ const Terminal: React.FC<TerminalProps> = ({
   const [history, setHistory] = useState<string[]>([
     'Welcome to Coder1 IDE Terminal - AI Chat Mode',
     'Just type naturally to chat with AI, or use $ prefix for bash commands',
-    'Examples: "create a landing page" or "$ npm install"',
+    'NEW: Use /ui to generate React components (e.g., /ui create a glowing button)',
+    'Examples: "create a landing page", "$ npm install", "/ui modern card"',
     ''
   ]);
   const [infiniteSessionId, setInfiniteSessionId] = useState<string | null>(null);
@@ -52,6 +53,57 @@ const Terminal: React.FC<TerminalProps> = ({
   const handleCommand = async (cmd: string) => {
     const newHistory = [...history, `$ ${cmd}`];
     
+    // Check for /ui command
+    if (cmd.startsWith('/ui ')) {
+      const uiCommand = cmd.substring(4).trim();
+      newHistory.push('🎨 Generating UI component...');
+      setHistory(newHistory);
+      setIsProcessing(true);
+      
+      try {
+        // Call Magic API endpoint
+        const response = await fetch('/api/magic/ui', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: uiCommand })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.component) {
+          // Replace "Generating..." with success message
+          newHistory[newHistory.length - 1] = '✅ Component generated successfully!';
+          
+          // Add component preview
+          newHistory.push(
+            '📦 Component Type: ' + (data.customizations?.detected || 'Unknown'),
+            '📝 Source: ' + (data.component.metadata?.source || 'local-fallback'),
+            '',
+            '--- Component Code ---',
+            ...data.component.code.split('\n'),
+            '--- End Component Code ---',
+            '',
+            '💡 ' + data.component.explanation,
+            '',
+            '📋 Component copied to clipboard (simulated)'
+          );
+          
+          // TODO: Integrate with ReactBits component to show in UI
+          // For now, we'll just show in terminal
+        } else {
+          newHistory[newHistory.length - 1] = `❌ Error: ${data.error || 'Failed to generate component'}`;
+        }
+      } catch (error) {
+        newHistory[newHistory.length - 1] = `❌ Error: ${error instanceof Error ? error.message : 'Network error'}`;
+      } finally {
+        setIsProcessing(false);
+      }
+      
+      setHistory(newHistory);
+      setInput('');
+      return;
+    }
+    
     // Check for bash command prefix
     if (cmd.startsWith('$')) {
       const bashCmd = cmd.substring(1).trim();
@@ -66,16 +118,18 @@ const Terminal: React.FC<TerminalProps> = ({
           newHistory.push(
             'AI Chat Mode (default): Just type naturally',
             'Bash Mode: Prefix with $ (e.g., $ ls, $ npm install)',
+            'UI Generation: /ui <description> (e.g., /ui create a glowing button)',
             'Commands:',
             '  $ clear   - Clear terminal',
             '  $ help    - Show this help',
             '  save      - Save conversation history',
+            '  /ui       - Generate React components with AI',
             ''
           );
           break;
         default:
           // Execute as bash command
-          newHistory.push(`Executing: ${bashCmd}`, '[Bash command execution not implemented in IDE]`, '');
+          newHistory.push(`Executing: ${bashCmd}`, '[Bash command execution not implemented in IDE]', '');
       }
     } else {
       // AI Chat mode
@@ -155,11 +209,12 @@ const Terminal: React.FC<TerminalProps> = ({
             console.log('Infinite loop started:', data);
             setInfiniteSessionId(data.sessionId);
             setHistory(prev => [...prev, '✅ Infinite Loop mode activated', `Session ID: ${data.sessionId}`, '']);
+            setIsInfiniteLoop(true, data.sessionId);
           } else {
             // Handle non-JSON success response
             setHistory(prev => [...prev, '✅ Infinite Loop mode activated', '']);
+            setIsInfiniteLoop(true);
           }
-          setIsInfiniteLoop(true);
         } else {
           // Error handling
           let errorMessage = 'Failed to start infinite loop';

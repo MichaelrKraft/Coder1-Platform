@@ -854,6 +854,15 @@ class TerminalVoice {
             settingsSection.appendChild(buttonsContainer);
         }
 
+        // Add Context Priming button (NEW - first button)
+        const contextPrimingBtn = document.createElement('button');
+        contextPrimingBtn.className = 'settings-btn context-priming-btn';
+        contextPrimingBtn.innerHTML = '<span>🧠 Context Priming</span>';
+        contextPrimingBtn.title = 'Pre-load project context for smarter AI interactions';
+        contextPrimingBtn.onclick = () => {
+            window.open('/context-priming.html', '_blank');
+        };
+
         // Add Voice Settings button
         const voiceToggleBtn = document.createElement('button');
         voiceToggleBtn.className = 'settings-btn voice-settings-btn';
@@ -939,9 +948,10 @@ class TerminalVoice {
         
         // Clear existing buttons and add in order
         buttonsContainer.innerHTML = '';
-        buttonsContainer.appendChild(voiceToggleBtn);
-        buttonsContainer.appendChild(ideSettingsBtn);
-        buttonsContainer.appendChild(docBtn);
+        buttonsContainer.appendChild(contextPrimingBtn);  // NEW - Context Priming first
+        buttonsContainer.appendChild(voiceToggleBtn);     // Voice Settings
+        buttonsContainer.appendChild(ideSettingsBtn);     // IDE Settings
+        buttonsContainer.appendChild(docBtn);             // Documentation
         
         // Hide robot icon from header (if it exists)
         this.hideRobotIconFromHeader();

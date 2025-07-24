@@ -1,0 +1,79 @@
+/* Aggressive CSS Fixes for UI Issues */
+
+/* Hide any "Coder1 IDE" text */
+*:not(img)[alt*="Coder1 IDE"],
+*[title*="Coder1 IDE"]:not(img),
+*[aria-label*="Coder1 IDE"]:not(img) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Hide any blue text in header area */
+[style*="color: rgb(0, 123, 255)"],
+[style*="color: #007bff"],
+[style*="color: blue"] {
+    display: none !important;
+}
+
+/* Clean terminal header */
+.terminal-header > span,
+.terminal-header > div:first-child:not(.terminal-header-right):not(.special-view-buttons) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Ensure terminal header is clean */
+.terminal-header {
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+.terminal-header * {
+    font-size: initial !important;
+}
+
+.terminal-header button,
+.terminal-header .special-view-buttons {
+    color: initial !important;
+}
+
+/* Hide any element that contains only "Coder1 IDE" text */
+*:not(script):not(style) {
+    position: relative;
+}
+
+*:not(script):not(style)::after {
+    content: '';
+}
+
+/* Target specific text nodes */
+.terminal-header::before,
+.terminal-header::after {
+    display: none !important;
+}
+
+/* Force proper button positioning */
+.terminal-header {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+}
+
+.terminal-header-right {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+}
+
+.special-view-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    order: -1 !important; /* Put special view buttons first */
+}

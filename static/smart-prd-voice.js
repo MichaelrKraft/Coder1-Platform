@@ -209,12 +209,8 @@ class SmartPRDVoice {
 
         // Silent acknowledgment - removed "Got it" speech
 
-        // Auto-submit if high confidence and looks like a complete request
-        if (confidence > 0.85 && this.isCompleteRequest(transcript)) {
-            setTimeout(() => {
-                this.submitMessage();
-            }, 1000);
-        }
+        // Removed auto-submit to allow user review
+        // Users can press Enter or click Send after reviewing the transcribed text
 
         this.showTranscript(transcript, confidence);
     }

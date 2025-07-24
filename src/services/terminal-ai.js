@@ -8,10 +8,11 @@ class TerminalAI {
         
         if (apiKey) {
             this.claude = new ClaudeCodeAPI(apiKey, {
-                timeout: 30000,
-                useCLI: false // Use SDK directly for terminal
+                timeout: 30000
+                // Will automatically use CLI if USE_CLAUDE_CODE_CLI=true
             });
-            console.log('✅ Terminal AI initialized with Claude');
+            const usingCLI = process.env.USE_CLAUDE_CODE_CLI === 'true';
+            console.log(`✅ Terminal AI initialized with Claude ${usingCLI ? '(via CLI - using Max subscription)' : '(via API)'}`);
         } else {
             this.claude = null;
             console.warn('⚠️  Terminal AI running in mock mode (no Anthropic API key)');

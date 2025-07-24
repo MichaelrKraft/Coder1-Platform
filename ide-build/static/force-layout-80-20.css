@@ -1,0 +1,145 @@
+/* Aggressive CSS to force 80/20 layout */
+
+/* Target the main IDE container structure */
+#root > div > div {
+    display: flex !important;
+    width: 100% !important;
+}
+
+/* Force 3-column layout */
+#root > div > div > div {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    height: 100vh !important;
+}
+
+/* File Explorer - Left Panel */
+#root > div > div > div > div:first-child {
+    width: 20% !important;
+    min-width: 200px !important;
+    max-width: 300px !important;
+    flex: 0 0 20% !important;
+}
+
+/* Editor/Terminal - Middle Panel */
+#root > div > div > div > div:nth-child(2) {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 50% !important;
+}
+
+/* Preview - Right Panel */
+#root > div > div > div > div:last-child {
+    width: 20% !important;
+    max-width: 20% !important;
+    min-width: 200px !important;
+    flex: 0 0 20% !important;
+}
+
+/* Target Allotment split view */
+.allotment-module_splitViewView__MGZ6O {
+    display: flex !important;
+    width: 100% !important;
+}
+
+.allotment-module_splitViewView__MGZ6O > div:last-child {
+    width: 20% !important;
+    max-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+.allotment-module_splitViewView__MGZ6O > div:nth-child(2) {
+    flex: 1 1 auto !important;
+    width: auto !important;
+}
+
+/* Target Pane elements */
+.Pane {
+    transition: none !important; /* Disable animations during resize */
+}
+
+.Pane:last-child {
+    width: 20% !important;
+    max-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+.Pane:nth-child(2) {
+    flex: 1 1 auto !important;
+    width: auto !important;
+}
+
+/* Target any iframe containers (usually preview) */
+div:has(> iframe) {
+    max-width: 20% !important;
+}
+
+/* Force preview panel by content */
+div[class*="preview"],
+div[class*="Preview"],
+div[id*="preview"],
+div[id*="Preview"] {
+    width: 20% !important;
+    max-width: 20% !important;
+    flex: 0 0 20% !important;
+}
+
+/* Ensure the editor/terminal takes remaining space */
+div[class*="editor"]:not([class*="preview"]),
+div[class*="Editor"]:not([class*="preview"]),
+div[class*="terminal"]:not([class*="preview"]),
+div[class*="Terminal"]:not([class*="preview"]) {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 50% !important;
+}
+
+/* Override any inline styles on panels */
+[style*="width: 33"],
+[style*="width:33"],
+[style*="width: 50"],
+[style*="width:50"] {
+    /* Only apply to large elements (panels) */
+    &:where([class*="Pane"], [class*="allotment"], div:has(> iframe)) {
+        width: 20% !important;
+    }
+}
+
+/* Splitter/Sash positioning */
+.sash-module_sash__RuSGu,
+[class*="sash"],
+[class*="Sash"] {
+    /* Position splitters correctly for 80/20 split */
+    &:last-of-type {
+        left: 80% !important;
+    }
+}
+
+/* Make sure content is visible */
+* {
+    overflow: visible !important;
+}
+
+.allotment-module_splitViewView__MGZ6O > div,
+.Pane {
+    overflow: auto !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    /* On smaller screens, hide preview panel */
+    #root > div > div > div > div:last-child,
+    .allotment-module_splitViewView__MGZ6O > div:last-child,
+    .Pane:last-child {
+        display: none !important;
+    }
+    
+    /* Let editor take full width */
+    #root > div > div > div > div:nth-child(2),
+    .allotment-module_splitViewView__MGZ6O > div:nth-child(2),
+    .Pane:nth-child(2) {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+    }
+}

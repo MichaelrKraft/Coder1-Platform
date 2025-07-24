@@ -6,6 +6,10 @@ import Explorer from './components/Explorer';
 import Preview from './components/Preview';
 import ReactBits from './components/ReactBits';
 import HivemindDashboard from './components/HivemindDashboard';
+import SupervisionView from './components/SupervisionView';
+import SleepModeView from './components/SleepModeView';
+import InfiniteLoopView from './components/InfiniteLoopView';
+import ParallelAgentsView from './components/ParallelAgentsView';
 
 function App() {
   const [activeView, setActiveView] = useState<'explorer' | 'terminal' | 'preview'>('terminal');
@@ -16,6 +20,7 @@ function App() {
   const [showHivemind, setShowHivemind] = useState(false);
   const [hivemindSessionId, setHivemindSessionId] = useState<string | null>(null);
   const [activeAgentCount, setActiveAgentCount] = useState(0);
+  const [infiniteSessionId, setInfiniteSessionId] = useState<string | null>(null);
 
   return (
     <div className="App">
@@ -34,7 +39,14 @@ function App() {
                   isSupervisionOn={isSupervisionOn}
                   setIsSupervisionOn={setIsSupervisionOn}
                   isInfiniteLoop={isInfiniteLoop}
-                  setIsInfiniteLoop={setIsInfiniteLoop}
+                  setIsInfiniteLoop={(value, sessionId) => {
+                    setIsInfiniteLoop(value);
+                    if (value && sessionId) {
+                      setInfiniteSessionId(sessionId);
+                    } else if (!value) {
+                      setInfiniteSessionId(null);
+                    }
+                  }}
                   isParallelAgents={isParallelAgents}
                   setIsParallelAgents={setIsParallelAgents}
                   onHivemindClick={() => setShowHivemind(true)}
@@ -47,6 +59,26 @@ function App() {
           </div>
         </div>
       </div>
+      
+      {/* Special views as overlays */}
+      {isSupervisionOn && (
+        <SupervisionView onClose={() => setIsSupervisionOn(false)} />
+      )}
+      {isSleepMode && (
+        <SleepModeView onClose={() => setIsSleepMode(false)} />
+      )}
+      {isInfiniteLoop && (
+        <InfiniteLoopView 
+          onClose={() => {
+            setIsInfiniteLoop(false);
+            setInfiniteSessionId(null);
+          }} 
+          sessionId={infiniteSessionId}
+        />
+      )}
+      {isParallelAgents && (
+        <ParallelAgentsView onClose={() => setIsParallelAgents(false)} />
+      )}
       
       {showHivemind && (
         <HivemindDashboard 

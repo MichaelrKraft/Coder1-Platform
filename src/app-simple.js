@@ -59,6 +59,18 @@ app.get('/platform', (req, res) => {
     });
 });
 
+// Context Priming route
+app.get('/context-priming', (req, res) => {
+    const filePath = path.join(__dirname, '../context-priming.html');
+    console.log('Serving context priming page from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving context priming page:', err);
+            res.status(404).send('Context priming page not found');
+        }
+    });
+});
+
 // Serve main static assets (for logo, CSS, JS files)
 app.use('/static', express.static(path.join(__dirname, '../static')));
 
@@ -921,6 +933,32 @@ try {
   console.log('✅ Product creation routes loaded successfully');
 } catch (error) {
   console.warn('⚠️ Failed to load product creation routes:', error.message);
+}
+
+// Load context management routes
+try {
+  const contextRoutes = require('./routes/context');
+  app.use('/api/context', contextRoutes);
+  console.log('✅ Context management routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load context routes:', error.message);
+}
+
+// Load 21st.dev Magic routes for React Bits
+try {
+  // Try to load enhanced magic routes first
+  let magicRoutes;
+  try {
+    magicRoutes = require('./routes/magic-enhanced');
+    console.log('✅ Enhanced Magic routes loaded successfully (53 components)');
+  } catch (enhancedError) {
+    // Fallback to original magic routes
+    magicRoutes = require('./routes/magic');
+    console.log('✅ 21st.dev Magic routes loaded successfully (React Bits integration)');
+  }
+  app.use('/api/magic', magicRoutes);
+} catch (error) {
+  console.warn('⚠️ Failed to load Magic routes:', error.message);
 }
 
 // Error handling

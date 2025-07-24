@@ -6,20 +6,41 @@
 (function() {
     'use strict';
 
+    // Track if we've already shown the panel
+    let panelShown = false;
+    
     // Check if project transfer data exists
     function checkForProjectTransfer() {
+        console.log('🔍 Checking for PRD project transfer...');
         const projectData = localStorage.getItem('productCreationProject');
         const transferReady = localStorage.getItem('projectTransferReady');
         
-        if (projectData && transferReady === 'true') {
+        console.log('📦 Project data exists:', !!projectData);
+        console.log('✅ Transfer ready flag:', transferReady);
+        console.log('🎯 Panel already shown:', panelShown);
+        
+        // Check if panel already exists in DOM
+        const existingPanel = document.getElementById('prd-transfer-panel');
+        if (existingPanel) {
+            console.log('📌 Panel already exists in DOM');
+            return;
+        }
+        
+        if (projectData && transferReady === 'true' && !panelShown) {
             try {
                 const project = JSON.parse(projectData);
+                console.log('📋 Project parsed successfully:', project);
                 displayProjectTransferPanel(project);
-                // Clear the transfer flag
-                localStorage.removeItem('projectTransferReady');
+                panelShown = true;
+                // Clear the transfer flag after a delay to ensure it's shown
+                setTimeout(() => {
+                    localStorage.removeItem('projectTransferReady');
+                }, 5000);
             } catch (error) {
-                console.error('Error parsing project transfer data:', error);
+                console.error('❌ Error parsing project transfer data:', error);
             }
+        } else {
+            console.log('⚠️ No project transfer data found or not ready');
         }
     }
 
@@ -27,23 +48,18 @@
     function displayProjectTransferPanel(project) {
         console.log('📋 Displaying PRD project transfer panel:', project);
 
-        // Create the transfer panel HTML
+        // Create the transfer panel HTML - starts collapsed
         const panelHTML = `
-            <div id="prd-transfer-panel" class="prd-transfer-panel">
-                <div class="prd-transfer-header">
+            <div id="prd-transfer-panel" class="prd-transfer-panel collapsed">
+                <div class="prd-transfer-header" id="prd-transfer-header">
                     <div class="prd-transfer-title">
                         <i class="fas fa-file-text"></i>
-                        <h3>PRD Project Transferred</h3>
+                        <h3>PRD Ready</h3>
                         <span class="prd-project-name">${project.title || 'Untitled Project'}</span>
                     </div>
                     <div class="prd-transfer-actions">
-                        <button id="copy-prd-btn" class="prd-action-btn primary">
-                            <i class="fas fa-copy"></i>
-                            Copy PRD for Claude Code
-                        </button>
-                        <button id="view-prd-btn" class="prd-action-btn secondary">
-                            <i class="fas fa-eye"></i>
-                            View Full PRD
+                        <button id="toggle-prd-btn" class="prd-action-btn toggle">
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                         <button id="dismiss-prd-btn" class="prd-action-btn close">
                             <i class="fas fa-times"></i>
@@ -81,6 +97,17 @@
                             <div class="prd-preview-text" id="prd-preview-text">
                                 ${formatPRDForClaudeCode(project)}
                             </div>
+                        </div>
+                        
+                        <div class="prd-transfer-buttons">
+                            <button id="copy-prd-btn" class="prd-action-btn primary">
+                                <i class="fas fa-copy"></i>
+                                Copy PRD for Claude Code
+                            </button>
+                            <button id="view-prd-btn" class="prd-action-btn secondary">
+                                <i class="fas fa-eye"></i>
+                                View Full PRD
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -144,6 +171,36 @@
 
     // Add event listeners for PRD transfer panel
     function addPRDTransferEventListeners(project) {
+        const panel = document.getElementById('prd-transfer-panel');
+        const toggleBtn = document.getElementById('toggle-prd-btn');
+        const header = document.getElementById('prd-transfer-header');
+        
+        // Toggle panel expansion
+        const togglePanel = () => {
+            if (panel) {
+                panel.classList.toggle('collapsed');
+                const isCollapsed = panel.classList.contains('collapsed');
+                localStorage.setItem('prdPanelCollapsed', isCollapsed);
+            }
+        };
+        
+        // Toggle button click
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePanel();
+            });
+        }
+        
+        // Header click (only when collapsed)
+        if (header) {
+            header.addEventListener('click', () => {
+                if (panel && panel.classList.contains('collapsed')) {
+                    togglePanel();
+                }
+            });
+        }
+        
         // Copy PRD button
         const copyBtn = document.getElementById('copy-prd-btn');
         if (copyBtn) {
@@ -256,20 +313,74 @@
         if (document.getElementById('prd-transfer-styles')) return;
 
         const css = `
+            @keyframes pulseGlow {
+                0% {
+                    box-shadow: 0 0 20px rgba(139, 92, 246, 0.8),
+                                0 0 40px rgba(139, 92, 246, 0.4),
+                                0 0 60px rgba(139, 92, 246, 0.2),
+                                inset 0 0 20px rgba(139, 92, 246, 0.1);
+                }
+                50% {
+                    box-shadow: 0 0 30px rgba(139, 92, 246, 1),
+                                0 0 60px rgba(139, 92, 246, 0.6),
+                                0 0 90px rgba(139, 92, 246, 0.3),
+                                inset 0 0 30px rgba(139, 92, 246, 0.2);
+                }
+                100% {
+                    box-shadow: 0 0 20px rgba(139, 92, 246, 0.8),
+                                0 0 40px rgba(139, 92, 246, 0.4),
+                                0 0 60px rgba(139, 92, 246, 0.2),
+                                inset 0 0 20px rgba(139, 92, 246, 0.1);
+                }
+            }
+            
             .prd-transfer-panel {
                 position: fixed;
-                top: 20px;
+                top: 25%;
                 right: 20px;
+                transform: translateY(-50%);
                 width: 450px;
-                background: rgba(26, 27, 38, 0.95);
-                border: 1px solid #414558;
-                border-radius: 12px;
+                background: rgba(26, 27, 38, 0.98);
+                border: 2px solid #8b5cf6;
+                border-radius: 16px;
                 backdrop-filter: blur(10px);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                animation: pulseGlow 2s ease-in-out infinite;
                 z-index: 10000;
                 transition: all 0.3s ease;
                 color: #c0caf5;
                 font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+            
+            /* Collapsed state */
+            .prd-transfer-panel.collapsed {
+                width: 280px;
+                animation: pulseGlow 3s ease-in-out infinite; /* Slower pulse when collapsed */
+            }
+            
+            .prd-transfer-panel.collapsed .prd-transfer-content {
+                display: none;
+            }
+            
+            .prd-transfer-panel.collapsed .prd-transfer-header {
+                border-bottom: none;
+                cursor: pointer;
+            }
+            
+            .prd-transfer-panel.collapsed .prd-transfer-header:hover {
+                background: rgba(139, 92, 246, 0.05);
+                border-radius: 14px;
+            }
+            
+            .prd-transfer-panel.collapsed .prd-transfer-title h3 {
+                font-size: 16px;
+            }
+            
+            .prd-transfer-panel.collapsed .prd-project-name {
+                font-size: 12px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 150px;
             }
 
             .prd-transfer-header {
@@ -278,6 +389,7 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
+                transition: all 0.3s ease;
             }
 
             .prd-transfer-title {
@@ -357,6 +469,33 @@
             .prd-action-btn.close:hover {
                 color: #ef4444;
             }
+            
+            .prd-action-btn.toggle {
+                background: transparent;
+                border: 1px solid #414558;
+                color: #9ca3af;
+                width: 32px;
+                height: 32px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 8px;
+            }
+            
+            .prd-action-btn.toggle:hover {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: #6b7280;
+            }
+            
+            .prd-action-btn.toggle i {
+                transition: transform 0.3s ease;
+                font-size: 14px;
+            }
+            
+            .prd-transfer-panel:not(.collapsed) .prd-action-btn.toggle i {
+                transform: rotate(180deg);
+            }
 
             .prd-action-btn i {
                 font-size: 14px;
@@ -434,22 +573,47 @@
                 max-height: 200px;
                 overflow-y: auto;
             }
+            
+            .prd-transfer-buttons {
+                display: flex;
+                gap: 8px;
+                margin-top: 12px;
+            }
+            
+            .prd-transfer-buttons .prd-action-btn {
+                flex: 1;
+                justify-content: center;
+            }
 
+            @keyframes slideInNotification {
+                0% {
+                    transform: translateX(-50%) translateY(-100px);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateX(-50%) translateY(0);
+                    opacity: 1;
+                }
+            }
+            
             .prd-notification {
                 position: fixed;
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: #10b981;
+                background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
                 color: white;
-                padding: 12px 16px;
-                border-radius: 8px;
+                padding: 16px 24px;
+                border-radius: 12px;
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 12px;
                 z-index: 10001;
-                font-size: 14px;
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                font-size: 15px;
+                font-weight: 500;
+                box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4),
+                           0 0 40px rgba(139, 92, 246, 0.3);
+                animation: slideInNotification 0.5s ease-out;
             }
 
             .prd-modal-overlay {
@@ -534,16 +698,49 @@
     }
 
     // Initialize when DOM is ready
+    console.log('🚀 PRD Transfer Script Loaded - Document state:', document.readyState);
+    console.log('🌐 Current URL:', window.location.href);
+    
+    // Function to check multiple times with delays
+    function scheduleChecks() {
+        // Check immediately
+        checkForProjectTransfer();
+        
+        // Check after short delay
+        setTimeout(() => {
+            console.log('⏱️ Checking after 500ms...');
+            checkForProjectTransfer();
+        }, 500);
+        
+        // Check after medium delay
+        setTimeout(() => {
+            console.log('⏱️ Checking after 1500ms...');
+            checkForProjectTransfer();
+        }, 1500);
+        
+        // Check after longer delay for slow loading
+        setTimeout(() => {
+            console.log('⏱️ Final check after 3000ms...');
+            checkForProjectTransfer();
+        }, 3000);
+    }
+    
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', checkForProjectTransfer);
+        console.log('📄 Document loading - waiting for DOMContentLoaded...');
+        document.addEventListener('DOMContentLoaded', scheduleChecks);
     } else {
         // DOM is already ready
-        setTimeout(checkForProjectTransfer, 500); // Small delay to ensure React app is loaded
+        console.log('✅ DOM ready - scheduling checks...');
+        scheduleChecks();
     }
 
     // Also check when URL contains transfer parameter
     if (window.location.search.includes('project=transfer')) {
-        setTimeout(checkForProjectTransfer, 1000);
+        console.log('🔗 Transfer parameter found in URL');
     }
+    
+    // Expose checkForProjectTransfer globally for debugging
+    window.checkForProjectTransfer = checkForProjectTransfer;
+    window.displayProjectTransferPanel = displayProjectTransferPanel;
 
 })();

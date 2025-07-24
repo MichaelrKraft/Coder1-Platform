@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Priming and Memory - Coder1 Platform</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/context-priming.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <button class="close-btn" onclick="window.location.href='/smart-prd-generator.html'" title="Back to PRD Generator">
+            <i class="fas fa-times"></i>
+        </button>
+        <header class="header">
+            <h1>🧠 Context Priming and Memory</h1>
+            <p>Pre-load your project context for smarter AI interactions</p>
+        </header>
+
+        <div class="quick-actions">
+            <h2>Quick Load</h2>
+            <div class="action-buttons">
+                <button class="action-btn" id="loadProject" data-preset="project">
+                    <span class="icon">📁</span>
+                    <div class="text-content">
+                        <span class="label">Project Overview</span>
+                        <span class="description">README, package.json, main files</span>
+                    </div>
+                </button>
+                <button class="action-btn" id="loadCurrent" data-preset="current">
+                    <span class="icon">🎯</span>
+                    <div class="text-content">
+                        <span class="label">Current Work</span>
+                        <span class="description">Recently modified files</span>
+                    </div>
+                </button>
+                <button class="action-btn" id="loadRecent" data-preset="recent">
+                    <span class="icon">📝</span>
+                    <div class="text-content">
+                        <span class="label">Recent Changes</span>
+                        <span class="description">Git diff and recent commits</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div class="recipes-section">
+            <h2>Context Recipes</h2>
+            <select id="recipeSelect" class="recipe-select">
+                <option value="">Choose a recipe...</option>
+                <option value="debug">🐛 Debug Mode</option>
+                <option value="feature">✨ New Feature</option>
+                <option value="review">👀 Code Review</option>
+                <option value="refactor">🔧 Refactoring</option>
+                <option value="testing">🧪 Testing</option>
+            </select>
+            <button id="saveRecipe" class="save-recipe-btn">💾 Save Current as Recipe</button>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-content">
+                <span class="drop-icon">📎</span>
+                <p>Drop files here or click to browse</p>
+                <input type="file" id="fileInput" multiple style="display: none;">
+            </div>
+        </div>
+
+        <div class="loaded-files">
+            <h3>Loaded Files</h3>
+            <ul id="fileList" class="file-list"></ul>
+        </div>
+
+        <div class="context-meter">
+            <h3>Context Usage</h3>
+            <div class="meter-container">
+                <div class="meter-fill" id="meterFill"></div>
+            </div>
+            <div class="meter-info">
+                <span id="tokenCount">0 tokens</span>
+                <span id="contextStatus">Ready to start</span>
+            </div>
+        </div>
+
+        <div class="action-buttons-bottom">
+            <button id="clearContext" class="clear-btn">🗑️ Clear All</button>
+            <button id="startCoding" class="start-btn">🚀 Start Coding with Context</button>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div id="messageContainer" class="message-container"></div>
+
+        <!-- Save Recipe Modal -->
+        <div id="saveRecipeModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Save Context Recipe</h3>
+                <input type="text" id="recipeName" placeholder="Recipe name..." class="recipe-name-input">
+                <textarea id="recipeDescription" placeholder="Description (optional)..." class="recipe-description"></textarea>
+                <div class="modal-actions">
+                    <button id="cancelSave" class="cancel-btn">Cancel</button>
+                    <button id="confirmSave" class="confirm-btn">Save Recipe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/context-priming.js"></script>
+</body>
+</html>

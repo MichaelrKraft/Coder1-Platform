@@ -1,7 +1,64 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/ide/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="/ide/static/api-config.js?v=6"></script><script defer="defer" src="/ide/static/js/main.a1cfdcd5.js?v=5"></script><link href="/ide/static/css/main.5c128812.css?v=5" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script src="/ide/static/api-injection.js?v=7"></script><script src="/ide/static/parallel-agents-modal.js?v=2"></script><script src="/ide/static/parallel-agents-fix.js?v=1"></script><script src="/ide/static/simple-stop-button.js?v=1"></script><script src="/ide/static/global-logo-final.js?v=2"></script><script src="/ide/static/hide-buttons-special-pages.js"></script><script src="/ide/static/cleanup-header-buttons.js"></script><link href="/ide/static/terminal-voice.css?v=32" rel="stylesheet">
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="./static/api-config.js?v=6"></script><script defer="defer" src="./static/js/main.a1cfdcd5.js?v=11"></script><link href="./static/css/main.5c128812.css?v=11" rel="stylesheet"><link href="./static/terminal-voice.css?v=33" rel="stylesheet">
+<link href="./static/fix-terminal-header.css?v=2" rel="stylesheet">
+</head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><!-- Temporarily disabling scripts to find the issue -->
+<script src="./static/api-injection.js?v=7"></script>
+<script src="./static/parallel-agents-modal.js?v=2"></script>
+<script src="./static/parallel-agents-fix.js?v=1"></script>
+<!-- <script src="./static/simple-stop-button.js?v=1"></script> -->
+<!-- <script src="./static/global-logo-final.js?v=2"></script> -->
+<!-- <script src="./static/hide-buttons-special-pages.js"></script> -->
+<script src="./static/cleanup-header-buttons.js"></script>
+<!-- <script src="./static/special-views-helper.js?v=1"></script> -->
 <script>
-// Immediate SuperClaude hiding and microphone addition
-console.log('🔥 IMMEDIATE: Starting SuperClaude cleanup and microphone setup');
+// Minimal SuperClaude and gear icon hiding
+(function() {
+    function hideSuperclaude() {
+        const elements = document.querySelectorAll('*');
+        elements.forEach(el => {
+            const text = el.textContent ? el.textContent.trim() : '';
+            if ((text === 'SuperClaude Terminal' || text.includes('SuperClaude Terminal')) && el.children.length === 0) {
+                el.style.display = 'none';
+            }
+        });
+    }
+    
+    function hideGearIcons() {
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            if (el.classList.contains('settings-section') || 
+                el.classList.contains('settings-btn') || 
+                el.closest('.settings-section')) {
+                return;
+            }
+            
+            const text = el.textContent?.trim() || '';
+            const innerHTML = el.innerHTML || '';
+            
+            if ((text === 'IDE Settings' || text.includes('IDE Settings')) &&
+                !el.closest('.settings-section')) {
+                const rect = el.getBoundingClientRect();
+                if (rect.top > window.innerHeight * 0.7) {
+                    el.remove();
+                }
+            }
+        });
+    }
+    
+    // Run once on load
+    setTimeout(() => {
+        hideSuperclaude();
+        hideGearIcons();
+    }, 1000);
+    
+    // Run periodically but less frequently
+    setInterval(() => {
+        hideSuperclaude();
+        hideGearIcons();
+    }, 30000); // Every 30 seconds instead of 10
+})();
+</script>
+
+<!-- Temporarily disabled the rest of inline script
 
 function hideSuperclaude() {
     // More aggressive approach to hide SuperClaude elements
@@ -241,12 +298,12 @@ function hideIDESettingsSpecifically() {
     });
 }
 
-// Run periodically
+// Run periodically (reduced frequency to avoid console spam)
 setInterval(() => {
     hideSuperclaude();
     removeBlueXButKeepSuperclaude();
     hideGearIcons();
-}, 1000);
+}, 10000); // Changed from 1000ms to 10000ms (10 seconds)
 
 // Run on DOM changes
 const observer = new MutationObserver(() => {
@@ -257,5 +314,24 @@ const observer = new MutationObserver(() => {
 if (document.body) {
     observer.observe(document.body, { childList: true, subtree: true });
 }
-</script>
-<script src="/ide/static/terminal-voice.js?v=27"></script><script src="/ide/static/remove-blue-x-aggressive.js?v=1"></script><script src="/ide/static/prd-project-transfer.js"></script></body></html>
+
+End of disabled script -->
+<!-- Re-enabling essential scripts only -->
+<script src="./static/terminal-voice.js?v=28"></script>
+<script src="./static/remove-blue-x-aggressive.js?v=1"></script>
+<!-- <script src="./static/special-views-buttons.js?v=7"></script> Disabled - keep only original small buttons -->
+<script src="./static/coder1-special-views.js?v=6"></script>
+<script src="./static/restore-coder1-logo.js?v=12"></script>
+<!-- <script src="./static/hide-terminal-title.js?v=2"></script> Disabled to fix terminal header -->
+<!-- <script src="./static/clean-terminal-header.js?v=1"></script> -->
+<script src="./static/remove-blue-text.js?v=1"></script>
+<script src="./static/hide-blue-coder1-text.js?v=1"></script>
+<script src="./static/remove-coder1-text-aggressively.js?v=1"></script>
+<script src="./static/global-logo-final.js?v=1"></script>
+<script src="./static/simple-text-removal.js?v=1"></script>
+<!-- <script src="./static/fix-all-ui-issues.js?v=1"></script> Disabled - may be causing issues -->
+<!-- <script src="./static/prd-cleanup.js"></script> -->
+<!-- <script src="./static/prd-project-transfer.js"></script> -->
+<!-- <script src="./static/prd-final-working.js"></script> Removed test button -->
+<!-- <script src="./static/context-priming-integration.js?v=1"></script> Disabled - causing layout issues -->
+<!-- <script src="./static/check-terminal-header.js?v=1"></script> Diagnostic complete --></body></html>

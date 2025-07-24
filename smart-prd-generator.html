@@ -17,8 +17,8 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coder1 - Smart PRD & Wireframe Generator</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="product-creation-hub.css">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/product-creation-hub.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -42,6 +42,11 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
                     <button class="ide-enter-btn" id="enterIDE">
                         <i class="fas fa-code"></i>
                         Enter Coder1 IDE
+                    </button>
+                    <div class="header-divider"></div>
+                    <button class="context-priming-btn" id="contextPriming" onclick="window.location.href='/context-priming.html'">
+                        <i class="fas fa-brain"></i>
+                        Context Priming
                     </button>
                     <div class="header-divider"></div>
                     <div class="status-indicator">
@@ -82,7 +87,7 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
                     <div class="input-wrapper glassmorphism">
                         <textarea 
                             id="messageInput" 
-                            placeholder=""
+                            placeholder="Provide your idea here."
                             rows="2"
                         ></textarea>
                         <div class="input-controls">
@@ -878,6 +883,108 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
                             <!-- Populated dynamically -->
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export PRD Modal -->
+    <div class="modal-overlay" id="exportModal" style="display: none;">
+        <div class="modal-container export-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-export"></i> Export PRD</h2>
+                <button class="modal-close" id="closeExportModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content">
+                <!-- Export Format Selection -->
+                <div class="export-section">
+                    <h3>Select Export Format</h3>
+                    <div class="export-formats">
+                        <button class="export-format-btn active" data-format="markdown">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Markdown</span>
+                            <small>.md</small>
+                        </button>
+                        <button class="export-format-btn" data-format="pdf">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>PDF</span>
+                            <small>.pdf</small>
+                        </button>
+                        <button class="export-format-btn" data-format="html">
+                            <i class="fas fa-file-code"></i>
+                            <span>HTML</span>
+                            <small>.html</small>
+                        </button>
+                        <button class="export-format-btn" data-format="json">
+                            <i class="fas fa-file-code"></i>
+                            <span>JSON</span>
+                            <small>.json</small>
+                        </button>
+                        <button class="export-format-btn" data-format="docx">
+                            <i class="fas fa-file-word"></i>
+                            <span>Word</span>
+                            <small>.docx</small>
+                        </button>
+                        <button class="export-format-btn" data-format="txt">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Plain Text</span>
+                            <small>.txt</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-section">
+                    <h3>Export Options</h3>
+                    <div class="export-options">
+                        <label class="export-option">
+                            <input type="checkbox" id="includeQuestions" checked>
+                            <span>Include Q&A Session</span>
+                        </label>
+                        <label class="export-option">
+                            <input type="checkbox" id="includeConsultation" checked>
+                            <span>Include Expert Consultation</span>
+                        </label>
+                        <label class="export-option">
+                            <input type="checkbox" id="includeWireframes" checked>
+                            <span>Include Wireframes</span>
+                        </label>
+                        <label class="export-option">
+                            <input type="checkbox" id="includeMarketInsights" checked>
+                            <span>Include Market Insights</span>
+                        </label>
+                        <label class="export-option">
+                            <input type="checkbox" id="includeIntelligence" checked>
+                            <span>Include AI Intelligence</span>
+                        </label>
+                        <label class="export-option">
+                            <input type="checkbox" id="includeMetadata" checked>
+                            <span>Include Project Metadata</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="export-section">
+                    <h3>Preview</h3>
+                    <div class="export-preview" id="exportPreview">
+                        <div class="preview-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Generating preview...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Actions -->
+                <div class="export-actions">
+                    <button class="btn-secondary" id="cancelExport">Cancel</button>
+                    <button class="btn-primary" id="confirmExport">
+                        <i class="fas fa-download"></i>
+                        Export PRD
+                    </button>
                 </div>
             </div>
         </div>

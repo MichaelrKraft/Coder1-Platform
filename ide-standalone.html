@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Coder1 IDE - Standalone</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #1a1b26;
+            color: #c0caf5;
+        }
+        .message {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        h1 {
+            color: #8b5cf6;
+            margin-bottom: 20px;
+        }
+        .button {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        }
+        iframe {
+            width: 100%;
+            height: calc(100vh - 40px);
+            border: none;
+            display: none;
+        }
+        .error {
+            color: #f7768e;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="message" id="message">
+        <h1>Coder1 IDE</h1>
+        <p>The IDE requires the backend server to be running.</p>
+        <button class="button" onclick="startNodeServer()">Start Node.js Server</button>
+        <button class="button" onclick="loadIDE()">Try Loading IDE Anyway</button>
+        <div class="error" id="error"></div>
+    </div>
+    
+    <iframe id="ideFrame" src=""></iframe>
+
+    <script>
+        function startNodeServer() {
+            document.getElementById('error').textContent = 'Cannot start Node.js server due to networking issue. Please use npm start in a separate terminal.';
+        }
+
+        function loadIDE() {
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('ideFrame').style.display = 'block';
+            document.getElementById('ideFrame').src = 'ide-build/index.html';
+        }
+
+        // Check if we can load the IDE assets
+        fetch('ide-build/static/js/main.a1cfdcd5.js')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('message').innerHTML += '<p style="color: #9ece6a;">✓ IDE assets found</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('error').textContent = 'IDE assets not found';
+            });
+    </script>
+</body>
+</html>

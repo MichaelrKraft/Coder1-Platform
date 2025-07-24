@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal AI Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #8b5cf6;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #7c3aed;
+        }
+        .response {
+            background: #000;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
+        .status {
+            color: #10b981;
+            margin: 10px 0;
+        }
+        .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Terminal AI Integration Test (Claude)</h1>
+        
+        <div class="test-section">
+            <h2>API Endpoint Test</h2>
+            <p>Test the /api/terminal/chat endpoint using Claude/Anthropic</p>
+            
+            <button onclick="testSimpleMessage()">Test: "Hello"</button>
+            <button onclick="testCreateFile()">Test: "Create a file called test.js"</button>
+            <button onclick="testHelp()">Test: "Help"</button>
+            <button onclick="testSaveHistory()">Test: Save History</button>
+            
+            <div class="status" id="status"></div>
+            <div class="response" id="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Custom Test</h2>
+            <input type="text" id="customMessage" placeholder="Type your test message" style="width: 100%; padding: 5px;">
+            <button onclick="testCustomMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const sessionId = `test-${Date.now()}`;
+        let testHistory = [];
+
+        async function sendMessage(message) {
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            
+            statusEl.textContent = 'Sending request...';
+            statusEl.className = 'status';
+            responseEl.textContent = '';
+            
+            try {
+                const response = await fetch('/api/terminal/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        sessionId: sessionId,
+                        context: 'terminal'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.textContent = '✅ Success';
+                    responseEl.textContent = `Response: ${data.response}\n\nTool Calls: ${JSON.stringify(data.toolCalls, null, 2)}`;
+                    
+                    // Add to history
+                    testHistory.push({ message, response: data.response });
+                } else {
+                    statusEl.textContent = '❌ API Error';
+                    statusEl.className = 'status error';
+                    responseEl.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                statusEl.textContent = '❌ Network Error';
+                statusEl.className = 'status error';
+                responseEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function testSimpleMessage() {
+            sendMessage('Hello');
+        }
+
+        function testCreateFile() {
+            sendMessage('Create a file called test.js');
+        }
+
+        function testHelp() {
+            sendMessage('help');
+        }
+
+        function testCustomMessage() {
+            const input = document.getElementById('customMessage');
+            if (input.value.trim()) {
+                sendMessage(input.value.trim());
+                input.value = '';
+            }
+        }
+
+        async function testSaveHistory() {
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            
+            statusEl.textContent = 'Testing save history...';
+            statusEl.className = 'status';
+            
+            try {
+                const response = await fetch('/api/terminal/save-history', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        history: testHistory,
+                        sessionId: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.textContent = '✅ Save history endpoint works';
+                    responseEl.textContent = `Filename: ${data.filename}\nData: ${JSON.stringify(data.data, null, 2)}`;
+                } else {
+                    statusEl.textContent = '❌ Save history failed';
+                    statusEl.className = 'status error';
+                    responseEl.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                statusEl.textContent = '❌ Network Error';
+                statusEl.className = 'status error';
+                responseEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Allow Enter key in custom input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('customMessage').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    testCustomMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

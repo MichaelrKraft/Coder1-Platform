@@ -1,0 +1,3783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDE Integration Test - React Bits + Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin': 'spin 1s linear infinite',
+                        'grid-move': 'grid-move 20s ease-in-out infinite',
+                        'grid-move-alt': 'grid-move-alt 25s ease-in-out infinite',
+                        'bounce': 'bounce 1s infinite',
+                        'ping': 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'wave': 'wave 2.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        'grid-move': {
+                            '0%': { 'transform': 'translate(0, 0)' },
+                            '25%': { 'transform': 'translate(3px, 2px)' },
+                            '50%': { 'transform': 'translate(6px, 6px)' },
+                            '75%': { 'transform': 'translate(2px, 4px)' },
+                            '100%': { 'transform': 'translate(0, 0)' }
+                        },
+                        'grid-move-alt': {
+                            '0%': { 'transform': 'translate(0, 0)' },
+                            '25%': { 'transform': 'translate(-2px, 3px)' },
+                            '50%': { 'transform': 'translate(-4px, -3px)' },
+                            '75%': { 'transform': 'translate(4px, -2px)' },
+                            '100%': { 'transform': 'translate(0, 0)' }
+                        },
+                        'shimmer': {
+                            '0%': { 'transform': 'translateX(-100%)' },
+                            '100%': { 'transform': 'translateX(100%)' }
+                        },
+                        'bounce': {
+                            '0%, 100%': { 
+                                'transform': 'translateY(-25%)',
+                                'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)'
+                            },
+                            '50%': { 
+                                'transform': 'translateY(0)',
+                                'animation-timing-function': 'cubic-bezier(0, 0, 0.2, 1)'
+                            }
+                        },
+                        'ping': {
+                            '75%, 100%': { 
+                                'transform': 'scale(2)',
+                                'opacity': '0'
+                            }
+                        },
+                        'float': {
+                            '0%, 100%': { 'transform': 'translateY(0px)' },
+                            '50%': { 'transform': 'translateY(-10px)' }
+                        },
+                        'wave': {
+                            '0%, 100%': { 'transform': 'rotate(0deg)' },
+                            '10%': { 'transform': 'rotate(14deg)' },
+                            '20%': { 'transform': 'rotate(-8deg)' },
+                            '30%': { 'transform': 'rotate(14deg)' },
+                            '40%': { 'transform': 'rotate(-4deg)' },
+                            '50%': { 'transform': 'rotate(10deg)' },
+                            '60%': { 'transform': 'rotate(0deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #0a0a0f;
+            color: #c0caf5;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* IDE Layout */
+        .ide-container {
+            display: flex;
+            height: 100vh;
+            background: #0a0a0f;
+        }
+        
+        .sidebar {
+            width: 60px;
+            background: #1a1b26;
+            border-right: 1px solid #414868;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .sidebar-icon {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #565f89;
+        }
+        
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: #24283b;
+            color: #7aa2f7;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .left-panel {
+            width: 320px;
+            background: #1a1b26;
+            border-right: 1px solid #414868;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #24283b;
+        }
+        
+        /* React Bits Styles */
+        .react-bits {
+            background: #24283b;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #414868;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .react-bits-header {
+            margin-bottom: 12px;
+        }
+        
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .react-bits-header h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #c0caf5;
+            font-weight: 600;
+        }
+        
+        .magic-badge {
+            font-size: 12px;
+            padding: 2px 6px;
+            background: #7aa2f7;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 6px 10px;
+            background: #1a1b26;
+            border: 1px solid #414868;
+            border-radius: 6px;
+            color: #c0caf5;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .search-input:focus {
+            border-color: #7aa2f7;
+        }
+        
+        .category-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #414868 transparent;
+        }
+        
+        .category-tab {
+            padding: 4px 8px;
+            background: #1a1b26;
+            border: 1px solid #414868;
+            border-radius: 4px;
+            color: #9aa5ce;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .category-tab:hover {
+            background: #2a2e42;
+            border-color: #565f89;
+        }
+        
+        .category-tab.active {
+            background: #7aa2f7;
+            border-color: #7aa2f7;
+            color: #1a1b26;
+        }
+        
+        .react-bits-content {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #414868 transparent;
+        }
+        
+        .react-bit-item {
+            background: #1a1b26;
+            border: 1px solid #414868;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .react-bit-item:hover {
+            background: #2a2e42;
+            border-color: #7aa2f7;
+            transform: translateX(2px);
+        }
+        
+        .react-bit-item.selected {
+            background: #2a2e42;
+            border-color: #bb9af7;
+            box-shadow: 0 0 0 1px #bb9af7;
+        }
+        
+        .bit-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .bit-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .bit-name {
+            color: #c0caf5;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        
+        .bit-description {
+            color: #565f89;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+        
+        /* Terminal Styles */
+        .terminal-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 16px;
+            background: #1a1b26;
+            border-radius: 8px;
+            border: 1px solid #414868;
+            overflow: hidden;
+        }
+        
+        .terminal-header {
+            background: #24283b;
+            padding: 8px 16px;
+            border-bottom: 1px solid #414868;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .terminal-header h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #c0caf5;
+        }
+        
+        .terminal-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .terminal-output {
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+        
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            margin-top: 16px;
+        }
+        
+        .terminal-prompt {
+            color: #7aa2f7;
+            margin-right: 8px;
+        }
+        
+        .terminal-input input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #c0caf5;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+        }
+        
+        /* Preview Panel */
+        .preview-panel {
+            width: 300px;
+            background: #1a1b26;
+            border-left: 1px solid #414868;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .preview-header h4 {
+            margin: 0;
+            font-size: 13px;
+            color: #c0caf5;
+            font-weight: 600;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .action-btn {
+            padding: 4px 8px;
+            background: #24283b;
+            border: 1px solid #414868;
+            border-radius: 4px;
+            color: #9aa5ce;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: #2a2e42;
+            border-color: #565f89;
+        }
+        
+        .action-btn.primary {
+            background: #7aa2f7;
+            border-color: #7aa2f7;
+            color: #1a1b26;
+            font-weight: 500;
+        }
+        
+        .action-btn.primary:hover {
+            background: #89b4fa;
+            border-color: #89b4fa;
+        }
+        
+        .preview-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 120px;
+            padding: 20px;
+            background: #24283b;
+            border-radius: 6px;
+            border: 1px solid #414868;
+            margin-bottom: 12px;
+        }
+        
+        .code-preview {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            font-size: 11px;
+            line-height: 1.5;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .code-preview code {
+            color: #c0caf5;
+        }
+        
+        /* Enhanced animations */
+        .glass-effect {
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-effect:hover {
+            backdrop-filter: blur(16px) saturate(200%);
+            -webkit-backdrop-filter: blur(16px) saturate(200%);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Fallback for browsers without backdrop-filter support */
+        @supports not (backdrop-filter: blur(12px)) {
+            .glass-effect {
+                background: rgba(26, 27, 38, 0.85);
+                border: 1px solid rgba(65, 72, 104, 0.6);
+            }
+            
+            .glass-effect:hover {
+                background: rgba(36, 40, 59, 0.9);
+                border-color: rgba(122, 162, 247, 0.8);
+            }
+        }
+        
+        .shiny-text {
+            background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 25%, #8b5cf6 50%, #ec4899 75%, #8b5cf6 100%);
+            background-size: 400% 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            animation: shine 3s ease-in-out infinite;
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Fallback for browsers that don't support background-clip: text */
+        .shiny-text::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 25%, #8b5cf6 50%, #ec4899 75%, #8b5cf6 100%);
+            background-size: 400% 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        @keyframes shine {
+            0% { 
+                background-position: 0% 50%;
+                transform: translateX(0);
+            }
+            50% { 
+                background-position: 100% 50%;
+                transform: translateX(2px);
+            }
+            100% { 
+                background-position: 0% 50%;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Enhanced shiny text with shimmer overlay */
+        .shiny-text-enhanced {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
+            background-size: 200% 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            animation: gradient-x 3s ease infinite;
+        }
+        
+        .shiny-text-enhanced::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: shimmer 2s infinite;
+            z-index: 1;
+        }
+        
+        .animate-grid-move {
+            animation: grid-move 15s ease-in-out infinite;
+        }
+        
+        .animate-grid-move-alt {
+            animation: grid-move-alt 20s ease-in-out infinite;
+        }
+        
+        /* Performance optimizations for animations */
+        .animate-pulse, 
+        .animate-spin, 
+        .animate-bounce, 
+        .animate-ping,
+        .animate-gradient-x,
+        .animate-shimmer,
+        .animate-grid-move,
+        .animate-grid-move-alt {
+            will-change: transform, opacity;
+            transform-style: preserve-3d;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        
+        /* Reduced motion preference support */
+        @media (prefers-reduced-motion: reduce) {
+            .animate-pulse, 
+            .animate-spin, 
+            .animate-bounce, 
+            .animate-ping,
+            .animate-gradient-x,
+            .animate-shimmer,
+            .animate-grid-move,
+            .animate-grid-move-alt,
+            .shiny-text,
+            .glass-effect {
+                animation: none !important;
+                transition: all 0.2s ease !important;
+            }
+            
+            .typewriter-demo {
+                animation: none !important;
+                border-right: 2px solid #10b981 !important;
+            }
+        }
+        
+        /* Success/error states */
+        .terminal-success {
+            color: #9ece6a;
+        }
+        
+        .terminal-error {
+            color: #f7768e;
+        }
+        
+        .terminal-info {
+            color: #7aa2f7;
+        }
+    </style>
+</head>
+<body>
+    <div class="ide-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-icon active" title="Explorer">📁</div>
+            <div class="sidebar-icon" title="Terminal">💻</div>
+            <div class="sidebar-icon" title="React Bits">⚛️</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - React Bits -->
+            <div class="left-panel">
+                <div class="react-bits">
+                    <div class="react-bits-header">
+                        <div class="header-top">
+                            <h3>React Bits</h3>
+                            <span class="magic-badge" id="magicStatus">✨ Magic</span>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Search components..." 
+                            class="search-input"
+                        >
+                    </div>
+
+                    <!-- Category Tabs -->
+                    <div class="category-tabs">
+                        <button class="category-tab active" data-category="all">All</button>
+                        <button class="category-tab" data-category="buttons">🔘</button>
+                        <button class="category-tab" data-category="text">📝</button>
+                        <button class="category-tab" data-category="cards">🎨</button>
+                        <button class="category-tab" data-category="forms">📋</button>
+                        <button class="category-tab" data-category="backgrounds">🌌</button>
+                        <button class="category-tab" data-category="loaders">⏳</button>
+                        <button class="category-tab" data-category="navigation">🧭</button>
+                        <button class="category-tab" data-category="layout">📐</button>
+                        <button class="category-tab" data-category="interactive">🎮</button>
+                        <button class="category-tab" data-category="data">📊</button>
+                        <button class="category-tab" data-category="media">🎬</button>
+                    </div>
+
+                    <!-- Component List -->
+                    <div id="componentList" class="react-bits-content">
+                        <!-- Components will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <!-- Terminal Area -->
+                <div class="terminal-area">
+                    <div class="terminal-header">
+                        <h3>Terminal</h3>
+                        <span class="text-xs text-gray-400">Try: /ui create a glowing button</span>
+                    </div>
+                    <div class="terminal-content">
+                        <div id="terminalOutput">
+                            <div class="terminal-output terminal-info">Welcome to Coder1 IDE Terminal - AI Chat Mode</div>
+                            <div class="terminal-output">Just type naturally to chat with AI, or use /ui prefix for component generation</div>
+                            <div class="terminal-output">Examples: "/ui create a glowing button" or "/ui modern card with animation"</div>
+                            <div class="terminal-output"></div>
+                        </div>
+                        <div class="terminal-input">
+                            <span class="terminal-prompt">$</span>
+                            <input type="text" id="terminalInput" placeholder="Type a command..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <h4 id="previewTitle">Select Component</h4>
+                    <div class="preview-actions">
+                        <button class="action-btn" onclick="togglePreview()" title="Toggle Code View">👁️</button>
+                        <button class="action-btn" onclick="copyCode()" title="Copy Code">📋</button>
+                        <button class="action-btn primary" onclick="insertCode()" title="Insert into Editor">Use</button>
+                    </div>
+                </div>
+                
+                <div id="previewArea" class="preview-visual">
+                    <p class="text-gray-500 text-sm">Click a component to preview</p>
+                </div>
+                
+                <div id="codeArea" class="code-preview" style="display: none;">
+                    <code id="codeDisplay">// Component code will appear here</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Component library with all enhanced components from test page
+        const componentLibrary = {
+            buttons: [
+                {
+                    id: 'btn-glow',
+                    name: 'Glowing Button',
+                    icon: '✨',
+                    description: 'Button with animated glow effect',
+                    preview: '<button class="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all duration-300">Click Me</button>',
+                    code: `export const GlowingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-purple-600 text-white rounded-lg 
+                 shadow-lg shadow-purple-500/50 hover:shadow-xl 
+                 hover:shadow-purple-500/60 transition-all duration-300"
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-pulse',
+                    name: 'Pulse Button',
+                    icon: '💫',
+                    description: 'Button with pulsing animation',
+                    preview: '<button class="px-6 py-3 bg-blue-600 text-white rounded-lg animate-pulse">Pulse Button</button>',
+                    code: `export const PulseButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-blue-600 text-white rounded-lg animate-pulse"
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-gradient',
+                    name: 'Gradient Button',
+                    icon: '🌈',
+                    description: 'Modern gradient button',
+                    preview: '<button class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300">Gradient</button>',
+                    code: `export const GradientButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 
+                 text-white rounded-lg hover:from-purple-700 
+                 hover:to-pink-700 transition-all duration-300"
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-neon',
+                    name: 'Neon Button',
+                    icon: '💡',
+                    description: 'Glowing neon-style button',
+                    preview: '<button class="px-6 py-3 bg-transparent border-2 border-cyan-400 text-cyan-400 rounded-lg hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 font-bold uppercase tracking-wider animate-pulse" style="text-shadow: 0 0 10px currentColor; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);">Neon Style</button>',
+                    code: `export const NeonButton = ({ children, onClick, color = 'cyan' }) => {
+  const colorClasses = {
+    cyan: 'border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:shadow-cyan-400/50',
+    pink: 'border-pink-400 text-pink-400 hover:bg-pink-400 hover:shadow-pink-400/50',
+    green: 'border-green-400 text-green-400 hover:bg-green-400 hover:shadow-green-400/50'
+  };
+  
+  return (
+    <button
+      onClick={onClick}
+      className={\`px-6 py-3 bg-transparent border-2 rounded-lg 
+                 hover:text-black hover:shadow-lg transition-all 
+                 duration-300 font-bold uppercase tracking-wider 
+                 \${colorClasses[color]}\`}
+      style={{ textShadow: '0 0 10px currentColor' }}
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-morphing',
+                    name: 'Morphing Button',
+                    icon: '🔄',
+                    description: 'Button that morphs on hover',
+                    preview: '<button class="group px-8 py-3 bg-gray-800 text-white rounded-full hover:rounded-lg hover:bg-purple-600 transition-all duration-500 transform hover:scale-110 overflow-hidden relative"><span class="relative z-10">Morph Me</span><div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div></button>',
+                    code: `export const MorphingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="group px-8 py-3 bg-gray-800 text-white rounded-full 
+                 hover:rounded-lg hover:bg-purple-600 transition-all 
+                 duration-500 transform hover:scale-110 overflow-hidden 
+                 relative"
+    >
+      <span className="relative z-10">{children}</span>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 
+                      to-pink-600 opacity-0 group-hover:opacity-100 
+                      transition-opacity duration-500" />
+    </button>
+  );
+};`
+                }
+            ],
+            text: [
+                {
+                    id: 'txt-shiny',
+                    name: 'Shiny Text',
+                    icon: '✨',
+                    description: 'Text with shimmering effect',
+                    preview: '<h2 class="text-3xl font-bold shiny-text">✨ Shiny Text Animation ✨</h2>',
+                    code: `export const ShinyText = ({ children }) => {
+  return (
+    <span className="relative inline-block">
+      <span className="relative z-10 bg-gradient-to-r from-purple-400 
+                       via-pink-400 to-purple-400 bg-clip-text 
+                       text-transparent animate-gradient-x">
+        {children}
+      </span>
+    </span>
+  );
+};`
+                },
+                {
+                    id: 'txt-typewriter',
+                    name: 'Typewriter Text',
+                    icon: '⌨️',
+                    description: 'Typewriter animation effect',
+                    preview: '<h2 class="text-2xl font-mono text-green-400" id="typewriter-demo">Hello, World! ⌨️</h2>',
+                    code: `export const TypewriterText = ({ text, speed = 100 }) => {
+  const [displayText, setDisplayText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showCursor, setShowCursor] = useState(true);
+  
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, text, speed]);
+  
+  useEffect(() => {
+    const cursorTimer = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 500);
+    return () => clearInterval(cursorTimer);
+  }, []);
+  
+  return (
+    <span className="font-mono">
+      {displayText}
+      <span className={\`inline-block w-0.5 h-6 bg-current ml-1 \${showCursor ? 'opacity-100' : 'opacity-0'}\`}>
+        |
+      </span>
+    </span>
+  );
+};`
+                },
+                {
+                    id: 'txt-glitch',
+                    name: 'Glitch Text',
+                    icon: '⚡',
+                    description: 'Cyberpunk glitch effect text',
+                    preview: '<div class="relative inline-block"><h2 class="text-3xl font-bold text-white relative z-10">GLITCH</h2><h2 class="absolute top-0 left-0 text-3xl font-bold text-red-500 opacity-70 animate-ping" style="transform: translate(2px, 0);">GLITCH</h2><h2 class="absolute top-0 left-0 text-3xl font-bold text-blue-500 opacity-50 animate-pulse" style="transform: translate(-2px, 0);">GLITCH</h2></div>',
+                    code: `export const GlitchText = ({ children, className = '' }) => {
+  return (
+    <div className={\`relative \${className}\`}>
+      <span className="absolute top-0 left-0 text-red-500 opacity-80 
+                       animate-ping">{children}</span>
+      <span className="absolute top-0 left-0 text-blue-500 opacity-60 
+                       animate-pulse" style={{ transform: 'translate(2px, 0)' }}>
+        {children}
+      </span>
+      <span className="relative text-white font-bold">{children}</span>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'txt-neon-glow',
+                    name: 'Neon Glow Text',
+                    icon: '💫',
+                    description: 'Bright neon glow effect',
+                    preview: '<h2 class="text-3xl font-bold text-cyan-400 animate-pulse" style="text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;">NEON GLOW</h2>',
+                    code: `export const NeonGlowText = ({ children, color = 'cyan', className = '' }) => {
+  const colorClasses = {
+    cyan: 'text-cyan-400',
+    pink: 'text-pink-400',
+    green: 'text-green-400',
+    purple: 'text-purple-400'
+  };
+  
+  return (
+    <span 
+      className={\`font-bold \${colorClasses[color]} \${className}\`}
+      style={{
+        textShadow: '0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor'
+      }}
+    >
+      {children}
+    </span>
+  );
+};`
+                },
+                {
+                    id: 'txt-wave',
+                    name: 'Wave Text',
+                    icon: '🌊',
+                    description: 'Animated wave text effect',
+                    preview: '<div class="text-2xl font-bold text-blue-500"><span class="inline-block animate-bounce" style="animation-delay: 0s;">W</span><span class="inline-block animate-bounce" style="animation-delay: 0.1s;">A</span><span class="inline-block animate-bounce" style="animation-delay: 0.2s;">V</span><span class="inline-block animate-bounce" style="animation-delay: 0.3s;">E</span><span class="inline-block animate-bounce" style="animation-delay: 0.4s;"> </span><span class="inline-block animate-bounce" style="animation-delay: 0.5s;">T</span><span class="inline-block animate-bounce" style="animation-delay: 0.6s;">E</span><span class="inline-block animate-bounce" style="animation-delay: 0.7s;">X</span><span class="inline-block animate-bounce" style="animation-delay: 0.8s;">T</span></div>',
+                    code: `export const WaveText = ({ text, className = '' }) => {
+  const letters = text.split('');
+  
+  return (
+    <div className={\`\${className}\`}>
+      {letters.map((letter, index) => (
+        <span
+          key={index}
+          className="inline-block animate-bounce"
+          style={{
+            animationDelay: \`\${index * 0.1}s\`
+          }}
+        >
+          {letter === ' ' ? '\u00A0' : letter}
+        </span>
+      ))}
+    </div>
+  );
+};`
+                }
+            ],
+            cards: [
+                {
+                    id: 'card-glass',
+                    name: 'Glass Card',
+                    icon: '🪟',
+                    description: 'Glassmorphic card design',
+                    preview: `<div class="group p-6 bg-white/15 glass-effect border border-white/30 rounded-xl hover:bg-white/25 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:-translate-y-1 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <h3 class="relative text-lg font-semibold mb-2 text-white group-hover:text-purple-200 transition-colors">Glass Card</h3>
+                        <p class="relative text-gray-300 group-hover:text-gray-200 transition-colors">Hover me!</p>
+                    </div>`,
+                    code: `export const GlassCard = ({ title, content, tags }) => {
+  return (
+    <div className="group p-6 bg-white/10 backdrop-blur-md border 
+                    border-white/20 rounded-xl hover:bg-white/20 
+                    hover:border-white/30 hover:shadow-xl 
+                    hover:shadow-purple-500/20 transition-all 
+                    duration-300 cursor-pointer transform 
+                    hover:scale-105">
+      <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+      <p className="text-gray-300">{content}</p>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'card-hover',
+                    name: 'Hover Card',
+                    icon: '🎯',
+                    description: 'Card with 3D hover effects',
+                    preview: `<div class="group relative p-6 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-xl border border-purple-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 transform hover:-translate-y-2 cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-pink-600/0 group-hover:from-purple-600/30 group-hover:to-pink-600/30 rounded-xl transition-all duration-300"></div>
+                        <h3 class="relative text-lg font-semibold mb-2 text-white">3D Hover Card</h3>
+                        <p class="relative text-gray-300">Lifts up and glows!</p>
+                    </div>`,
+                    code: `export const HoverCard = ({ title, content, cta }) => {
+  return (
+    <div className="group relative p-6 bg-gradient-to-br 
+                    from-purple-600/20 to-pink-600/20 rounded-xl 
+                    border border-purple-500/30 transition-all 
+                    duration-300 hover:shadow-2xl 
+                    hover:shadow-purple-500/30 transform 
+                    hover:-translate-y-2 cursor-pointer">
+      <div className="absolute inset-0 bg-gradient-to-br 
+                      from-purple-600/0 to-pink-600/0 
+                      group-hover:from-purple-600/30 
+                      group-hover:to-pink-600/30 rounded-xl 
+                      transition-all duration-300" />
+      <h3 className="relative text-xl font-semibold mb-2 text-white">
+        {title}
+      </h3>
+      <p className="relative text-gray-300">{content}</p>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'card-gradient',
+                    name: 'Gradient Border Card',
+                    icon: '🌈',
+                    description: 'Card with animated gradient border',
+                    preview: `<div class="relative p-[2px] rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-gradient-x">
+                        <div class="bg-gray-900 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold mb-2 text-white">Gradient Border</h3>
+                            <p class="text-gray-300">Watch the border colors flow!</p>
+                        </div>
+                    </div>`,
+                    code: `export const GradientBorderCard = ({ title, content }) => {
+  return (
+    <div className="relative p-[2px] rounded-xl bg-gradient-to-r 
+                    from-purple-500 via-pink-500 to-purple-500 
+                    animate-gradient-x">
+      <div className="bg-gray-900 rounded-xl p-6">
+        <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+        <p className="text-gray-300">{content}</p>
+      </div>
+    </div>
+  );
+};`
+                }
+            ],
+            forms: [
+                {
+                    id: 'form-input',
+                    name: 'Modern Input',
+                    icon: '✏️',
+                    description: 'Floating label input field',
+                    preview: '<div class="relative"><input type="text" placeholder=" " class="peer px-4 py-2 w-64 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 transition-colors" /><label class="absolute left-4 -top-2.5 bg-gray-900 px-1 text-sm text-gray-400 transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-purple-500">Email Address</label></div>',
+                    code: `export const ModernInput = ({ label, value, onChange, type = "text" }) => {
+  return (
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        className="peer px-4 py-2 bg-gray-800 border border-gray-600 
+                   rounded-lg text-white focus:border-purple-500 
+                   focus:ring-2 focus:ring-purple-500/20 transition-all
+                   placeholder-transparent"
+        placeholder=" "
+      />
+      <label className="absolute left-4 -top-2.5 bg-gray-900 px-1 
+                        text-sm text-gray-400 transition-all 
+                        peer-placeholder-shown:top-2 
+                        peer-placeholder-shown:text-base 
+                        peer-focus:-top-2.5 peer-focus:text-sm 
+                        peer-focus:text-purple-500">
+        {label}
+      </label>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'form-search',
+                    name: 'Search Bar',
+                    icon: '🔍',
+                    description: 'Animated search input with icon',
+                    preview: '<div class="relative w-64"><input type="text" placeholder="Search..." class="pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-full text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all w-full"><div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div></div>',
+                    code: `export const SearchBar = ({ placeholder = "Search...", onSearch, className = '' }) => {
+  const [value, setValue] = useState('');
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch?.(value);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className={\`relative \${className}\`}>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder={placeholder}
+        className="pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 
+                   rounded-full text-white focus:border-purple-500 
+                   focus:ring-2 focus:ring-purple-500/20 transition-all 
+                   w-full"
+      />
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 
+                      text-gray-400">
+        <SearchIcon className="w-5 h-5" />
+      </div>
+    </form>
+  );
+};`
+                },
+                {
+                    id: 'form-toggle',
+                    name: 'Toggle Switch',
+                    icon: '🔘',
+                    description: 'Animated toggle switch',
+                    preview: '<div class="flex items-center space-x-3"><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div></label><span class="text-white">Dark Mode</span></div>',
+                    code: `export const ToggleSwitch = ({ label, checked, onChange, className = '' }) => {
+  return (
+    <div className={\`flex items-center space-x-3 \${className}\`}>
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange?.(e.target.checked)}
+          className="sr-only peer"
+        />
+        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none 
+                        peer-focus:ring-4 peer-focus:ring-purple-300 
+                        rounded-full peer peer-checked:after:translate-x-full 
+                        peer-checked:after:border-white after:content-[''] 
+                        after:absolute after:top-[2px] after:left-[2px] 
+                        after:bg-white after:rounded-full after:h-5 
+                        after:w-5 after:transition-all peer-checked:bg-purple-600" />
+      </label>
+      {label && <span className="text-white">{label}</span>}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'form-textarea',
+                    name: 'Auto-resize Textarea',
+                    icon: '📝',
+                    description: 'Textarea that grows with content',
+                    preview: '<textarea placeholder="Start typing..." class="w-64 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none" rows="3"></textarea>',
+                    code: `export const AutoTextarea = ({ placeholder, value, onChange, className = '' }) => {
+  const textareaRef = useRef(null);
+  
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [value]);
+  
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={\`w-full px-4 py-3 bg-gray-800 border border-gray-600 
+                 rounded-lg text-white focus:border-purple-500 
+                 focus:ring-2 focus:ring-purple-500/20 transition-all 
+                 resize-none \${className}\`}
+      rows={3}
+    />
+  );
+};`
+                },
+                {
+                    id: 'form-select',
+                    name: 'Custom Select',
+                    icon: '📋',
+                    description: 'Styled dropdown select',
+                    preview: '<div class="relative w-64"><select class="appearance-none w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all pr-10"><option>Choose an option...</option><option>Option 1</option><option>Option 2</option><option>Option 3</option></select><div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div>',
+                    code: `export const CustomSelect = ({ options, value, onChange, placeholder, className = '' }) => {
+  return (
+    <div className={\`relative \${className}\`}>
+      <select
+        value={value}
+        onChange={onChange}
+        className="appearance-none w-full px-4 py-3 bg-gray-800 
+                   border border-gray-600 rounded-lg text-white 
+                   focus:border-purple-500 focus:ring-2 
+                   focus:ring-purple-500/20 transition-all pr-10"
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options?.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center 
+                      pr-3 pointer-events-none">
+        <ChevronDownIcon className="w-5 h-5 text-gray-400" />
+      </div>
+    </div>
+  );
+};`
+                }
+            ],
+            backgrounds: [
+                {
+                    id: 'bg-gradient-mesh',
+                    name: 'Gradient Mesh',
+                    icon: '🌈',
+                    description: 'Animated gradient mesh background',
+                    preview: `<div class="w-full h-32 bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400 rounded-lg relative overflow-hidden animate-gradient-x">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-pulse"></div>
+                        <div class="absolute top-4 left-4 text-white/80 font-medium">Gradient Mesh</div>
+                    </div>`,
+                    code: `export const GradientMesh = ({ className = '' }) => {
+  return (
+    <div className={\`relative overflow-hidden \${className}\`}>
+      <div className="absolute inset-0 bg-gradient-to-br 
+                      from-purple-400 via-pink-400 to-indigo-400 
+                      animate-gradient-x" />
+      <div className="absolute inset-0 bg-gradient-to-tr 
+                      from-transparent via-white/10 to-transparent 
+                      animate-pulse" />
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-floating-shapes',
+                    name: 'Floating Shapes',
+                    icon: '🎈',
+                    description: 'Animated floating geometric shapes',
+                    preview: `<div class="w-full h-32 bg-gray-900 rounded-lg relative overflow-hidden">
+                        <div class="absolute top-4 left-4 w-4 h-4 bg-purple-500 rounded-full animate-bounce opacity-80"></div>
+                        <div class="absolute top-8 right-8 w-3 h-3 bg-pink-500 rounded opacity-60 animate-pulse"></div>
+                        <div class="absolute bottom-8 left-8 w-5 h-5 bg-blue-500 rounded-full animate-ping opacity-40"></div>
+                        <div class="absolute bottom-4 right-4 w-2 h-2 bg-green-500 rounded-full animate-bounce opacity-70" style="animation-delay: 1s;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/60 text-sm">Floating Shapes</div>
+                    </div>`,
+                    code: `export const FloatingShapes = ({ shapes = 8, className = '' }) => {
+  const [floatingShapes, setFloatingShapes] = useState([]);
+  
+  useEffect(() => {
+    const newShapes = Array.from({ length: shapes }, (_, i) => ({
+      id: i,
+      x: Math.random() * 90,
+      y: Math.random() * 90,
+      size: Math.random() * 20 + 10,
+      color: ['purple', 'pink', 'blue', 'green'][Math.floor(Math.random() * 4)],
+      animation: ['bounce', 'pulse', 'ping'][Math.floor(Math.random() * 3)],
+      delay: Math.random() * 3
+    }));
+    setFloatingShapes(newShapes);
+  }, [shapes]);
+  
+  return (
+    <div className={\`relative overflow-hidden bg-gray-900 \${className}\`}>
+      {floatingShapes.map(shape => (
+        <div
+          key={shape.id}
+          className={\`absolute bg-\${shape.color}-500 rounded-full 
+                     animate-\${shape.animation} opacity-70\`}
+          style={{
+            left: \`\${shape.x}%\`,
+            top: \`\${shape.y}%\`,
+            width: \`\${shape.size}px\`,
+            height: \`\${shape.size}px\`,
+            animationDelay: \`\${shape.delay}s\`
+          }}
+        />
+      ))}
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-animated-grid',
+                    name: 'Animated Grid',
+                    icon: '⚡',
+                    description: 'Glowing animated grid pattern',
+                    preview: `<div class="w-full h-32 bg-black rounded-lg relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-40 animate-grid-move" style="background-image: linear-gradient(rgba(139, 92, 246, 0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.8) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        <div class="absolute inset-0 opacity-25 animate-grid-move-alt" style="background-image: linear-gradient(rgba(236, 72, 153, 0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(236, 72, 153, 0.6) 1px, transparent 1px); background-size: 30px 30px;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-purple-300 text-sm font-medium bg-black/60 px-3 py-1 rounded backdrop-blur-sm">Animated Grid</div>
+                    </div>`,
+                    code: `export const AnimatedGrid = ({ gridSize = 20, className = '' }) => {
+  return (
+    <div className={\`relative overflow-hidden bg-black \${className}\`}>
+      <div 
+        className="absolute inset-0 opacity-20 animate-grid-move"
+        style={{
+          backgroundImage: \`
+            linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+          \`,
+          backgroundSize: \`\${gridSize}px \${gridSize}px\`
+        }}
+      />
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-particle-field',
+                    name: 'Particle Field',
+                    icon: '✨',
+                    description: 'Animated particle field effect',
+                    preview: `<div class="w-full h-32 bg-gradient-to-br from-indigo-900 to-purple-900 rounded-lg relative overflow-hidden">
+                        <div class="absolute top-2 left-2 w-1 h-1 bg-cyan-400 rounded-full animate-ping shadow-lg shadow-cyan-400/50"></div>
+                        <div class="absolute top-6 right-4 w-1 h-1 bg-pink-400 rounded-full animate-pulse shadow-lg shadow-pink-400/50"></div>
+                        <div class="absolute bottom-8 left-6 w-1 h-1 bg-blue-400 rounded-full animate-ping shadow-lg shadow-blue-400/50" style="animation-delay: 0.5s;"></div>
+                        <div class="absolute bottom-4 right-8 w-1 h-1 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" style="animation-delay: 1s;"></div>
+                        <div class="absolute top-4 left-1/2 w-1 h-1 bg-yellow-400 rounded-full animate-ping shadow-lg shadow-yellow-400/50" style="animation-delay: 1.5s;"></div>
+                        <div class="absolute bottom-6 left-1/3 w-1 h-1 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50" style="animation-delay: 2s;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/70 text-sm bg-black/40 px-3 py-1 rounded backdrop-blur-sm">Particle Field</div>
+                    </div>`,
+                    code: `export const ParticleField = ({ particleCount = 50, className = '' }) => {
+  const [particles, setParticles] = useState([]);
+  
+  useEffect(() => {
+    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      animation: Math.random() > 0.5 ? 'ping' : 'pulse',
+      delay: Math.random() * 3,
+      opacity: Math.random() * 0.8 + 0.2,
+      color: ['cyan', 'pink', 'blue', 'green', 'yellow', 'purple'][Math.floor(Math.random() * 6)]
+    }));
+    setParticles(newParticles);
+  }, [particleCount]);
+  
+  return (
+    <div className={\`relative overflow-hidden bg-gradient-to-br 
+                     from-indigo-900 to-purple-900 \${className}\`}>
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          className={\`absolute w-1 h-1 bg-\${particle.color}-400 rounded-full 
+                     animate-\${particle.animation} shadow-lg 
+                     shadow-\${particle.color}-400/50\`}
+          style={{
+            left: \`\${particle.x}%\`,
+            top: \`\${particle.y}%\`,
+            opacity: particle.opacity,
+            animationDelay: \`\${particle.delay}s\`
+          }}
+        />
+      ))}
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-aurora',
+                    name: 'Aurora Background',
+                    icon: '🌊',
+                    description: 'Flowing aurora-like background',
+                    preview: `<div class="w-full h-32 bg-black rounded-lg relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600/30 via-pink-600/20 to-blue-600/30 animate-pulse"></div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent via-cyan-400/10 to-transparent animate-ping"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/70 text-sm">Aurora Background</div>
+                    </div>`,
+                    code: `export const AuroraBackground = ({ className = '' }) => {
+  return (
+    <div className={\`relative overflow-hidden bg-black \${className}\`}>
+      <div className="absolute inset-0 bg-gradient-to-r 
+                      from-purple-600/30 via-pink-600/20 to-blue-600/30 
+                      animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-br 
+                      from-transparent via-cyan-400/10 to-transparent 
+                      animate-ping" />
+      <div className="absolute inset-0 bg-gradient-to-tl 
+                      from-green-400/5 via-transparent to-purple-400/5 
+                      animate-bounce" />
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                }
+            ],
+            loaders: [
+                {
+                    id: 'load-spinner',
+                    name: 'Spinner',
+                    icon: '🌀',
+                    description: 'Classic spinning loader',
+                    preview: '<div class="flex justify-center"><div class="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin shadow-lg shadow-purple-500/30"></div></div>',
+                    code: `export const Spinner = ({ size = 'md', color = 'purple' }) => {
+  const sizes = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+  
+  const colors = {
+    purple: 'border-purple-600',
+    blue: 'border-blue-600',
+    pink: 'border-pink-600'
+  };
+  
+  return (
+    <div className={\`\${sizes[size]} \${colors[color]} border-4 
+                     border-t-transparent rounded-full animate-spin 
+                     shadow-lg shadow-\${color}-500/30\`} />
+  );
+};`
+                },
+                {
+                    id: 'load-dots',
+                    name: 'Bouncing Dots',
+                    icon: '⚫',
+                    description: 'Three bouncing dot loader',
+                    preview: '<div class="flex justify-center"><div class="flex space-x-2"><div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce shadow-sm"></div><div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce shadow-sm" style="animation-delay: 0.1s;"></div><div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce shadow-sm" style="animation-delay: 0.2s;"></div></div></div>',
+                    code: `export const BouncingDots = ({ size = 'md', color = 'purple', dotCount = 3 }) => {
+  const sizes = {
+    sm: 'w-2 h-2',
+    md: 'w-3 h-3',
+    lg: 'w-4 h-4'
+  };
+  
+  const colors = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    pink: 'bg-pink-600'
+  };
+  
+  return (
+    <div className="flex space-x-2">
+      {Array.from({ length: dotCount }, (_, i) => (
+        <div
+          key={i}
+          className={\`\${sizes[size]} \${colors[color]} rounded-full animate-bounce shadow-sm\`}
+          style={{ animationDelay: \`\${i * 0.1}s\` }}
+        />
+      ))}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'load-pulse',
+                    name: 'Pulse Loader',
+                    icon: '💓',
+                    description: 'Pulsing circle loader',
+                    preview: '<div class="flex justify-center"><div class="relative w-16 h-16 flex items-center justify-center"><div class="absolute w-16 h-16 bg-purple-600 rounded-full animate-ping opacity-20"></div><div class="absolute w-12 h-12 bg-purple-600 rounded-full animate-pulse opacity-60"></div><div class="w-8 h-8 bg-purple-600 rounded-full shadow-lg shadow-purple-500/50"></div></div></div>',
+                    code: `export const PulseLoader = ({ size = 'md', color = 'purple' }) => {
+  const sizes = {
+    sm: { outer: 'w-12 h-12', middle: 'w-8 h-8', inner: 'w-6 h-6' },
+    md: { outer: 'w-16 h-16', middle: 'w-12 h-12', inner: 'w-8 h-8' },
+    lg: { outer: 'w-20 h-20', middle: 'w-16 h-16', inner: 'w-12 h-12' }
+  };
+  
+  const colors = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    pink: 'bg-pink-600'
+  };
+  
+  return (
+    <div className={\`relative \${sizes[size].outer} flex items-center justify-center\`}>
+      <div className={\`absolute \${sizes[size].outer} \${colors[color]} 
+                      rounded-full animate-ping opacity-20\`} />
+      <div className={\`absolute \${sizes[size].middle} \${colors[color]} 
+                      rounded-full animate-pulse opacity-60\`} />
+      <div className={\`\${sizes[size].inner} \${colors[color]} rounded-full 
+                      shadow-lg shadow-\${color}-500/50\`} />
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'load-bars',
+                    name: 'Dancing Bars',
+                    icon: '📊',
+                    description: 'Animated bar chart loader',
+                    preview: '<div class="flex justify-center"><div class="flex items-end space-x-1 h-8"><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 20px; animation-delay: 0s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 32px; animation-delay: 0.1s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 16px; animation-delay: 0.2s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 24px; animation-delay: 0.3s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 28px; animation-delay: 0.4s;"></div></div></div>',
+                    code: `export const DancingBars = ({ barCount = 5, color = 'purple' }) => {
+  const colors = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    pink: 'bg-pink-600'
+  };
+  
+  const heights = ['16px', '24px', '32px', '20px', '28px'];
+  
+  return (
+    <div className="flex items-end space-x-1 h-8">
+      {Array.from({ length: barCount }, (_, i) => (
+        <div
+          key={i}
+          className={\`w-2 \${colors[color]} rounded-t animate-pulse shadow-sm\`}
+          style={{
+            height: heights[i % heights.length],
+            animationDelay: \`\${i * 0.1}s\`
+          }}
+        />
+      ))}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'load-skeleton',
+                    name: 'Skeleton Loader',
+                    icon: '🦴',
+                    description: 'Content placeholder skeleton',
+                    preview: '<div class="space-y-3 w-64"><div class="h-4 bg-gray-600 rounded animate-pulse"></div><div class="h-4 bg-gray-600 rounded animate-pulse w-3/4"></div><div class="h-4 bg-gray-600 rounded animate-pulse w-1/2"></div><div class="flex space-x-2 mt-4"><div class="w-12 h-12 bg-gray-600 rounded-full animate-pulse"></div><div class="flex-1 space-y-2"><div class="h-3 bg-gray-600 rounded animate-pulse"></div><div class="h-3 bg-gray-600 rounded animate-pulse w-2/3"></div></div></div></div>',
+                    code: `export const SkeletonLoader = ({ lines = 3, showAvatar = false, className = '' }) => {
+  return (
+    <div className={\`space-y-3 \${className}\`}>
+      {/* Text lines */}
+      {Array.from({ length: lines }, (_, i) => (
+        <div
+          key={i}
+          className={\`h-4 bg-gray-600 rounded animate-pulse \${
+            i === lines - 1 ? 'w-3/4' : i === lines - 2 ? 'w-1/2' : 'w-full'
+          }\`}
+        />
+      ))}
+      
+      {/* Avatar + text section */}
+      {showAvatar && (
+        <div className="flex space-x-2 mt-4">
+          <div className="w-12 h-12 bg-gray-600 rounded-full animate-pulse" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-gray-600 rounded animate-pulse" />
+            <div className="h-3 bg-gray-600 rounded animate-pulse w-2/3" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};`
+                }
+            ],
+            navigation: [
+                {
+                    id: 'nav-breadcrumb',
+                    name: 'Breadcrumb',
+                    icon: '🍞',
+                    description: 'Navigation breadcrumb trail',
+                    preview: '<nav class="flex space-x-2 text-sm text-gray-300"><a href="#" class="hover:text-purple-400 transition-colors">Home</a><span class="text-gray-500">/</span><a href="#" class="hover:text-purple-400 transition-colors">Products</a><span class="text-gray-500">/</span><span class="text-purple-400 font-medium">Current</span></nav>',
+                    code: `export const Breadcrumb = ({ items }) => {
+  return (
+    <nav className="flex space-x-2 text-sm text-gray-300">
+      {items.map((item, index) => (
+        <React.Fragment key={index}>
+          {index > 0 && <span className="text-gray-500">/</span>}
+          {item.href ? (
+            <a 
+              href={item.href}
+              className="hover:text-purple-400 transition-colors"
+            >
+              {item.label}
+            </a>
+          ) : (
+            <span className="text-purple-400 font-medium">{item.label}</span>
+          )}
+        </React.Fragment>
+      ))}
+    </nav>
+  );
+};`
+                },
+                {
+                    id: 'nav-sidebar',
+                    name: 'Sidebar Menu',
+                    icon: '📋',
+                    description: 'Collapsible sidebar navigation',
+                    preview: '<div class="w-48 bg-gray-800 rounded-lg p-4"><div class="space-y-2"><div class="flex items-center space-x-3 p-2 rounded hover:bg-gray-700 cursor-pointer"><span>🏠</span><span class="text-white">Dashboard</span></div><div class="flex items-center space-x-3 p-2 rounded hover:bg-gray-700 cursor-pointer"><span>📊</span><span class="text-white">Analytics</span></div><div class="flex items-center space-x-3 p-2 rounded bg-purple-600"><span>⚙️</span><span class="text-white font-medium">Settings</span></div></div></div>',
+                    code: `export const SidebarMenu = ({ items, activeItem, onItemClick }) => {
+  return (
+    <div className="w-64 bg-gray-800 h-full p-4">
+      <div className="space-y-2">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            onClick={() => onItemClick?.(item)}
+            className={\`flex items-center space-x-3 p-2 rounded cursor-pointer
+                      transition-colors \${
+                        activeItem === item.id
+                          ? 'bg-purple-600 text-white'
+                          : 'hover:bg-gray-700 text-gray-300'
+                      }\`}
+          >
+            <span>{item.icon}</span>
+            <span className={activeItem === item.id ? 'font-medium' : ''}>
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'nav-tabs',
+                    name: 'Tab Navigation',
+                    icon: '📑',
+                    description: 'Horizontal tab navigation',
+                    preview: '<div class="border-b border-gray-700"><nav class="flex space-x-8"><button class="py-2 px-1 border-b-2 border-purple-500 text-purple-400 font-medium">Overview</button><button class="py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300">Details</button><button class="py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300">Settings</button></nav></div>',
+                    code: `export const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
+  return (
+    <div className="border-b border-gray-700">
+      <nav className="flex space-x-8">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange?.(tab.id)}
+            className={\`py-2 px-1 border-b-2 font-medium transition-all
+                      \${
+                        activeTab === tab.id
+                          ? 'border-purple-500 text-purple-400'
+                          : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                      }\`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'nav-pagination',
+                    name: 'Pagination',
+                    icon: '📄',
+                    description: 'Page navigation controls',
+                    preview: '<div class="flex items-center space-x-2"><button class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">Previous</button><button class="px-3 py-2 bg-purple-600 text-white rounded">1</button><button class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">2</button><button class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">3</button><span class="px-3 py-2 text-gray-500">...</span><button class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">10</button><button class="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">Next</button></div>',
+                    code: `export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const getVisiblePages = () => {
+    const pages = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center space-x-2">
+      <button
+        onClick={() => onPageChange?.(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-3 py-2 text-gray-400 hover:text-white 
+                   hover:bg-gray-700 rounded transition-colors 
+                   disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Previous
+      </button>
+      
+      {getVisiblePages().map((page, index) => (
+        <React.Fragment key={index}>
+          {page === "..." ? (
+            <span className="px-3 py-2 text-gray-500">...</span>
+          ) : (
+            <button
+              onClick={() => onPageChange?.(page)}
+              className={\`px-3 py-2 rounded transition-colors \${
+                currentPage === page
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }\`}
+            >
+              {page}
+            </button>
+          )}
+        </React.Fragment>
+      ))}
+      
+      <button
+        onClick={() => onPageChange?.(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="px-3 py-2 text-gray-400 hover:text-white 
+                   hover:bg-gray-700 rounded transition-colors 
+                   disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'nav-dropdown',
+                    name: 'Dropdown Menu',
+                    icon: '📋',
+                    description: 'Dropdown navigation menu',
+                    preview: '<div class="relative inline-block"><button class="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"><span>Menu</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><div class="absolute top-full left-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg"><a href="#" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">Profile</a><a href="#" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">Settings</a><hr class="border-gray-700"><a href="#" class="block px-4 py-2 text-red-400 hover:bg-gray-700">Logout</a></div></div>',
+                    code: `export const DropdownMenu = ({ trigger, items, isOpen, onToggle }) => {
+  const [open, setOpen] = useState(isOpen || false);
+  
+  const toggleDropdown = () => {
+    const newState = !open;
+    setOpen(newState);
+    onToggle?.(newState);
+  };
+
+  return (
+    <div className="relative inline-block">
+      <button
+        onClick={toggleDropdown}
+        className="flex items-center space-x-2 px-4 py-2 bg-gray-700 
+                   text-white rounded hover:bg-gray-600 transition-colors"
+      >
+        <span>{trigger}</span>
+        <ChevronDownIcon className="w-4 h-4" />
+      </button>
+      
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-48 bg-gray-800 
+                        border border-gray-700 rounded-lg shadow-lg z-50">
+          {items.map((item, index) => (
+            <React.Fragment key={index}>
+              {item.divider ? (
+                <hr className="border-gray-700" />
+              ) : (
+                <a
+                  href={item.href}
+                  onClick={item.onClick}
+                  className={\`block px-4 py-2 transition-colors \${
+                    item.danger
+                      ? 'text-red-400 hover:bg-gray-700'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  }\`}
+                >
+                  {item.label}
+                </a>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};`
+                }
+            ],
+            layout: [
+                {
+                    id: 'layout-grid',
+                    name: 'CSS Grid Layout',
+                    icon: '⚏',
+                    description: 'Responsive CSS grid container',
+                    preview: '<div class="grid grid-cols-3 gap-4 w-64"><div class="bg-purple-600 h-16 rounded"></div><div class="bg-pink-600 h-16 rounded"></div><div class="bg-blue-600 h-16 rounded"></div><div class="bg-green-600 h-16 rounded col-span-2"></div><div class="bg-yellow-600 h-16 rounded"></div></div>',
+                    code: `export const GridLayout = ({ children, columns = 3, gap = 4, className = '' }) => {
+  return (
+    <div 
+      className={\`grid gap-\${gap} \${className}\`}
+      style={{ gridTemplateColumns: \`repeat(\${columns}, minmax(0, 1fr))\` }}
+    >
+      {children}
+    </div>
+  );
+};
+
+export const GridItem = ({ children, colSpan = 1, rowSpan = 1, className = '' }) => {
+  return (
+    <div 
+      className={\`\${className}\`}
+      style={{ 
+        gridColumn: \`span \${colSpan}\`,
+        gridRow: \`span \${rowSpan}\`
+      }}
+    >
+      {children}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'layout-flex',
+                    name: 'Flex Container',
+                    icon: '📐',
+                    description: 'Flexible layout container',
+                    preview: '<div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg w-64"><div class="flex items-center space-x-3"><div class="w-8 h-8 bg-purple-600 rounded-full"></div><span class="text-white">Profile</span></div><button class="px-3 py-1 bg-purple-600 text-white rounded text-sm">Edit</button></div>',
+                    code: `export const FlexContainer = ({ 
+  children, 
+  direction = 'row', 
+  justify = 'start', 
+  align = 'stretch',
+  wrap = false,
+  gap = 0,
+  className = ''
+}) => {
+  const directionClass = direction === 'column' ? 'flex-col' : 'flex-row';
+  const justifyClasses = {
+    start: 'justify-start',
+    end: 'justify-end',
+    center: 'justify-center',
+    between: 'justify-between',
+    around: 'justify-around',
+    evenly: 'justify-evenly'
+  };
+  const alignClasses = {
+    start: 'items-start',
+    end: 'items-end',
+    center: 'items-center',
+    stretch: 'items-stretch',
+    baseline: 'items-baseline'
+  };
+  
+  return (
+    <div className={\`flex \${directionClass} \${justifyClasses[justify]} 
+                     \${alignClasses[align]} \${wrap ? 'flex-wrap' : ''} 
+                     \${gap ? \`gap-\${gap}\` : ''} \${className}\`}>
+      {children}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'layout-sidebar',
+                    name: 'Sidebar Layout',
+                    icon: '📱',
+                    description: 'Sidebar + main content layout',
+                    preview: '<div class="flex h-32 w-64 bg-gray-900 rounded-lg overflow-hidden"><div class="w-16 bg-gray-800 flex flex-col items-center py-2 space-y-2"><div class="w-8 h-8 bg-purple-600 rounded"></div><div class="w-8 h-8 bg-gray-600 rounded"></div><div class="w-8 h-8 bg-gray-600 rounded"></div></div><div class="flex-1 p-4"><div class="text-white text-sm font-medium">Main Content</div><div class="text-gray-400 text-xs mt-1">Sidebar layout example</div></div></div>',
+                    code: `export const SidebarLayout = ({ 
+  sidebar, 
+  children, 
+  sidebarWidth = 'w-64',
+  sidebarPosition = 'left',
+  className = ''
+}) => {
+  return (
+    <div className={\`flex h-full \${className}\`}>
+      {sidebarPosition === 'left' && (
+        <div className={\`\${sidebarWidth} flex-shrink-0\`}>
+          {sidebar}
+        </div>
+      )}
+      
+      <div className="flex-1 overflow-hidden">
+        {children}
+      </div>
+      
+      {sidebarPosition === 'right' && (
+        <div className={\`\${sidebarWidth} flex-shrink-0\`}>
+          {sidebar}
+        </div>
+      )}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'layout-stack',
+                    name: 'Stack Layout',
+                    icon: '📚',
+                    description: 'Vertical stack with spacing',
+                    preview: '<div class="space-y-4 w-48"><div class="p-3 bg-purple-600 text-white rounded">Header</div><div class="p-3 bg-gray-700 text-gray-200 rounded">Content block 1</div><div class="p-3 bg-gray-700 text-gray-200 rounded">Content block 2</div><div class="p-3 bg-gray-600 text-gray-300 rounded text-sm">Footer</div></div>',
+                    code: `export const Stack = ({ 
+  children, 
+  spacing = 4, 
+  align = 'stretch',
+  className = ''
+}) => {
+  const alignClasses = {
+    start: 'items-start',
+    center: 'items-center',
+    end: 'items-end',
+    stretch: 'items-stretch'
+  };
+  
+  return (
+    <div className={\`flex flex-col space-y-\${spacing} \${alignClasses[align]} \${className}\`}>
+      {children}
+    </div>
+  );
+};
+
+export const StackItem = ({ children, className = '' }) => {
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'layout-masonry',
+                    name: 'Masonry Layout',
+                    icon: '🧱',
+                    description: 'Pinterest-style masonry grid',
+                    preview: '<div class="columns-3 gap-2 w-64"><div class="break-inside-avoid mb-2"><div class="bg-purple-600 h-16 rounded"></div></div><div class="break-inside-avoid mb-2"><div class="bg-pink-600 h-24 rounded"></div></div><div class="break-inside-avoid mb-2"><div class="bg-blue-600 h-12 rounded"></div></div><div class="break-inside-avoid mb-2"><div class="bg-green-600 h-20 rounded"></div></div><div class="break-inside-avoid mb-2"><div class="bg-yellow-600 h-16 rounded"></div></div></div>',
+                    code: `export const MasonryLayout = ({ 
+  children, 
+  columns = 3, 
+  gap = 4,
+  className = ''
+}) => {
+  return (
+    <div 
+      className={\`gap-\${gap} \${className}\`}
+      style={{ 
+        columnCount: columns,
+        columnGap: \`\${gap * 0.25}rem\`
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+export const MasonryItem = ({ children, className = '' }) => {
+  return (
+    <div className={\`break-inside-avoid mb-\${gap || 4} \${className}\`}>
+      {children}
+    </div>
+  );
+};`
+                }
+            ],
+            interactive: [
+                {
+                    id: 'int-modal',
+                    name: 'Modal Dialog',
+                    icon: '🪟',
+                    description: 'Overlay modal with backdrop',
+                    preview: '<div class="relative w-64 h-32 bg-gray-900 rounded-lg overflow-hidden"><div class="absolute inset-0 bg-black/50 flex items-center justify-center"><div class="bg-gray-800 p-6 rounded-lg border border-gray-700 w-48"><h3 class="text-white font-medium mb-2">Modal Title</h3><p class="text-gray-300 text-sm mb-4">Modal content goes here</p><div class="flex space-x-2"><button class="px-3 py-1 bg-purple-600 text-white rounded text-sm">Confirm</button><button class="px-3 py-1 bg-gray-600 text-gray-200 rounded text-sm">Cancel</button></div></div></div></div>',
+                    code: `export const Modal = ({ 
+  isOpen, 
+  onClose, 
+  title, 
+  children,
+  actions,
+  size = 'md'
+}) => {
+  const sizes = {
+    sm: 'max-w-md',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+    xl: 'max-w-4xl'
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className={\`relative bg-gray-800 p-6 rounded-lg border 
+                      border-gray-700 \${sizes[size]} max-h-[90vh] 
+                      overflow-y-auto shadow-2xl\`}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-white">{title}</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <div className="text-gray-300 mb-6">
+          {children}
+        </div>
+        
+        {actions && (
+          <div className="flex justify-end space-x-3">
+            {actions}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'int-tooltip',
+                    name: 'Tooltip',
+                    icon: '💬',
+                    description: 'Hover tooltip component',
+                    preview: '<div class="relative inline-block"><button class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">Hover me</button><div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-sm rounded shadow-lg whitespace-nowrap opacity-90">This is a tooltip<div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div></div></div>',
+                    code: `export const Tooltip = ({ 
+  children, 
+  content, 
+  position = 'top',
+  delay = 200 
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  const showTooltip = () => {
+    const id = setTimeout(() => setIsVisible(true), delay);
+    setTimeoutId(id);
+  };
+
+  const hideTooltip = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+    setIsVisible(false);
+  };
+
+  const positions = {
+    top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
+    bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
+    left: 'right-full top-1/2 transform -translate-y-1/2 mr-2',
+    right: 'left-full top-1/2 transform -translate-y-1/2 ml-2'
+  };
+
+  return (
+    <div 
+      className="relative inline-block"
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+    >
+      {children}
+      {isVisible && (
+        <div className={\`absolute z-50 px-3 py-1 bg-gray-900 text-white 
+                        text-sm rounded shadow-lg whitespace-nowrap 
+                        \${positions[position]}\`}>
+          {content}
+          <div className="absolute w-0 h-0 border-4 border-transparent border-t-gray-900" />
+        </div>
+      )}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'int-accordion',
+                    name: 'Accordion',
+                    icon: '📑',
+                    description: 'Collapsible content sections',
+                    preview: '<div class="w-64 space-y-2"><div class="border border-gray-700 rounded"><button class="w-full px-4 py-3 text-left text-white bg-gray-800 hover:bg-gray-700 transition-colors flex items-center justify-between"><span>Section 1</span><span class="text-purple-400">−</span></button><div class="px-4 py-3 text-gray-300 text-sm bg-gray-900">This is the expanded content for section 1.</div></div><div class="border border-gray-700 rounded"><button class="w-full px-4 py-3 text-left text-white bg-gray-800 hover:bg-gray-700 transition-colors flex items-center justify-between"><span>Section 2</span><span class="text-gray-500">+</span></button></div></div>',
+                    code: `export const Accordion = ({ items, allowMultiple = false }) => {
+  const [openItems, setOpenItems] = useState(new Set());
+
+  const toggleItem = (index) => {
+    const newOpenItems = new Set(openItems);
+    
+    if (openItems.has(index)) {
+      newOpenItems.delete(index);
+    } else {
+      if (!allowMultiple) {
+        newOpenItems.clear();
+      }
+      newOpenItems.add(index);
+    }
+    
+    setOpenItems(newOpenItems);
+  };
+
+  return (
+    <div className="space-y-2">
+      {items.map((item, index) => (
+        <div key={index} className="border border-gray-700 rounded">
+          <button
+            onClick={() => toggleItem(index)}
+            className="w-full px-4 py-3 text-left text-white bg-gray-800 
+                       hover:bg-gray-700 transition-colors flex items-center 
+                       justify-between"
+          >
+            <span>{item.title}</span>
+            <span className="text-purple-400">
+              {openItems.has(index) ? '−' : '+'}
+            </span>
+          </button>
+          {openItems.has(index) && (
+            <div className="px-4 py-3 text-gray-300 bg-gray-900">
+              {item.content}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'int-slider',
+                    name: 'Range Slider',
+                    icon: '🎚️',
+                    description: 'Interactive range input slider',
+                    preview: '<div class="w-64 p-4"><div class="mb-2 text-white text-sm">Volume: <span class="text-purple-400 font-medium">75</span></div><div class="relative"><input type="range" min="0" max="100" value="75" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider" style="background: linear-gradient(to right, #8b5cf6 0%, #8b5cf6 75%, #374151 75%, #374151 100%);"><div class="absolute left-3/4 -top-1 w-4 h-4 bg-purple-600 rounded-full shadow-lg shadow-purple-500/50 transform -translate-x-1/2"></div></div></div>',
+                    code: `export const RangeSlider = ({ 
+  min = 0, 
+  max = 100, 
+  value, 
+  onChange,
+  label,
+  showValue = true,
+  step = 1,
+  className = ''
+}) => {
+  const percentage = ((value - min) / (max - min)) * 100;
+
+  return (
+    <div className={\`\${className}\`}>
+      {label && (
+        <div className="mb-2 text-white text-sm flex justify-between">
+          <span>{label}</span>
+          {showValue && (
+            <span className="text-purple-400 font-medium">{value}</span>
+          )}
+        </div>
+      )}
+      
+      <div className="relative">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={value}
+          step={step}
+          onChange={(e) => onChange?.(Number(e.target.value))}
+          className="w-full h-2 bg-gray-700 rounded-lg appearance-none 
+                     cursor-pointer slider"
+          style={{
+            background: \`linear-gradient(to right, 
+              #8b5cf6 0%, #8b5cf6 \${percentage}%, 
+              #374151 \${percentage}%, #374151 100%)\`
+          }}
+        />
+        <div 
+          className="absolute -top-1 w-4 h-4 bg-purple-600 rounded-full 
+                     shadow-lg shadow-purple-500/50 transform -translate-x-1/2 
+                     pointer-events-none"
+          style={{ left: \`\${percentage}%\` }}
+        />
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'int-tabs',
+                    name: 'Tab Component',
+                    icon: '📂',
+                    description: 'Tabbed content interface',
+                    preview: '<div class="w-64"><div class="flex border-b border-gray-700"><button class="px-4 py-2 text-purple-400 border-b-2 border-purple-500">Tab 1</button><button class="px-4 py-2 text-gray-400 hover:text-white">Tab 2</button><button class="px-4 py-2 text-gray-400 hover:text-white">Tab 3</button></div><div class="p-4 bg-gray-800 text-gray-300 text-sm">Content for Tab 1 is displayed here. This is the active tab panel.</div></div>',
+                    code: `export const Tabs = ({ tabs, activeTab, onTabChange, className = '' }) => {
+  return (
+    <div className={className}>
+      <div className="flex border-b border-gray-700">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange?.(tab.id)}
+            className={\`px-4 py-2 transition-colors \${
+              activeTab === tab.id
+                ? 'text-purple-400 border-b-2 border-purple-500'
+                : 'text-gray-400 hover:text-white'
+            }\`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      
+      <div className="p-4 bg-gray-800">
+        {tabs.find(tab => tab.id === activeTab)?.content}
+      </div>
+    </div>
+  );
+};
+
+// Usage helper
+export const TabPanel = ({ children, className = '' }) => {
+  return (
+    <div className={\`text-gray-300 \${className}\`}>
+      {children}
+    </div>
+  );
+};`
+                }
+            ],
+            data: [
+                {
+                    id: 'data-table',
+                    name: 'Data Table',
+                    icon: '📊',
+                    description: 'Sortable data table with pagination',
+                    preview: '<div class="w-64 bg-gray-800 rounded-lg overflow-hidden"><table class="w-full text-sm"><thead class="bg-gray-700"><tr><th class="px-3 py-2 text-left text-white font-medium">Name</th><th class="px-3 py-2 text-left text-white font-medium">Status</th></tr></thead><tbody><tr class="border-t border-gray-700"><td class="px-3 py-2 text-gray-300">John Doe</td><td class="px-3 py-2"><span class="px-2 py-1 text-xs bg-green-600 text-white rounded">Active</span></td></tr><tr class="border-t border-gray-700"><td class="px-3 py-2 text-gray-300">Jane Smith</td><td class="px-3 py-2"><span class="px-2 py-1 text-xs bg-yellow-600 text-white rounded">Pending</span></td></tr></tbody></table></div>',
+                    code: `export const DataTable = ({ 
+  columns, 
+  data, 
+  sortable = true,
+  onSort,
+  className = ''
+}) => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
+  const handleSort = (key) => {
+    if (!sortable) return;
+    
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    
+    setSortConfig({ key, direction });
+    onSort?.({ key, direction });
+  };
+
+  return (
+    <div className={\`bg-gray-800 rounded-lg overflow-hidden \${className}\`}>
+      <table className="w-full">
+        <thead className="bg-gray-700">
+          <tr>
+            {columns.map((column) => (
+              <th
+                key={column.key}
+                onClick={() => handleSort(column.key)}
+                className={\`px-6 py-3 text-left text-xs font-medium 
+                          text-gray-300 uppercase tracking-wider 
+                          \${sortable ? 'cursor-pointer hover:bg-gray-600' : ''}\`}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>{column.label}</span>
+                  {sortable && sortConfig.key === column.key && (
+                    <span className="text-purple-400">
+                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-700">
+          {data.map((row, index) => (
+            <tr key={index} className="hover:bg-gray-700">
+              {columns.map((column) => (
+                <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {column.render ? column.render(row[column.key], row) : row[column.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'data-chart',
+                    name: 'Chart Component',
+                    icon: '📈',
+                    description: 'Simple bar chart visualization',
+                    preview: '<div class="w-64 p-4 bg-gray-800 rounded-lg"><h3 class="text-white font-medium mb-4">Sales Data</h3><div class="space-y-3"><div class="flex items-center justify-between"><span class="text-gray-300 text-sm">Jan</span><div class="flex-1 mx-3 bg-gray-700 rounded-full h-2"><div class="bg-purple-600 h-2 rounded-full" style="width: 80%"></div></div><span class="text-purple-400 text-sm">80</span></div><div class="flex items-center justify-between"><span class="text-gray-300 text-sm">Feb</span><div class="flex-1 mx-3 bg-gray-700 rounded-full h-2"><div class="bg-purple-600 h-2 rounded-full" style="width: 60%"></div></div><span class="text-purple-400 text-sm">60</span></div><div class="flex items-center justify-between"><span class="text-gray-300 text-sm">Mar</span><div class="flex-1 mx-3 bg-gray-700 rounded-full h-2"><div class="bg-purple-600 h-2 rounded-full" style="width: 90%"></div></div><span class="text-purple-400 text-sm">90</span></div></div></div>',
+                    code: `export const BarChart = ({ 
+  data, 
+  title,
+  color = 'purple',
+  height = 'h-2',
+  showValues = true,
+  className = ''
+}) => {
+  const maxValue = Math.max(...data.map(item => item.value));
+  
+  const colorClasses = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    green: 'bg-green-600',
+    pink: 'bg-pink-600'
+  };
+
+  return (
+    <div className={\`p-4 bg-gray-800 rounded-lg \${className}\`}>
+      {title && (
+        <h3 className="text-white font-medium mb-4">{title}</h3>
+      )}
+      <div className="space-y-3">
+        {data.map((item, index) => {
+          const percentage = (item.value / maxValue) * 100;
+          
+          return (
+            <div key={index} className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm w-12 text-right">
+                {item.label}
+              </span>
+              <div className={\`flex-1 mx-3 bg-gray-700 rounded-full \${height}\`}>
+                <div 
+                  className={\`\${colorClasses[color]} \${height} rounded-full transition-all duration-500\`}
+                  style={{ width: \`\${percentage}%\` }}
+                />
+              </div>
+              {showValues && (
+                <span className="text-purple-400 text-sm w-8">
+                  {item.value}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'data-stats',
+                    name: 'Stats Cards',
+                    icon: '📊',
+                    description: 'Statistics display cards',
+                    preview: '<div class="grid grid-cols-2 gap-3 w-64"><div class="bg-gray-800 p-3 rounded-lg border border-gray-700"><div class="text-2xl font-bold text-purple-400">1.2K</div><div class="text-gray-400 text-sm">Users</div><div class="text-green-400 text-xs">+12%</div></div><div class="bg-gray-800 p-3 rounded-lg border border-gray-700"><div class="text-2xl font-bold text-blue-400">$45K</div><div class="text-gray-400 text-sm">Revenue</div><div class="text-green-400 text-xs">+8%</div></div><div class="bg-gray-800 p-3 rounded-lg border border-gray-700"><div class="text-2xl font-bold text-pink-400">98%</div><div class="text-gray-400 text-sm">Uptime</div><div class="text-red-400 text-xs">-2%</div></div><div class="bg-gray-800 p-3 rounded-lg border border-gray-700"><div class="text-2xl font-bold text-green-400">543</div><div class="text-gray-400 text-sm">Orders</div><div class="text-green-400 text-xs">+15%</div></div></div>',
+                    code: `export const StatsCard = ({ 
+  title, 
+  value, 
+  change, 
+  color = 'purple',
+  icon,
+  className = ''
+}) => {
+  const colorClasses = {
+    purple: 'text-purple-400',
+    blue: 'text-blue-400',
+    green: 'text-green-400',
+    pink: 'text-pink-400',
+    yellow: 'text-yellow-400'
+  };
+
+  const changeColor = change?.startsWith('+') 
+    ? 'text-green-400' 
+    : change?.startsWith('-') 
+    ? 'text-red-400' 
+    : 'text-gray-400';
+
+  return (
+    <div className={\`bg-gray-800 p-4 rounded-lg border border-gray-700 \${className}\`}>
+      <div className="flex items-center justify-between mb-2">
+        <div className={\`text-2xl font-bold \${colorClasses[color]}\`}>
+          {value}
+        </div>
+        {icon && (
+          <div className="p-2 bg-gray-700 rounded-lg">
+            {icon}
+          </div>
+        )}
+      </div>
+      <div className="text-gray-400 text-sm mb-1">{title}</div>
+      {change && (
+        <div className={\`text-xs \${changeColor}\`}>
+          {change}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const StatsGrid = ({ stats, columns = 2, className = '' }) => {
+  return (
+    <div className={\`grid grid-cols-\${columns} gap-4 \${className}\`}>
+      {stats.map((stat, index) => (
+        <StatsCard key={index} {...stat} />
+      ))}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'data-progress',
+                    name: 'Progress Indicator',
+                    icon: '📈',
+                    description: 'Progress bars and indicators',
+                    preview: '<div class="w-64 space-y-4 p-4 bg-gray-800 rounded-lg"><div><div class="flex justify-between text-sm mb-2"><span class="text-gray-300">Project Progress</span><span class="text-purple-400">75%</span></div><div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-purple-600 h-2 rounded-full" style="width: 75%"></div></div></div><div><div class="flex justify-between text-sm mb-2"><span class="text-gray-300">Storage Used</span><span class="text-blue-400">60%</span></div><div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full" style="width: 60%"></div></div></div></div>',
+                    code: `export const ProgressBar = ({ 
+  label,
+  value, 
+  max = 100,
+  color = 'purple',
+  size = 'md',
+  showValue = true,
+  animated = false,
+  className = ''
+}) => {
+  const percentage = Math.min((value / max) * 100, 100);
+  
+  const colorClasses = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    green: 'bg-green-600',
+    pink: 'bg-pink-600',
+    red: 'bg-red-600'
+  };
+  
+  const sizes = {
+    sm: 'h-1',
+    md: 'h-2',
+    lg: 'h-3'
+  };
+
+  return (
+    <div className={className}>
+      {(label || showValue) && (
+        <div className="flex justify-between text-sm mb-2">
+          {label && <span className="text-gray-300">{label}</span>}
+          {showValue && (
+            <span className={\`text-\${color}-400\`}>
+              {Math.round(percentage)}%
+            </span>
+          )}
+        </div>
+      )}
+      <div className={\`w-full bg-gray-700 rounded-full \${sizes[size]}\`}>
+        <div 
+          className={\`\${colorClasses[color]} \${sizes[size]} rounded-full 
+                     transition-all duration-500 \${animated ? 'animate-pulse' : ''}\`}
+          style={{ width: \`\${percentage}%\` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const CircularProgress = ({ 
+  value, 
+  max = 100, 
+  size = 80,
+  strokeWidth = 6,
+  color = 'purple',
+  className = ''
+}) => {
+  const percentage = Math.min((value / max) * 100, 100);
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  const colorClasses = {
+    purple: '#8b5cf6',
+    blue: '#3b82f6',
+    green: '#10b981',
+    pink: '#ec4899'
+  };
+
+  return (
+    <div className={\`relative inline-flex items-center justify-center \${className}\`}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          className="text-gray-700"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={colorClasses[color]}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className="transition-all duration-500"
+        />
+      </svg>
+      <div className="absolute text-sm font-medium text-white">
+        {Math.round(percentage)}%
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'data-list',
+                    name: 'Data List',
+                    icon: '📋',
+                    description: 'Scrollable data list with actions',
+                    preview: '<div class="w-64 bg-gray-800 rounded-lg max-h-48 overflow-y-auto"><div class="p-3 border-b border-gray-700 flex items-center justify-between hover:bg-gray-700"><div><div class="text-white text-sm font-medium">John Doe</div><div class="text-gray-400 text-xs">john@example.com</div></div><button class="text-purple-400 hover:text-purple-300 text-xs">Edit</button></div><div class="p-3 border-b border-gray-700 flex items-center justify-between hover:bg-gray-700"><div><div class="text-white text-sm font-medium">Jane Smith</div><div class="text-gray-400 text-xs">jane@example.com</div></div><button class="text-purple-400 hover:text-purple-300 text-xs">Edit</button></div><div class="p-3 flex items-center justify-between hover:bg-gray-700"><div><div class="text-white text-sm font-medium">Bob Wilson</div><div class="text-gray-400 text-xs">bob@example.com</div></div><button class="text-purple-400 hover:text-purple-300 text-xs">Edit</button></div></div>',
+                    code: `export const DataList = ({ 
+  items, 
+  renderItem,
+  onItemClick,
+  onItemAction,
+  maxHeight = 'max-h-96',
+  className = ''
+}) => {
+  return (
+    <div className={\`bg-gray-800 rounded-lg \${maxHeight} overflow-y-auto \${className}\`}>
+      {items.map((item, index) => (
+        <div
+          key={item.id || index}
+          onClick={() => onItemClick?.(item)}
+          className="p-3 border-b border-gray-700 last:border-b-0 
+                     hover:bg-gray-700 cursor-pointer transition-colors"
+        >
+          {renderItem ? renderItem(item, index) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-white text-sm font-medium">
+                  {item.title || item.name}
+                </div>
+                {item.subtitle && (
+                  <div className="text-gray-400 text-xs">
+                    {item.subtitle}
+                  </div>
+                )}
+              </div>
+              {item.action && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onItemAction?.(item, item.action);
+                  }}
+                  className="text-purple-400 hover:text-purple-300 text-xs 
+                           transition-colors"
+                >
+                  {item.action}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+      
+      {items.length === 0 && (
+        <div className="p-8 text-center text-gray-400">
+          No items to display
+        </div>
+      )}
+    </div>
+  );
+};`
+                }
+            ],
+            media: [
+                {
+                    id: 'media-image',
+                    name: 'Image Gallery',
+                    icon: '🖼️',
+                    description: 'Responsive image gallery with lightbox',
+                    preview: '<div class="grid grid-cols-3 gap-2 w-64"><div class="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg relative overflow-hidden cursor-pointer hover:scale-105 transition-transform"><div class="absolute inset-0 bg-black/20 flex items-center justify-center"><span class="text-white text-xs">Image 1</span></div></div><div class="aspect-square bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg relative overflow-hidden cursor-pointer hover:scale-105 transition-transform"><div class="absolute inset-0 bg-black/20 flex items-center justify-center"><span class="text-white text-xs">Image 2</span></div></div><div class="aspect-square bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg relative overflow-hidden cursor-pointer hover:scale-105 transition-transform"><div class="absolute inset-0 bg-black/20 flex items-center justify-center"><span class="text-white text-xs">Image 3</span></div></div></div>',
+                    code: `export const ImageGallery = ({ 
+  images, 
+  columns = 3,
+  showLightbox = true,
+  className = ''
+}) => {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  return (
+    <>
+      <div className={\`grid grid-cols-\${columns} gap-4 \${className}\`}>
+        {images.map((image, index) => (
+          <div
+            key={index}
+            onClick={() => showLightbox && setSelectedImage(image)}
+            className="aspect-square relative overflow-hidden rounded-lg 
+                       cursor-pointer hover:scale-105 transition-transform"
+          >
+            <img
+              src={image.src}
+              alt={image.alt}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/0 hover:bg-black/20 
+                          transition-colors flex items-center justify-center">
+              {showLightbox && (
+                <div className="opacity-0 hover:opacity-100 transition-opacity">
+                  <span className="text-white text-sm bg-black/50 px-2 py-1 rounded">
+                    View
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 flex items-center 
+                     justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-full">
+            <img
+              src={selectedImage.src}
+              alt={selectedImage.alt}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 text-white bg-black/50 
+                         rounded-full w-8 h-8 flex items-center justify-center
+                         hover:bg-black/70 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};`
+                },
+                {
+                    id: 'media-video',
+                    name: 'Video Player',
+                    icon: '🎥',
+                    description: 'Custom video player with controls',
+                    preview: '<div class="w-64 aspect-video bg-black rounded-lg relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center"><button class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"><svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button></div><div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4"><div class="flex items-center space-x-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div><div class="flex-1 h-1 bg-white/20 rounded-full"><div class="w-1/3 h-1 bg-white rounded-full"></div></div><span class="text-white text-xs">1:23 / 4:56</span></div></div></div>',
+                    code: `export const VideoPlayer = ({ 
+  src, 
+  poster,
+  autoPlay = false,
+  controls = true,
+  muted = false,
+  className = ''
+}) => {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [showControls, setShowControls] = useState(true);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    const newTime = pos * duration;
+    
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
+  };
+
+  return (
+    <div 
+      className={\`relative rounded-lg overflow-hidden \${className}\`}
+      onMouseEnter={() => setShowControls(true)}
+      onMouseLeave={() => setShowControls(false)}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        autoPlay={autoPlay}
+        muted={muted}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        className="w-full h-full object-cover"
+        onClick={togglePlay}
+      />
+      
+      {controls && (
+        <div className={\`absolute inset-0 \${showControls ? 'opacity-100' : 'opacity-0'} 
+                        transition-opacity pointer-events-none\`}>
+          {/* Play button overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <button
+              onClick={togglePlay}
+              className="w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full 
+                         flex items-center justify-center hover:bg-black/70 
+                         transition-colors pointer-events-auto"
+            >
+              {isPlaying ? (
+                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              )}
+            </button>
+          </div>
+          
+          {/* Bottom controls */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t 
+                          from-black/60 to-transparent p-4">
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={togglePlay}
+                className="text-white hover:text-purple-400 transition-colors 
+                           pointer-events-auto"
+              >
+                {isPlaying ? '⏸️' : '▶️'}
+              </button>
+              
+              <div 
+                className="flex-1 h-1 bg-white/20 rounded-full cursor-pointer 
+                           pointer-events-auto"
+                onClick={handleSeek}
+              >
+                <div 
+                  className="h-1 bg-purple-500 rounded-full"
+                  style={{ width: \`\${(currentTime / duration) * 100}%\` }}
+                />
+              </div>
+              
+              <span className="text-white text-xs">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'media-audio',
+                    name: 'Audio Player',
+                    icon: '🎵',
+                    description: 'Custom audio player with waveform',
+                    preview: '<div class="w-64 bg-gray-800 rounded-lg p-4"><div class="flex items-center space-x-3 mb-3"><button class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><div class="flex-1"><div class="text-white text-sm font-medium">Song Title</div><div class="text-gray-400 text-xs">Artist Name</div></div><span class="text-gray-400 text-xs">3:45</span></div><div class="flex items-center space-x-1 h-8"><div class="w-1 bg-purple-600 rounded-full animate-pulse" style="height: 60%"></div><div class="w-1 bg-purple-500 rounded-full animate-pulse" style="height: 80%; animation-delay: 0.1s;"></div><div class="w-1 bg-purple-400 rounded-full animate-pulse" style="height: 40%; animation-delay: 0.2s;"></div><div class="w-1 bg-purple-600 rounded-full animate-pulse" style="height: 90%; animation-delay: 0.3s;"></div><div class="w-1 bg-purple-500 rounded-full animate-pulse" style="height: 70%; animation-delay: 0.4s;"></div></div></div>',
+                    code: `export const AudioPlayer = ({ 
+  src, 
+  title, 
+  artist,
+  showWaveform = true,
+  className = ''
+}) => {
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    const newTime = pos * duration;
+    
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleVolumeChange = (newVolume) => {
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
+  };
+
+  // Generate waveform bars
+  const waveformBars = Array.from({ length: 50 }, (_, i) => ({
+    height: Math.random() * 80 + 20,
+    delay: i * 0.05
+  }));
+
+  return (
+    <div className={\`bg-gray-800 rounded-lg p-4 \${className}\`}>
+      <audio
+        ref={audioRef}
+        src={src}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+      />
+      
+      <div className="flex items-center space-x-3 mb-4">
+        <button
+          onClick={togglePlay}
+          className="w-12 h-12 bg-purple-600 rounded-full flex items-center 
+                     justify-center hover:bg-purple-700 transition-colors"
+        >
+          {isPlaying ? (
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          )}
+        </button>
+        
+        <div className="flex-1">
+          <div className="text-white text-sm font-medium">{title}</div>
+          <div className="text-gray-400 text-xs">{artist}</div>
+        </div>
+        
+        <div className="text-gray-400 text-xs">
+          {formatTime(currentTime)} / {formatTime(duration)}
+        </div>
+      </div>
+      
+      {/* Progress bar */}
+      <div 
+        className="w-full h-1 bg-gray-700 rounded-full cursor-pointer mb-4"
+        onClick={handleSeek}
+      >
+        <div 
+          className="h-1 bg-purple-500 rounded-full"
+          style={{ width: \`\${(currentTime / duration) * 100}%\` }}
+        />
+      </div>
+      
+      {/* Waveform visualization */}
+      {showWaveform && (
+        <div className="flex items-center justify-center space-x-1 h-12 mb-4">
+          {waveformBars.map((bar, index) => (
+            <div
+              key={index}
+              className={\`w-1 bg-purple-500 rounded-full \${
+                isPlaying ? 'animate-pulse' : ''
+              }\`}
+              style={{
+                height: \`\${bar.height}%\`,
+                animationDelay: \`\${bar.delay}s\`
+              }}
+            />
+          ))}
+        </div>
+      )}
+      
+      {/* Volume control */}
+      <div className="flex items-center space-x-2">
+        <span className="text-gray-400 text-xs">🔊</span>
+        <div className="flex-1">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={volume}
+            onChange={(e) => handleVolumeChange(Number(e.target.value))}
+            className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'media-avatar',
+                    name: 'Avatar Component',
+                    icon: '👤',
+                    description: 'User avatar with fallbacks and status',
+                    preview: '<div class="flex items-center space-x-4"><div class="relative"><div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-medium">JD</div><div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-gray-800 rounded-full"></div></div><div class="relative"><div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-medium">AS</div><div class="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-500 border-2 border-gray-800 rounded-full"></div></div><div class="relative"><div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-medium">MK</div><div class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-500 border-2 border-gray-800 rounded-full"></div></div></div>',
+                    code: `export const Avatar = ({ 
+  src, 
+  name, 
+  size = 'md',
+  status,
+  fallbackColor = 'purple',
+  className = ''
+}) => {
+  const [imageError, setImageError] = useState(false);
+  
+  const sizes = {
+    xs: 'w-6 h-6 text-xs',
+    sm: 'w-8 h-8 text-sm',
+    md: 'w-12 h-12 text-base',
+    lg: 'w-16 h-16 text-lg',
+    xl: 'w-20 h-20 text-xl'
+  };
+  
+  const statusSizes = {
+    xs: 'w-2 h-2',
+    sm: 'w-2.5 h-2.5',
+    md: 'w-3 h-3',
+    lg: 'w-4 h-4',
+    xl: 'w-5 h-5'
+  };
+  
+  const fallbackColors = {
+    purple: 'from-purple-500 to-pink-500',
+    blue: 'from-blue-500 to-cyan-500',
+    green: 'from-green-500 to-emerald-500',
+    red: 'from-red-500 to-rose-500',
+    yellow: 'from-yellow-500 to-orange-500'
+  };
+  
+  const statusColors = {
+    online: 'bg-green-500',
+    away: 'bg-yellow-500',
+    busy: 'bg-red-500',
+    offline: 'bg-gray-500'
+  };
+  
+  const getInitials = (name) => {
+    return name
+      ?.split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || '?';
+  };
+
+  return (
+    <div className={\`relative inline-block \${className}\`}>
+      <div className={\`\${sizes[size]} rounded-full overflow-hidden flex items-center justify-center font-medium\`}>
+        {src && !imageError ? (
+          <img
+            src={src}
+            alt={name}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className={\`w-full h-full bg-gradient-to-br \${fallbackColors[fallbackColor]} 
+                          flex items-center justify-center text-white\`}>
+            {getInitials(name)}
+          </div>
+        )}
+      </div>
+      
+      {status && (
+        <div className={\`absolute -bottom-0.5 -right-0.5 \${statusSizes[size]} 
+                        \${statusColors[status]} border-2 border-gray-800 rounded-full\`} />
+      )}
+    </div>
+  );
+};
+
+export const AvatarGroup = ({ 
+  avatars, 
+  max = 3, 
+  size = 'md',
+  className = ''
+}) => {
+  const visibleAvatars = avatars.slice(0, max);
+  const remainingCount = avatars.length - max;
+
+  return (
+    <div className={\`flex -space-x-2 \${className}\`}>
+      {visibleAvatars.map((avatar, index) => (
+        <Avatar
+          key={index}
+          {...avatar}
+          size={size}
+          className="border-2 border-gray-800"
+        />
+      ))}
+      
+      {remainingCount > 0 && (
+        <div className={\`\${sizes[size]} rounded-full bg-gray-700 border-2 border-gray-800 
+                        flex items-center justify-center text-white font-medium text-xs\`}>
+          +{remainingCount}
+        </div>
+      )}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'media-file',
+                    name: 'File Upload',
+                    icon: '📁',
+                    description: 'Drag and drop file upload component',
+                    preview: '<div class="w-64 p-6 border-2 border-dashed border-gray-600 rounded-lg bg-gray-800/50 hover:border-purple-500 hover:bg-gray-800 transition-all cursor-pointer"><div class="text-center"><div class="text-3xl mb-2">📁</div><div class="text-white text-sm font-medium mb-1">Drop files here</div><div class="text-gray-400 text-xs">or click to browse</div><div class="mt-3 text-xs text-gray-500">Supports: JPG, PNG, PDF, DOC</div></div></div>',
+                    code: `export const FileUpload = ({ 
+  onFileSelect,
+  acceptedTypes = ['image/*', '.pdf', '.doc', '.docx'],
+  maxSize = 10 * 1024 * 1024, // 10MB
+  multiple = false,
+  className = ''
+}) => {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    handleFiles(files);
+  };
+
+  const handleFiles = (files) => {
+    const validFiles = files.filter(file => {
+      if (file.size > maxSize) {
+        alert(\`File \${file.name} is too large. Max size is \${maxSize / 1024 / 1024}MB\`);
+        return false;
+      }
+      return true;
+    });
+
+    setUploadedFiles(prev => multiple ? [...prev, ...validFiles] : validFiles);
+    onFileSelect?.(multiple ? validFiles : validFiles[0]);
+  };
+
+  const removeFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  return (
+    <div className={className}>
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        className={\`p-6 border-2 border-dashed rounded-lg cursor-pointer 
+                   transition-all \${
+                     isDragOver
+                       ? 'border-purple-500 bg-purple-500/10'
+                       : 'border-gray-600 bg-gray-800/50 hover:border-purple-500 hover:bg-gray-800'
+                   }\`}
+      >
+        <div className="text-center">
+          <div className="text-4xl mb-3">📁</div>
+          <div className="text-white text-sm font-medium mb-1">
+            {isDragOver ? 'Drop files here' : 'Drop files here'}
+          </div>
+          <div className="text-gray-400 text-xs mb-3">
+            or click to browse
+          </div>
+          <div className="text-xs text-gray-500">
+            Supports: {acceptedTypes.join(', ')}
+          </div>
+          <div className="text-xs text-gray-500">
+            Max size: {formatFileSize(maxSize)}
+          </div>
+        </div>
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple={multiple}
+        accept={acceptedTypes.join(',')}
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+
+      {uploadedFiles.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {uploadedFiles.map((file, index) => (
+            <div key={index} className="flex items-center justify-between 
+                                       p-3 bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl">📄</div>
+                <div>
+                  <div className="text-white text-sm font-medium">
+                    {file.name}
+                  </div>
+                  <div className="text-gray-400 text-xs">
+                    {formatFileSize(file.size)}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => removeFile(index)}
+                className="text-red-400 hover:text-red-300 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};`
+                }
+            ]
+        };
+
+        let selectedComponent = null;
+        let magicEnabled = false;
+        let showingCode = false;
+
+        // Initialize
+        window.onload = () => {
+            renderComponents('all');
+            checkMagicStatus();
+            setupEventListeners();
+        };
+
+        // Check Magic API status
+        async function checkMagicStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/magic/health');
+                const data = await response.json();
+                magicEnabled = data.magic21st?.connected || false;
+                document.getElementById('magicStatus').textContent = magicEnabled ? '✨ Magic' : '🔌 Local';
+            } catch (error) {
+                console.log('Magic API not available, using local fallback');
+                magicEnabled = false;
+                document.getElementById('magicStatus').textContent = '🔌 Local';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Category tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderComponents(e.target.dataset.category);
+                });
+            });
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                filterComponents(query);
+            });
+
+            // Terminal input
+            document.getElementById('terminalInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleTerminalCommand(e.target.value);
+                    e.target.value = '';
+                }
+            });
+        }
+
+        // Render components
+        function renderComponents(category) {
+            const list = document.getElementById('componentList');
+            list.innerHTML = '';
+
+            let components = [];
+            if (category === 'all') {
+                Object.values(componentLibrary).forEach(cat => {
+                    components = [...components, ...cat];
+                });
+            } else {
+                components = componentLibrary[category] || [];
+            }
+
+            components.forEach(comp => {
+                const item = document.createElement('div');
+                item.className = 'react-bit-item';
+                item.innerHTML = `
+                    <span class="bit-icon">${comp.icon}</span>
+                    <div class="bit-info">
+                        <div class="bit-name">${comp.name}</div>
+                        <div class="bit-description">${comp.description}</div>
+                    </div>
+                `;
+                item.onclick = () => selectComponent(comp);
+                list.appendChild(item);
+            });
+        }
+
+        // Filter components
+        function filterComponents(query) {
+            const items = document.querySelectorAll('.react-bit-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // Select component
+        function selectComponent(component) {
+            selectedComponent = component;
+            
+            // Update UI
+            document.querySelectorAll('.react-bit-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Show preview
+            document.getElementById('previewTitle').textContent = component.name;
+            const previewArea = document.getElementById('previewArea');
+            previewArea.innerHTML = component.preview;
+            
+            // Initialize special animations
+            if (component.id === 'txt-typewriter') {
+                setTimeout(() => initializeTypewriter(), 100);
+            }
+            
+            document.getElementById('codeDisplay').textContent = component.code;
+        }
+
+        // Initialize typewriter animation
+        function initializeTypewriter() {
+            const typewriterElement = document.querySelector('#typewriter-demo');
+            if (!typewriterElement) return;
+            
+            const text = "Hello, World! ⌨️";
+            const typeSpeed = 100;
+            const deleteSpeed = 50;
+            const pauseTime = 2000;
+            let i = 0;
+            let isDeleting = false;
+            let timeoutId;
+            let blinkIntervalId;
+            
+            // Clear any existing animation
+            if (typewriterElement.timeoutId) {
+                clearTimeout(typewriterElement.timeoutId);
+            }
+            if (typewriterElement.blinkIntervalId) {
+                clearInterval(typewriterElement.blinkIntervalId);
+            }
+            
+            // Reset element
+            typewriterElement.innerHTML = '';
+            typewriterElement.style.borderRight = '2px solid #10b981';
+            typewriterElement.style.display = 'inline-block';
+            typewriterElement.style.whiteSpace = 'nowrap';
+            typewriterElement.style.animation = 'none';
+            
+            function typeWriter() {
+                if (!isDeleting && i < text.length) {
+                    typewriterElement.innerHTML += text.charAt(i);
+                    i++;
+                    timeoutId = setTimeout(typeWriter, typeSpeed + Math.random() * 50);
+                } else if (!isDeleting && i === text.length) {
+                    timeoutId = setTimeout(() => {
+                        isDeleting = true;
+                        typeWriter();
+                    }, pauseTime);
+                } else if (isDeleting && i > 0) {
+                    typewriterElement.innerHTML = text.substring(0, i-1);
+                    i--;
+                    timeoutId = setTimeout(typeWriter, deleteSpeed);
+                } else if (isDeleting && i === 0) {
+                    isDeleting = false;
+                    timeoutId = setTimeout(typeWriter, 500);
+                }
+            }
+            
+            // Start typing animation
+            typeWriter();
+            
+            // Cursor blinking animation
+            blinkIntervalId = setInterval(() => {
+                if (typewriterElement.style.borderRightColor === 'transparent') {
+                    typewriterElement.style.borderRightColor = '#10b981';
+                } else {
+                    typewriterElement.style.borderRightColor = 'transparent';
+                }
+            }, 530);
+            
+            // Store IDs for cleanup
+            typewriterElement.timeoutId = timeoutId;
+            typewriterElement.blinkIntervalId = blinkIntervalId;
+        }
+
+        // Handle terminal commands
+        async function handleTerminalCommand(command) {
+            const output = document.getElementById('terminalOutput');
+            
+            // Add command to output
+            const commandLine = document.createElement('div');
+            commandLine.className = 'terminal-output';
+            commandLine.innerHTML = `<span class="terminal-prompt">$</span> ${command}`;
+            output.appendChild(commandLine);
+
+            // Handle /ui commands
+            if (command.startsWith('/ui ')) {
+                const message = command.substring(4);
+                
+                const loadingLine = document.createElement('div');
+                loadingLine.className = 'terminal-output terminal-info';
+                loadingLine.textContent = '⏳ Generating component...';
+                output.appendChild(loadingLine);
+
+                try {
+                    let response, data;
+                    
+                    // Try Magic API first
+                    try {
+                        response = await fetch('http://localhost:3000/api/magic/ui', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message })
+                        });
+                        data = await response.json();
+                    } catch (apiError) {
+                        // Use local fallback if API fails
+                        console.log('Using local fallback for component generation');
+                        data = generateLocalComponent(message);
+                    }
+
+                    loadingLine.remove();
+
+                    if (data.success) {
+                        const successLine = document.createElement('div');
+                        successLine.className = 'terminal-output terminal-success';
+                        successLine.innerHTML = `✅ Generated ${data.customizations.detected} component!`;
+                        output.appendChild(successLine);
+
+                        // Show generated code
+                        const codeLine = document.createElement('div');
+                        codeLine.className = 'terminal-output';
+                        codeLine.innerHTML = `<pre style="background: #0a0a0a; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 8px 0;"><code>${data.component.code}</code></pre>`;
+                        output.appendChild(codeLine);
+
+                        // Add copy button
+                        const copyLine = document.createElement('div');
+                        copyLine.className = 'terminal-output terminal-info';
+                        copyLine.innerHTML = `<button onclick="copyGeneratedCode('${btoa(data.component.code)}')" class="action-btn primary" style="margin-top: 8px; cursor: pointer;">📋 Copy Code</button>`;
+                        output.appendChild(copyLine);
+
+                        // Update preview if available
+                        if (data.customizations.detected) {
+                            updatePreviewFromGenerated(data.customizations.detected, data.component.code);
+                        }
+                    } else {
+                        const errorLine = document.createElement('div');
+                        errorLine.className = 'terminal-output terminal-error';
+                        errorLine.textContent = '❌ ' + data.error;
+                        output.appendChild(errorLine);
+                    }
+                } catch (error) {
+                    loadingLine.remove();
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'terminal-output terminal-error';
+                    errorLine.textContent = '❌ Failed to generate component';
+                    output.appendChild(errorLine);
+                }
+            } else {
+                // Handle regular commands or chat
+                const responseLine = document.createElement('div');
+                responseLine.className = 'terminal-output';
+                responseLine.textContent = 'Chat mode not implemented in test. Try /ui commands for component generation.';
+                output.appendChild(responseLine);
+            }
+
+            // Scroll to bottom
+            output.parentElement.scrollTop = output.parentElement.scrollHeight;
+        }
+
+        // Copy generated code from terminal
+        function copyGeneratedCode(encodedCode) {
+            const code = atob(encodedCode);
+            navigator.clipboard.writeText(code);
+            
+            const output = document.getElementById('terminalOutput');
+            const successLine = document.createElement('div');
+            successLine.className = 'terminal-output terminal-success';
+            successLine.textContent = '📋 Code copied to clipboard!';
+            output.appendChild(successLine);
+            
+            output.parentElement.scrollTop = output.parentElement.scrollHeight;
+        }
+
+        // Generate component locally when API is unavailable
+        function generateLocalComponent(message) {
+            const msg = message.toLowerCase();
+            let componentType = 'button';
+            let componentName = 'Button';
+            let code = '';
+            
+            // Detect component type with expanded categories
+            if (msg.includes('button')) {
+                componentType = 'button';
+                componentName = 'Button';
+                
+                if (msg.includes('glow')) {
+                    code = `export const GlowingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-purple-600 text-white rounded-lg 
+                 shadow-lg shadow-purple-500/50 hover:shadow-xl 
+                 hover:shadow-purple-500/60 transition-all duration-300"
+    >
+      {children}
+    </button>
+  );
+};`;
+                } else if (msg.includes('neon')) {
+                    code = `export const NeonButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-transparent border-2 border-cyan-400 
+                 text-cyan-400 rounded-lg hover:bg-cyan-400 hover:text-black 
+                 hover:shadow-lg hover:shadow-cyan-400/50 transition-all 
+                 duration-300 font-bold uppercase tracking-wider"
+      style={{ textShadow: '0 0 10px currentColor' }}
+    >
+      {children}
+    </button>
+  );
+};`;
+                } else {
+                    code = `export const ModernButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 
+                 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 
+                 transition-all duration-300 shadow-lg hover:shadow-xl"
+    >
+      {children}
+    </button>
+  );
+};`;
+                }
+            } else if (msg.includes('card')) {
+                componentType = 'card';
+                componentName = 'Card';
+                code = `export const ModernCard = ({ title, content }) => {
+  return (
+    <div className="p-6 bg-white/10 backdrop-blur-lg border border-white/20 
+                    rounded-xl hover:bg-white/20 hover:shadow-xl 
+                    hover:shadow-purple-500/20 transition-all duration-300 
+                    cursor-pointer transform hover:scale-105">
+      <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+      <p className="text-gray-300">{content}</p>
+    </div>
+  );
+};`;
+            } else if (msg.includes('text') || msg.includes('heading') || msg.includes('title')) {
+                componentType = 'text';
+                componentName = 'Text';
+                code = `export const ShinyText = ({ children }) => {
+  return (
+    <span className="bg-gradient-to-r from-purple-400 via-pink-400 
+                     to-purple-400 bg-clip-text text-transparent 
+                     animate-gradient-x font-bold text-2xl">
+      {children}
+    </span>
+  );
+};`;
+            } else if (msg.includes('form') || msg.includes('input') || msg.includes('field')) {
+                componentType = 'form';
+                componentName = 'Input';
+                code = `export const ModernInput = ({ label, value, onChange, type = "text" }) => {
+  return (
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        className="peer px-4 py-2 bg-gray-800 border border-gray-600 
+                   rounded-lg text-white focus:border-purple-500 
+                   focus:ring-2 focus:ring-purple-500/20 transition-all
+                   placeholder-transparent"
+        placeholder=" "
+      />
+      <label className="absolute left-4 -top-2.5 bg-gray-900 px-1 
+                        text-sm text-gray-400 transition-all 
+                        peer-placeholder-shown:top-2 
+                        peer-placeholder-shown:text-base 
+                        peer-focus:-top-2.5 peer-focus:text-sm 
+                        peer-focus:text-purple-500">
+        {label}
+      </label>
+    </div>
+  );
+};`;
+            } else if (msg.includes('nav') || msg.includes('menu') || msg.includes('breadcrumb')) {
+                componentType = 'navigation';
+                componentName = 'Navigation';
+                code = `export const Navigation = ({ items, activeItem, onItemClick }) => {
+  return (
+    <nav className="flex space-x-8">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => onItemClick?.(item.id)}
+          className={\`py-2 px-1 border-b-2 font-medium transition-all
+                    \${
+                      activeItem === item.id
+                        ? 'border-purple-500 text-purple-400'
+                        : 'border-transparent text-gray-400 hover:text-gray-300'
+                    }\`}
+        >
+          {item.label}
+        </button>
+      ))}
+    </nav>
+  );
+};`;
+            } else if (msg.includes('modal') || msg.includes('dialog') || msg.includes('popup')) {
+                componentType = 'interactive';
+                componentName = 'Modal';
+                code = `export const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-gray-800 p-6 rounded-lg border 
+                      border-gray-700 max-w-lg max-h-[90vh] 
+                      overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-white">{title}</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="text-gray-300">{children}</div>
+      </div>
+    </div>
+  );
+};`;
+            } else if (msg.includes('table') || msg.includes('grid') || msg.includes('data')) {
+                componentType = 'data';
+                componentName = 'Table';
+                code = `export const DataTable = ({ columns, data }) => {
+  return (
+    <div className="bg-gray-800 rounded-lg overflow-hidden">
+      <table className="w-full">
+        <thead className="bg-gray-700">
+          <tr>
+            {columns.map((column) => (
+              <th key={column.key} className="px-6 py-3 text-left text-xs 
+                                           font-medium text-gray-300 uppercase">
+                {column.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-700">
+          {data.map((row, index) => (
+            <tr key={index} className="hover:bg-gray-700">
+              {columns.map((column) => (
+                <td key={column.key} className="px-6 py-4 text-sm text-gray-300">
+                  {row[column.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};`;
+            } else if (msg.includes('avatar') || msg.includes('profile') || msg.includes('user')) {
+                componentType = 'media';
+                componentName = 'Avatar';
+                code = `export const Avatar = ({ src, name, size = 'md', status }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  const sizes = {
+    sm: 'w-8 h-8 text-sm',
+    md: 'w-12 h-12 text-base',
+    lg: 'w-16 h-16 text-lg'
+  };
+  
+  const getInitials = (name) => {
+    return name?.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2) || '?';
+  };
+
+  return (
+    <div className="relative inline-block">
+      <div className={\`\${sizes[size]} rounded-full overflow-hidden flex items-center justify-center font-medium\`}>
+        {src && !imageError ? (
+          <img
+            src={src}
+            alt={name}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 
+                          flex items-center justify-center text-white">
+            {getInitials(name)}
+          </div>
+        )}
+      </div>
+      {status && (
+        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 
+                        bg-green-500 border-2 border-gray-800 rounded-full" />
+      )}
+    </div>
+  );
+};`;
+            } else if (msg.includes('loader') || msg.includes('spinner') || msg.includes('loading')) {
+                componentType = 'loader';
+                componentName = 'Loader';
+                code = `export const Spinner = ({ size = 'md', color = 'purple' }) => {
+  const sizes = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+  
+  return (
+    <div className={\`\${sizes[size]} border-4 border-purple-600 
+                     border-t-transparent rounded-full animate-spin 
+                     shadow-lg shadow-purple-500/30\`} />
+  );
+};`;
+            }
+            
+            return {
+                success: true,
+                component: {
+                    code: code,
+                    explanation: `A modern ${componentName.toLowerCase()} component with animations`
+                },
+                customizations: {
+                    detected: componentType,
+                    applied: ['modern', 'animated']
+                },
+                source: 'local-fallback'
+            };
+        }
+
+        // Update preview from generated component
+        function updatePreviewFromGenerated(type, code) {
+            const previews = {
+                button: '<button class="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all duration-300">Generated Button</button>',
+                text: '<h2 class="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">Generated Text</h2>',
+                'shiny-text': '<h2 class="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">Generated Text</h2>',
+                card: '<div class="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl"><h3 class="text-lg font-semibold mb-2 text-white">Generated Card</h3><p class="text-gray-300">AI-generated component</p></div>',
+                form: '<div class="relative w-48"><input type="text" placeholder=" " class="peer px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 transition-colors" /><label class="absolute left-4 -top-2.5 bg-gray-900 px-1 text-sm text-gray-400">Generated Input</label></div>',
+                navigation: '<nav class="flex space-x-8"><button class="py-2 px-1 border-b-2 border-purple-500 text-purple-400 font-medium">Home</button><button class="py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300">About</button><button class="py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300">Contact</button></nav>',
+                interactive: '<div class="p-4 bg-gray-800 rounded-lg border border-gray-700"><h3 class="text-white font-medium mb-2">Generated Modal Preview</h3><p class="text-gray-300 text-sm">Interactive component generated</p><div class="flex space-x-2 mt-3"><button class="px-3 py-1 bg-purple-600 text-white rounded text-sm">Confirm</button><button class="px-3 py-1 bg-gray-600 text-gray-200 rounded text-sm">Cancel</button></div></div>',
+                data: '<div class="bg-gray-800 rounded-lg overflow-hidden"><table class="w-full text-sm"><thead class="bg-gray-700"><tr><th class="px-3 py-2 text-left text-white font-medium">Name</th><th class="px-3 py-2 text-left text-white font-medium">Value</th></tr></thead><tbody><tr class="border-t border-gray-700"><td class="px-3 py-2 text-gray-300">Item 1</td><td class="px-3 py-2 text-purple-400">100</td></tr><tr class="border-t border-gray-700"><td class="px-3 py-2 text-gray-300">Item 2</td><td class="px-3 py-2 text-purple-400">200</td></tr></tbody></table></div>',
+                media: '<div class="flex items-center space-x-3"><div class="relative"><div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-medium">AI</div><div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-gray-800 rounded-full"></div></div><div><div class="text-white text-sm font-medium">Generated Avatar</div><div class="text-gray-400 text-xs">AI-generated component</div></div></div>',
+                loader: '<div class="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin shadow-lg shadow-purple-500/30"></div>',
+                background: '<div class="w-full h-32 bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400 rounded-lg relative overflow-hidden animate-gradient-x"><div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-pulse"></div><div class="absolute top-4 left-4 text-white/80 font-medium">Generated Background</div></div>'
+            };
+            
+            const previewArea = document.getElementById('previewArea');
+            const codeDisplay = document.getElementById('codeDisplay');
+            
+            document.getElementById('previewTitle').textContent = `Generated ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            previewArea.innerHTML = previews[type] || '<div class="text-gray-400">Preview generated component</div>';
+            codeDisplay.textContent = code;
+        }
+
+        // Preview panel functions
+        function togglePreview() {
+            showingCode = !showingCode;
+            const previewArea = document.getElementById('previewArea');
+            const codeArea = document.getElementById('codeArea');
+            
+            if (showingCode) {
+                previewArea.style.display = 'none';
+                codeArea.style.display = 'block';
+            } else {
+                previewArea.style.display = 'flex';
+                codeArea.style.display = 'none';
+            }
+        }
+
+        function copyCode() {
+            if (selectedComponent?.code) {
+                navigator.clipboard.writeText(selectedComponent.code);
+                
+                const output = document.getElementById('terminalOutput');
+                const successLine = document.createElement('div');
+                successLine.className = 'terminal-output terminal-success';
+                successLine.textContent = `📋 Copied ${selectedComponent.name} code to clipboard!`;
+                output.appendChild(successLine);
+                
+                output.parentElement.scrollTop = output.parentElement.scrollHeight;
+                
+                // Visual feedback on button
+                const copyBtn = event.target;
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅';
+                copyBtn.style.background = '#9ece6a';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '';
+                }, 1000);
+            } else {
+                const output = document.getElementById('terminalOutput');
+                const errorLine = document.createElement('div');
+                errorLine.className = 'terminal-output terminal-error';
+                errorLine.textContent = '❌ No component selected to copy';
+                output.appendChild(errorLine);
+                
+                output.parentElement.scrollTop = output.parentElement.scrollHeight;
+            }
+        }
+
+        function insertCode() {
+            if (selectedComponent?.code) {
+                const output = document.getElementById('terminalOutput');
+                const successLine = document.createElement('div');
+                successLine.className = 'terminal-output terminal-info';
+                successLine.textContent = `➕ Component "${selectedComponent.name}" would be inserted into editor at cursor position.`;
+                output.appendChild(successLine);
+                
+                output.parentElement.scrollTop = output.parentElement.scrollHeight;
+                
+                // Simulate postMessage for real IDE integration
+                console.log('Sending INSERT_COMPONENT message:', {
+                    type: 'INSERT_COMPONENT',
+                    code: selectedComponent.code,
+                    componentName: selectedComponent.name
+                });
+            }
+        }
+    </script>
+</body>
+</html>
