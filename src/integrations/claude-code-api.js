@@ -1,108 +1,145 @@
 /**
  * Claude Code API Integration
  * 
- * Provides Claude AI functionality using Claude Code Max subscription
- * instead of direct Anthropic API calls
+ * Provides Claude AI functionality using either:
+ * 1. Official Anthropic SDK (default)
+ * 2. Claude Code CLI Bridge (to leverage Claude Code Max subscription)
  */
 
-const axios = require('axios');
+const Anthropic = require('@anthropic-ai/sdk');
 const { logger } = require('../monitoring/comprehensive-logger');
+
+// Import CLI bridge as optional dependency
+let ClaudeCodeCLIAdapter;
+try {
+    const bridge = require('./claude-code-cli-bridge');
+    ClaudeCodeCLIAdapter = bridge.ClaudeCodeCLIAdapter;
+} catch (error) {
+    logger.warn('Claude Code CLI Bridge not available');
+}
 
 class ClaudeCodeAPI {
     constructor(apiKey, options = {}) {
         this.apiKey = apiKey;
-        this.baseURL = options.baseURL || 'https://api.anthropic.com';
         this.logger = options.logger || logger;
         this.timeout = options.timeout || 30000;
         
-        // Setup axios instance
-        this.client = axios.create({
-            baseURL: this.baseURL,
-            timeout: this.timeout,
-            headers: {
-                'x-api-key': this.apiKey,
-                'Content-Type': 'application/json',
-                'anthropic-version': '2023-06-01',
-                'User-Agent': 'Coder1-Autonomous-Vibe-Interface/1.0'
-            }
-        });
+        // Check if we should use CLI bridge
+        const useCLI = options.useCLI || process.env.USE_CLAUDE_CODE_CLI === 'true';
+        
+        if (useCLI && ClaudeCodeCLIAdapter) {
+            logger.info('Using Claude Code CLI Bridge to leverage Max subscription');
+            this.client = new ClaudeCodeCLIAdapter(options);
+            this.usingCLI = true;
+        } else {
+            // Setup Anthropic client
+            this.client = new Anthropic({
+                apiKey: this.apiKey,
+                timeout: this.timeout,
+                maxRetries: 3
+            });
+            this.usingCLI = false;
+        }
+        
+        // Store options for later use
+        this.options = options;
     }
 
     /**
-     * Send a message to Claude using Claude Code API
+     * Send a message to Claude using the official SDK
      * @param {string} content - The message content
      * @param {Object} options - Additional options
-     * @returns {Promise<string>} Claude's response
+     * @returns {Promise<string|Stream>} Claude's response or stream
      */
     async sendMessage(content, options = {}) {
         try {
             const {
-                model = 'claude-3-haiku-20240307',
+                model = 'claude-3-sonnet-20240229',
                 maxTokens = 1000,
                 temperature = 0.3,
-                systemPrompt = null
+                systemPrompt = null,
+                stream = false
             } = options;
 
-            this.logger.info('Sending message to Claude Code API', {
+            this.logger.info('Sending message to Claude API', {
                 model,
                 contentLength: content.length,
-                hasSystemPrompt: !!systemPrompt
+                hasSystemPrompt: !!systemPrompt,
+                streaming: stream
             });
 
             // Prepare messages array
-            const messages = [];
-            
-            if (systemPrompt) {
-                messages.push({
-                    role: 'system',
-                    content: systemPrompt
-                });
-            }
-            
-            messages.push({
+            const messages = [{
                 role: 'user',
                 content: content
-            });
+            }];
 
-            const requestBody = {
+            const requestOptions = {
                 model,
                 max_tokens: maxTokens,
                 temperature,
-                messages
+                messages,
+                stream
             };
 
-            const response = await this.client.post('/v1/messages', requestBody);
+            // Add system prompt if provided
+            if (systemPrompt) {
+                requestOptions.system = systemPrompt;
+            }
+
+            // Handle streaming if requested
+            if (stream) {
+                const stream = await this.client.messages.create(requestOptions);
+                return stream; // Return the stream for caller to handle
+            }
+
+            // Non-streaming request
+            const response = await this.client.messages.create(requestOptions);
             
-            if (response.data && response.data.content && response.data.content[0]) {
-                const responseText = response.data.content[0].text;
-                this.logger.info('Claude Code API response received', {
+            if (response && response.content && response.content[0]) {
+                const responseText = response.content[0].text;
+                this.logger.info('Claude API response received', {
                     responseLength: responseText.length,
-                    model: response.data.model
+                    model: response.model,
+                    usage: response.usage
                 });
                 return responseText;
             }
             
-            throw new Error('Invalid response format from Claude Code API');
+            throw new Error('Invalid response format from Claude API');
 
         } catch (error) {
-            this.logger.error('Claude Code API error:', {
+            this.logger.error('Claude API error:', {
                 error: error.message,
-                status: error.response?.status,
-                statusText: error.response?.statusText
+                status: error.status,
+                type: error.type
             });
 
-            // Check if it's an authentication error
-            if (error.response?.status === 401) {
-                throw new Error('Claude Code API authentication failed. Please check your API key.');
+            // Handle Anthropic SDK errors
+            if (error.status === 401) {
+                throw new Error('Claude API authentication failed. Please check your API key.');
             }
             
-            // Check if it's a rate limit error
-            if (error.response?.status === 429) {
-                throw new Error('Claude Code API rate limit exceeded. Please try again later.');
+            if (error.status === 429) {
+                throw new Error('Claude API rate limit exceeded. Please try again later.');
             }
             
-            throw new Error(`Claude Code API request failed: ${error.message}`);
+            if (error.status === 400) {
+                throw new Error(`Claude API bad request: ${error.message}`);
+            }
+            
+            throw new Error(`Claude API request failed: ${error.message}`);
         }
+    }
+
+    /**
+     * Send a streaming message to Claude
+     * @param {string} content - The message content
+     * @param {Object} options - Additional options
+     * @returns {Promise<Stream>} Claude's response stream
+     */
+    async streamMessage(content, options = {}) {
+        return this.sendMessage(content, { ...options, stream: true });
     }
 
     /**
@@ -163,24 +200,23 @@ Keep analysis simple and focus only on categorizing the project type and complex
      * @returns {Promise<Object>} Enhanced brief
      */
     async generateEnhancedBrief(originalRequest, questions, answers, analysis) {
-        const briefPrompt = `Create an enhanced project brief based on this Q&A session:
+        const systemPrompt = `Create an enhanced project brief based on this Q&A session
 
 Original Request: "${originalRequest}"
 
 Q&A Session:
-${questions.map((q, i) => `Q: ${q.question}\nA: ${answers[i] || 'No answer provided'}`).join('\n\n')}
+${questions.map((q, i) => `Q: ${q.question || q}\nA: ${answers[i] || 'No answer provided'}`).join('\n\n')}
 
-Project Analysis: ${JSON.stringify(analysis, null, 2)}
-
-Create a comprehensive, actionable project brief that a developer could use to build exactly what the user wants. Include all specific requirements, preferences, and details gathered from the Q&A session.
-
-Format as a clear, structured brief with sections for requirements, features, design preferences, technical specifications, and success criteria.`;
+Project Analysis: ${JSON.stringify(analysis, null, 2)}`;
 
         try {
-            const response = await this.sendMessage(briefPrompt, {
+            const response = await this.sendMessage(`Create a comprehensive, actionable project brief that a developer could use to build exactly what the user wants. Include all specific requirements, preferences, and details gathered from the Q&A session.
+
+Format as a clear, structured brief with sections for requirements, features, design preferences, technical specifications, and success criteria.`, {
                 model: 'claude-3-sonnet-20240229',
                 maxTokens: 2000,
-                temperature: 0.2
+                temperature: 0.2,
+                systemPrompt
             });
 
             return {
@@ -313,13 +349,14 @@ Please build a comprehensive, functional website that addresses all the above re
     }
 
     /**
-     * Health check for Claude Code API
+     * Health check for Claude API
      */
     async healthCheck() {
         try {
             const response = await this.sendMessage('Hello Claude, please respond with "API is working"', {
                 maxTokens: 50,
-                temperature: 0
+                temperature: 0,
+                model: 'claude-3-haiku-20240307'
             });
             
             return {

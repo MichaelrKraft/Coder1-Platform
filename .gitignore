@@ -47,4 +47,4 @@ tmp/
 temp/
 
 # Project files
-projects/
+projects/.env

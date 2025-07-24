@@ -207,8 +207,7 @@ class SmartPRDVoice {
             messageInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
-        // Provide voice confirmation
-        this.speak("Got it", 0.8);
+        // Silent acknowledgment - removed "Got it" speech
 
         // Auto-submit if high confidence and looks like a complete request
         if (confidence > 0.85 && this.isCompleteRequest(transcript)) {

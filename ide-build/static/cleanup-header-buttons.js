@@ -35,31 +35,6 @@ console.log('🧹 Cleaning up header buttons...');
                 }
             }
             
-            // Also check for any button with long text that might need shortening
-            if (buttonText.length > 15) {
-                console.log('Found long button text:', buttonText);
-                
-                // Look for text nodes and shorten them
-                const walker = document.createTreeWalker(
-                    button,
-                    NodeFilter.SHOW_TEXT,
-                    null,
-                    false
-                );
-                
-                let node;
-                while (node = walker.nextNode()) {
-                    const text = node.textContent.trim();
-                    if (text.length > 15) {
-                        // Shorten the text
-                        if (text.includes('SuperClaude')) {
-                            node.textContent = 'SC';
-                        } else if (text.includes('Terminal')) {
-                            node.textContent = '';
-                        }
-                    }
-                }
-            }
         });
         
         // Also look for specific control buttons with labels

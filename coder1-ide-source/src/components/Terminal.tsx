@@ -31,12 +31,15 @@ const Terminal: React.FC<TerminalProps> = ({
 }) => {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState<string[]>([
-    'Welcome to Coder1 IDE Terminal',
-    'Type "help" for available commands',
+    'Welcome to Coder1 IDE Terminal - AI Chat Mode',
+    'Just type naturally to chat with AI, or use $ prefix for bash commands',
+    'Examples: "create a landing page" or "$ npm install"',
     ''
   ]);
   const [infiniteSessionId, setInfiniteSessionId] = useState<string | null>(null);
   const [isStoppingInfinite, setIsStoppingInfinite] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionId] = useState(`terminal-${Date.now()}`);
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -46,33 +49,73 @@ const Terminal: React.FC<TerminalProps> = ({
     }
   }, [history]);
 
-  const handleCommand = (cmd: string) => {
+  const handleCommand = async (cmd: string) => {
     const newHistory = [...history, `$ ${cmd}`];
     
-    switch (cmd.toLowerCase()) {
-      case 'help':
-        newHistory.push(
-          'Available commands:',
-          '  help     - Show this help message',
-          '  clear    - Clear terminal',
-          '  claude   - Start Claude Code session',
-          '  /ui      - Use 21st.dev Magic to create React components',
-          ''
-        );
-        break;
-      case 'clear':
-        setHistory(['']);
-        setInput('');
-        return;
-      case 'claude':
-        newHistory.push('Starting Claude Code session...', '');
-        break;
-      default:
-        if (cmd.startsWith('/ui ')) {
-          newHistory.push(`Generating component: ${cmd.substring(4)}...`, '');
+    // Check for bash command prefix
+    if (cmd.startsWith('$')) {
+      const bashCmd = cmd.substring(1).trim();
+      
+      // Special handling for known commands
+      switch (bashCmd.toLowerCase()) {
+        case 'clear':
+          setHistory(['']);
+          setInput('');
+          return;
+        case 'help':
+          newHistory.push(
+            'AI Chat Mode (default): Just type naturally',
+            'Bash Mode: Prefix with $ (e.g., $ ls, $ npm install)',
+            'Commands:',
+            '  $ clear   - Clear terminal',
+            '  $ help    - Show this help',
+            '  save      - Save conversation history',
+            ''
+          );
+          break;
+        default:
+          // Execute as bash command
+          newHistory.push(`Executing: ${bashCmd}`, '[Bash command execution not implemented in IDE]`, '');
+      }
+    } else {
+      // AI Chat mode
+      setIsProcessing(true);
+      newHistory.push('AI is processing...');
+      setHistory(newHistory);
+      
+      try {
+        // Call AI chat endpoint
+        const response = await fetch('/api/terminal/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: cmd,
+            sessionId: sessionId,
+            context: 'terminal'
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Replace "AI is processing..." with actual response
+          newHistory[newHistory.length - 1] = data.response || 'Done.';
+          
+          // Handle tool calls if any
+          if (data.toolCalls && data.toolCalls.length > 0) {
+            for (const tool of data.toolCalls) {
+              newHistory.push(`[Tool: ${tool.type}] ${JSON.stringify(tool.args)}`);
+              // TODO: Implement confirmation dialogs
+            }
+          }
         } else {
-          newHistory.push(`Command not found: ${cmd}`, '');
+          newHistory[newHistory.length - 1] = `Error: ${data.error || 'Failed to process request'}`;
         }
+      } catch (error) {
+        newHistory[newHistory.length - 1] = `Error: ${error instanceof Error ? error.message : 'Network error'}. Press Enter to retry.`;
+      } finally {
+        setIsProcessing(false);
+      }
     }
     
     setHistory(newHistory);
@@ -80,7 +123,7 @@ const Terminal: React.FC<TerminalProps> = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && input.trim()) {
+    if (e.key === 'Enter' && input.trim() && !isProcessing) {
       handleCommand(input.trim());
     }
   };
@@ -185,7 +228,8 @@ const Terminal: React.FC<TerminalProps> = ({
       }
     } catch (error) {
       console.error('Parallel agents toggle error:', error);
-      setHistory(prev => [...prev, `❌ Error: ${error}`, '']);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setHistory(prev => [...prev, `❌ Error: ${errorMessage}`, '']);
     }
   };
 
@@ -200,7 +244,43 @@ const Terminal: React.FC<TerminalProps> = ({
       }
     } catch (error) {
       console.error('Supervision toggle error:', error);
-      setHistory(prev => [...prev, `❌ Error: ${error}`, '']);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setHistory(prev => [...prev, `❌ Error: ${errorMessage}`, '']);
+    }
+  };
+
+  // Handle save history
+  const handleSaveHistory = async () => {
+    try {
+      const response = await fetch('/api/terminal/save-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          history: history,
+          sessionId: sessionId
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Download the history file
+        const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = data.filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        setHistory(prev => [...prev, '✅ History saved successfully', '']);
+      } else {
+        setHistory(prev => [...prev, `❌ Failed to save history: ${data.error}`, '']);
+      }
+    } catch (error) {
+      console.error('Save history error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setHistory(prev => [...prev, `❌ Error saving history: ${errorMessage}`, '']);
     }
   };
 
@@ -208,10 +288,20 @@ const Terminal: React.FC<TerminalProps> = ({
     <div className="terminal">
       <div className="terminal-header">
         <div className="terminal-header-left">
-          {/* No SuperClaude Terminal text or icon */}
+          <span className="terminal-mode-indicator" style={{ color: '#8b5cf6', fontSize: '14px', fontWeight: 'bold' }}>
+            AI Chat Mode
+          </span>
         </div>
         
         <div className="terminal-header-right">
+          <button 
+            className="terminal-control-btn save-history"
+            onClick={handleSaveHistory}
+            title="Save conversation history"
+            style={{ marginRight: '10px' }}
+          >
+            💾 Save
+          </button>
           <button 
             className={`terminal-control-btn sleep-mode ${isSleepMode ? 'active' : ''}`}
             onClick={() => setIsSleepMode(!isSleepMode)}
@@ -261,6 +351,8 @@ const Terminal: React.FC<TerminalProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
+            disabled={isProcessing}
+            placeholder={isProcessing ? "AI is processing..." : "Type a message or $ for bash command"}
             autoFocus
           />
         </div>

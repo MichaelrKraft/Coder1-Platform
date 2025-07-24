@@ -372,7 +372,7 @@ class TerminalVoice {
         console.log('🎤 Created voice button in wrapper');
 
         // Add left padding to input to make room for button
-        const paddingNeeded = 50; // Fixed padding for microphone space
+        const paddingNeeded = 40; // Fixed padding for microphone space (reduced for smaller button)
         inputElement.style.paddingLeft = `${paddingNeeded}px !important`;
         
         console.log('📝 Added padding to input:', paddingNeeded, 'px');
@@ -599,12 +599,12 @@ class TerminalVoice {
 
         // Auto-execute simple commands with high confidence
         if (confidence > 0.8 && this.isSimpleCommand(transcript)) {
-            this.speak("Got it", 0.8);
+            // Silent acknowledgment - removed "Got it" speech
             setTimeout(() => {
                 this.executeCommand();
             }, 500);
         } else {
-            this.speak("Got it", 0.8);
+            // Silent acknowledgment - removed "Got it" speech
         }
 
         this.showTranscript(transcript, confidence);
