@@ -16,63 +16,64 @@
 
 /* Overlay Container */
 .coder1-special-view-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: var(--primary-bg);
-    z-index: 9999;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--text-primary);
-    overflow-y: auto;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #1a1a1a !important;
+    z-index: 9999 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    color: #ffffff !important;
+    overflow-y: auto !important;
 }
 
 /* Animated Background - Exactly like PRD Generator */
-.animated-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
+.coder1-special-view-overlay .animated-background {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
 }
 
-.gradient-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.6;
-    animation: float 20s infinite ease-in-out;
+.coder1-special-view-overlay .gradient-orb {
+    position: absolute !important;
+    border-radius: 50% !important;
+    filter: blur(100px) !important;
+    opacity: 0.6 !important;
+    animation: float 20s infinite ease-in-out !important;
 }
 
-.orb-1 {
-    width: 600px;
-    height: 600px;
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
-    top: -200px;
-    left: -200px;
-    animation-delay: 0s;
+.coder1-special-view-overlay .orb-1 {
+    width: 600px !important;
+    height: 600px !important;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+    top: -200px !important;
+    left: -200px !important;
+    animation-delay: 0s !important;
 }
 
-.orb-2 {
-    width: 500px;
-    height: 500px;
-    background: linear-gradient(135deg, #10b981, #06b6d4);
-    bottom: -200px;
-    right: -200px;
-    animation-delay: 7s;
+.coder1-special-view-overlay .orb-2 {
+    width: 500px !important;
+    height: 500px !important;
+    background: linear-gradient(135deg, #10b981, #06b6d4) !important;
+    bottom: -200px !important;
+    right: -200px !important;
+    animation-delay: 7s !important;
 }
 
-.orb-3 {
-    width: 400px;
-    height: 400px;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation-delay: 14s;
+.coder1-special-view-overlay .orb-3 {
+    width: 400px !important;
+    height: 400px !important;
+    background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    animation-delay: 14s !important;
 }
 
 @keyframes float {
@@ -84,26 +85,30 @@
 
 /* Container - Smaller padding */
 .coder1-container {
-    padding: 24px;
-    max-width: 1000px;
-    margin: 0 auto;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative !important;
+    padding: 24px !important;
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 1 !important;
 }
 
 /* Glassmorphism Panel - Matching PRD but smaller */
 .coder1-glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 800px;
-    overflow: hidden;
+    background: rgba(42, 42, 42, 0.6) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    max-width: 800px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 2 !important;
 }
 
 /* Panel Header - Compact */
@@ -147,22 +152,28 @@
 
 /* Metrics Grid - Tighter spacing */
 .coder1-metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 16px !important;
+    margin-bottom: 20px !important;
+}
+
+.coder1-metrics-grid.sleep-metrics {
+    grid-template-columns: repeat(3, 1fr) !important;
+    max-width: 600px !important;
+    margin: 40px auto 0 !important;
 }
 
 /* Metric Cards - Smaller and more compact */
 .coder1-metric-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    padding: 16px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    display: flex !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+    transition: all 0.2s !important;
 }
 
 .coder1-metric-card:hover {
@@ -492,6 +503,74 @@
 }
 
 /* Sleep Mode Specific */
+.coder1-sleep-center {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.sleep-icon-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sleep-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.3);
+    animation: sleep-pulse 3s infinite ease-out;
+}
+
+.sleep-icon {
+    font-size: 60px;
+    color: var(--accent-primary);
+    z-index: 1;
+    position: relative;
+}
+
+@keyframes sleep-pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+}
+
+.coder1-sleep-center h3 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.coder1-sleep-center p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+}
+
+.sleep-metrics {
+    margin-top: 40px;
+}
+
+.sleep-actions {
+    margin-top: 40px;
+    text-align: center;
+}
+
 .sleep-timer {
     text-align: center;
     margin: 24px 0;
@@ -596,4 +675,34 @@
 
 .coder1-special-view-overlay ::-webkit-scrollbar-thumb:hover {
     background: #7c3aed;
+}
+
+/* Health Grid for Supervision View */
+.health-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.health-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.health-item span:first-child {
+    color: var(--text-secondary);
+}
+
+.health-item span:last-child {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Activity List Styles */
+.activity-list,
+.activity-log {
+    margin-top: 12px;
 }

@@ -169,10 +169,17 @@
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="metric-info">
-                            <div class="metric-value">12:34</div>
+                            <div class="metric-value" id="sleepTimer">00:00</div>
                             <div class="metric-label">Sleep Duration</div>
                         </div>
                     </div>
+                </div>
+                
+                <div class="sleep-actions">
+                    <button class="coder1-btn" onclick="wakeUpSystem()">
+                        <i class="fas fa-sun"></i>
+                        Wake Up System
+                    </button>
                 </div>
             </div>
         `;
@@ -510,8 +517,19 @@
         const exitBtn = overlay.querySelector('.coder1-exit-btn');
         if (exitBtn) {
             exitBtn.addEventListener('click', () => {
+                // Stop sleep timer if active
+                if (sleepTimerInterval) {
+                    clearInterval(sleepTimerInterval);
+                    sleepTimerInterval = null;
+                    sleepStartTime = null;
+                }
                 overlay.remove();
             });
+        }
+        
+        // Start sleep timer if sleep mode
+        if (type === 'sleep-mode') {
+            startSleepTimer();
         }
         
         // Add escape key handler
@@ -536,7 +554,7 @@
         const link = document.createElement('link');
         link.id = 'coder1-special-views-unified-css';
         link.rel = 'stylesheet';
-        link.href = './static/special-views-unified.css?v=3';
+        link.href = './static/special-views-unified.css?v=4';
         document.head.appendChild(link);
         
         // Keep Font Awesome if not already loaded
@@ -633,6 +651,42 @@
     
     // Initialize styles when script loads
     addCoder1Styles();
+    
+    // Sleep mode timer functionality
+    let sleepStartTime = null;
+    let sleepTimerInterval = null;
+    
+    function startSleepTimer() {
+        sleepStartTime = Date.now();
+        sleepTimerInterval = setInterval(updateSleepTimer, 1000);
+    }
+    
+    function updateSleepTimer() {
+        if (!sleepStartTime) return;
+        
+        const elapsed = Math.floor((Date.now() - sleepStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        
+        const timerElement = document.getElementById('sleepTimer');
+        if (timerElement) {
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+    
+    window.wakeUpSystem = function() {
+        if (sleepTimerInterval) {
+            clearInterval(sleepTimerInterval);
+            sleepTimerInterval = null;
+        }
+        sleepStartTime = null;
+        
+        // Close the overlay
+        const overlay = document.querySelector('.coder1-special-view-overlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    };
     
     // Override terminal buttons to use our special views
     function overrideTerminalButtons() {
