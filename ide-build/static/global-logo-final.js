@@ -36,9 +36,7 @@
                 el.style.setProperty('max-height', '140px', 'important');
                 el.style.setProperty('object-fit', 'contain', 'important');
                 
-                // Move the logo up into header bar
-                el.style.setProperty('position', 'relative', 'important');
-                el.style.setProperty('top', '-280px', 'important');
+                // Don't move individual images, we'll move the container instead
                 
                 // If it's not our custom logo, replace the src
                 if (el.tagName === 'IMG' && !el.src.includes('coder1-logo.svg')) {
@@ -93,8 +91,6 @@
                     max-width: 140px !important;
                     max-height: 140px !important;
                     object-fit: contain !important;
-                    position: relative !important;
-                    top: -280px !important;
                 }
                 
                 /* Style the parent containers too */
@@ -168,6 +164,25 @@
                 existingBrandMark.remove();
             }
         }
+        
+        // Move logo's container up instead of the logo itself
+        const logoImages = document.querySelectorAll('img[src*="coder1-logo.svg"], .logo-image');
+        logoImages.forEach(logo => {
+            // Look for the sidebar or panel container
+            let parent = logo.parentElement;
+            let levelsUp = 0;
+            while (parent && levelsUp < 10) {
+                const classes = parent.className || '';
+                // Check if this is a sidebar or panel
+                if (classes.includes('sidebar') || classes.includes('panel') || classes.includes('left')) {
+                    console.log('Moving container:', parent, 'up by 280px');
+                    parent.style.setProperty('margin-top', '-280px', 'important');
+                    break;
+                }
+                parent = parent.parentElement;
+                levelsUp++;
+            }
+        });
         
         return foundExistingLogo;
     }
