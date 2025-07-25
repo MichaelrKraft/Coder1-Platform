@@ -1,0 +1,34 @@
+services:
+  # Web Service for the Node.js/Express backend
+  - type: web
+    name: coder1-platform
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Add your API keys in Render dashboard, not in this file
+      # - key: OPENAI_API_KEY
+      #   sync: false
+      # - key: ANTHROPIC_API_KEY
+      #   sync: false
+    
+    # Health check endpoint
+    healthCheckPath: /health
+    
+    # Static files configuration
+    staticPublishPath: ./
+
+# Static Site for GitHub Pages content (optional)
+# Uncomment if you want to deploy static files separately
+# - type: static
+#   name: coder1-static
+#   buildCommand: npm run build
+#   staticPublishPath: ./
+#   routes:
+#     - type: rewrite
+#       source: /*
+#       destination: /index.html
