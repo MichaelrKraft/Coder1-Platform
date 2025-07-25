@@ -87,6 +87,36 @@
         header.appendChild(logoContainer);
         console.log('✅ Logo added to header');
         
+        // Hide blue text in the header area
+        const headerTextElements = header.querySelectorAll('*');
+        headerTextElements.forEach(el => {
+            // Skip if it's our logo or contains our logo
+            if (el === logoContainer || el.contains(logoContainer) || el.querySelector('.header-coder1-logo')) {
+                return;
+            }
+            
+            // Check if element has text content
+            const text = el.textContent?.trim();
+            if (text && (text.includes('Coder1') || text.includes('IDE'))) {
+                // Check if it's blue
+                const style = window.getComputedStyle(el);
+                const color = style.color;
+                
+                // Check for blue color (various formats)
+                if (color.includes('rgb(0, 123, 255)') || 
+                    color.includes('#007bff') ||
+                    color.includes('rgb(0') && color.includes('123')) {
+                    
+                    // Only hide if it's a leaf element (no children except text)
+                    if (el.children.length === 0) {
+                        console.log('Hiding blue text in header:', text);
+                        el.style.visibility = 'hidden';
+                        el.style.opacity = '0';
+                    }
+                }
+            }
+        });
+        
         // Optionally hide the Explorer logo
         const explorerLogos = document.querySelectorAll('.sidebar img[src*="logo"], .explorer img[src*="logo"]');
         explorerLogos.forEach(logo => {
