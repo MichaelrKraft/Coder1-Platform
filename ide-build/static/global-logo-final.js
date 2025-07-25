@@ -5,6 +5,9 @@
     console.log('🎯 React Logo Override Loading...');
     
     function overrideLogo() {
+        // Track if we found any logos
+        let foundExistingLogo = false;
+        
         // Target all potential logo elements in React
         const logoSelectors = [
             '.logo-image',
@@ -19,6 +22,11 @@
         logoSelectors.forEach(selector => {
             const elements = document.querySelectorAll(selector);
             elements.forEach(el => {
+                // Skip our own brand mark
+                if (el.id === 'coder1-brand-mark' || el.closest('#coder1-brand-mark')) {
+                    return;
+                }
+                
                 // Override with maximum specificity
                 el.style.setProperty('width', '140px', 'important');
                 el.style.setProperty('height', '140px', 'important');
@@ -32,6 +40,20 @@
                 if (el.tagName === 'IMG' && !el.src.includes('coder1-logo.svg')) {
                     el.src = './static/coder1-logo.svg';
                     el.alt = 'Coder1 Logo';
+                    foundExistingLogo = true;
+                    
+                    // Add click handler to existing logo
+                    el.style.cursor = 'pointer';
+                    el.onclick = () => {
+                        // Check if we're on GitHub Pages
+                        if (window.location.hostname.includes('github.io')) {
+                            window.location.href = '../smart-prd-generator.html';
+                        } else {
+                            // For Render or local development
+                            window.location.href = '../';
+                        }
+                    };
+                    el.title = 'Back to Coder1 Home';
                 }
                 
                 console.log('✅ Overrode logo element:', el);
@@ -80,48 +102,58 @@
             document.head.appendChild(style);
         }
         
-        // Always ensure our custom logo exists and is properly positioned
-        let brandMark = document.getElementById('coder1-brand-mark');
-        if (!brandMark) {
-            brandMark = document.createElement('div');
-            brandMark.id = 'coder1-brand-mark';
-            document.body.appendChild(brandMark);
-        }
-        
-        // Always update the styles to ensure they're applied
-        brandMark.style.cssText = `
-            position: fixed !important;
-            top: 15px !important;
-            left: 15px !important;
-            width: 140px !important;
-            height: 140px !important;
-            z-index: 2147483647 !important;
-            pointer-events: auto !important;
-            cursor: pointer !important;
-            background-image: url('./static/coder1-logo.svg') !important;
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        `;
-        
-        brandMark.onclick = () => {
-            // Check if we're on GitHub Pages
-            if (window.location.hostname.includes('github.io')) {
-                window.location.href = '../smart-prd-generator.html';
-            } else {
-                // For Render or local development
-                window.location.href = '../';
+        // Only create our custom logo if no existing logo was found
+        if (!foundExistingLogo) {
+            let brandMark = document.getElementById('coder1-brand-mark');
+            if (!brandMark) {
+                brandMark = document.createElement('div');
+                brandMark.id = 'coder1-brand-mark';
+                document.body.appendChild(brandMark);
             }
-        };
-        brandMark.title = 'Back to Coder1 Home';
-        
-        // Ensure it's always in the body, not inside any other container
-        if (brandMark.parentNode !== document.body) {
-            document.body.appendChild(brandMark);
+            
+            // Always update the styles to ensure they're applied
+            brandMark.style.cssText = `
+                position: fixed !important;
+                top: 15px !important;
+                left: 15px !important;
+                width: 140px !important;
+                height: 140px !important;
+                z-index: 2147483647 !important;
+                pointer-events: auto !important;
+                cursor: pointer !important;
+                background-image: url('./static/coder1-logo.svg') !important;
+                background-size: contain !important;
+                background-repeat: no-repeat !important;
+                background-position: center !important;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            `;
+            
+            brandMark.onclick = () => {
+                // Check if we're on GitHub Pages
+                if (window.location.hostname.includes('github.io')) {
+                    window.location.href = '../smart-prd-generator.html';
+                } else {
+                    // For Render or local development
+                    window.location.href = '../';
+                }
+            };
+            brandMark.title = 'Back to Coder1 Home';
+            
+            // Ensure it's always in the body, not inside any other container
+            if (brandMark.parentNode !== document.body) {
+                document.body.appendChild(brandMark);
+            }
+        } else {
+            // If we found an existing logo, remove any custom brand mark
+            const existingBrandMark = document.getElementById('coder1-brand-mark');
+            if (existingBrandMark) {
+                existingBrandMark.remove();
+            }
         }
+        
+        return foundExistingLogo;
     }
     
     // Run immediately and repeatedly
