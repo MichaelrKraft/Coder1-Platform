@@ -860,7 +860,13 @@ class TerminalVoice {
         contextPrimingBtn.innerHTML = '<span>🧠 Context Priming</span>';
         contextPrimingBtn.title = 'Pre-load project context for smarter AI interactions';
         contextPrimingBtn.onclick = () => {
-            window.open('/context-priming.html', '_blank');
+            // Check if we're on GitHub Pages
+            if (window.location.hostname.includes('github.io')) {
+                window.open('../context-priming.html', '_blank');
+            } else {
+                // For Render or local development
+                window.open('/context-priming.html', '_blank');
+            }
         };
 
         // Add Voice Settings button
