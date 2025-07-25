@@ -40,28 +40,44 @@
         logoContainer.className = 'coder1-logo';
         logoContainer.style.cssText = `
             position: fixed;
-            top: -40px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
             z-index: 10000;
             cursor: pointer;
             display: flex;
             align-items: center;
         `;
         
-        // Create the actual logo content
-        logoContainer.innerHTML = `
-            <a href="/" style="
-                display: flex;
-                align-items: center;
-                text-decoration: none;
-            ">
-                <img src="./static/coder1-logo.svg" alt="Coder1" style="
-                    height: 30px;
-                    width: auto;
-                    max-width: 80px;
-                ">
-            </a>
+        // Create the actual logo content with click handler
+        const logoLink = document.createElement('a');
+        logoLink.style.cssText = `
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            cursor: pointer;
         `;
+        
+        const logoImg = document.createElement('img');
+        logoImg.src = './static/coder1-logo.svg';
+        logoImg.alt = 'Coder1';
+        logoImg.style.cssText = `
+            height: 140px;
+            width: 140px;
+            object-fit: contain;
+        `;
+        
+        logoLink.appendChild(logoImg);
+        logoContainer.appendChild(logoLink);
+        
+        // Add click handler with environment detection
+        logoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.location.hostname.includes('github.io')) {
+                window.location.href = '../smart-prd-generator.html';
+            } else {
+                window.location.href = '/';
+            }
+        });
         
         document.body.appendChild(logoContainer);
         console.log('✅ Logo added successfully');
