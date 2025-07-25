@@ -1865,8 +1865,8 @@ Please analyze this PRD and help me build this project step by step.`;
         
         // Navigate to Coder1 IDE with context
         const ideUrl = this.currentProject 
-            ? '/ide?project=transfer'
-            : '/ide';
+            ? '/ide-build/?project=transfer'
+            : '/ide-build/';
             
         window.open(ideUrl, '_blank');
         
