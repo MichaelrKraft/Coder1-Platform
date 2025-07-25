@@ -36,9 +36,9 @@
                 el.style.setProperty('max-height', '140px', 'important');
                 el.style.setProperty('object-fit', 'contain', 'important');
                 
-                // Move the logo up
+                // Move the logo up significantly
                 el.style.setProperty('position', 'relative', 'important');
-                el.style.setProperty('top', '-50px', 'important');
+                el.style.setProperty('top', '-120px', 'important');
                 
                 // If it's not our custom logo, replace the src
                 if (el.tagName === 'IMG' && !el.src.includes('coder1-logo.svg')) {
@@ -84,7 +84,7 @@
                     max-height: 140px !important;
                     object-fit: contain !important;
                     position: relative !important;
-                    top: -50px !important;
+                    top: -120px !important;
                 }
                 
                 /* Style the parent containers too */
