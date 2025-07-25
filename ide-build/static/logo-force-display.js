@@ -3,20 +3,61 @@
     'use strict';
     
     function forceLogo() {
-        // Remove any existing logos first
-        const existingLogos = document.querySelectorAll('.coder1-logo, #coder1-brand-mark');
-        existingLogos.forEach(el => el.remove());
+        // Remove any existing logos first - more aggressive
+        const logoSelectors = [
+            '.coder1-logo',
+            '#coder1-brand-mark',
+            '[class*="logo"]',
+            '[id*="logo"]',
+            'img[src*="logo"]',
+            'img[alt*="Coder"]',
+            'div[style*="logo"]'
+        ];
+        
+        logoSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                // Don't remove our forced logo
+                if (!el.classList.contains('coder1-logo-forced')) {
+                    // Check if it's in the header area (not sidebar buttons)
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < 200 && rect.left < 300) {
+                        el.remove();
+                    }
+                }
+            });
+        });
+        
+        // Also remove any blue colored elements that might be logos
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            const style = window.getComputedStyle(el);
+            const rect = el.getBoundingClientRect();
+            
+            // If it's in the logo area and has blue color
+            if (rect.top < 200 && rect.left < 300 && 
+                (style.backgroundColor.includes('rgb(0') || 
+                 style.backgroundColor.includes('blue') ||
+                 style.color.includes('rgb(0') ||
+                 style.color.includes('blue'))) {
+                
+                // Don't remove our forced logo
+                if (!el.classList.contains('coder1-logo-forced')) {
+                    el.style.display = 'none';
+                }
+            }
+        });
         
         // Create new logo
         const logo = document.createElement('div');
         logo.className = 'coder1-logo-forced';
         logo.style.cssText = `
             position: fixed !important;
-            top: 8px !important;
-            left: 12px !important;
+            top: 15px !important;
+            left: 15px !important;
             z-index: 999999 !important;
-            width: 48px !important;
-            height: 48px !important;
+            width: 140px !important;
+            height: 140px !important;
             background-image: url('./static/coder1-logo.svg') !important;
             background-size: contain !important;
             background-repeat: no-repeat !important;
