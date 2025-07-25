@@ -10,7 +10,7 @@
             const rect = el.getBoundingClientRect();
             
             // If it's in the top area where our logo is
-            if (rect.top < 150 && rect.left > 50 && rect.left < 300) {
+            if (rect.top < 150 && rect.left >= 0 && rect.left < 300) {
                 // Check if it contains the text we don't want
                 if (el.textContent === 'Coder1 IDE' || el.innerText === 'Coder1 IDE') {
                     // Check if it's not our image logo
@@ -38,7 +38,7 @@
             if (node.textContent.includes('Coder1 IDE') || 
                 (node.textContent.trim() === 'IDE' && node.parentElement)) {
                 const rect = node.parentElement.getBoundingClientRect();
-                if (rect.left > 50 && rect.left < 300 && rect.top < 150) {
+                if (rect.left >= 0 && rect.left < 300 && rect.top < 150) {
                     textNodes.push(node);
                 }
             }
