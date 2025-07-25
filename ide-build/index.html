@@ -1,8 +1,27 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="./static/api-config.js?v=6"></script><script defer="defer" src="./static/js/main.a1cfdcd5.js?v=11"></script><link href="./static/css/main.5c128812.css?v=11" rel="stylesheet"><link href="./static/terminal-voice.css?v=33" rel="stylesheet">
 <link href="./static/fix-terminal-header.css?v=2" rel="stylesheet">
-<link href="./static/special-views-unified.css?v=2" rel="stylesheet">
+<link href="./static/special-views-unified.css?v=3" rel="stylesheet">
+<script>
+// Force reload CSS to ensure new styles are loaded
+(function() {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = './static/special-views-unified.css?t=' + new Date().getTime();
+    document.head.appendChild(link);
+})();
+</script>
 </head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><!-- Load special views FIRST before other scripts -->
-<script src="./static/coder1-special-views-v4.js?v=1"></script>
+<script>
+// Force reload V4 with timestamp to bypass cache
+(function() {
+    var script = document.createElement('script');
+    script.src = './static/coder1-special-views-v4.js?t=' + new Date().getTime();
+    script.onload = function() {
+        console.log('✅ Loaded V4 with timestamp:', new Date().getTime());
+    };
+    document.head.appendChild(script);
+})();
+</script>
 <script>
 // Verify special views loaded
 setTimeout(function() {
@@ -371,4 +390,6 @@ End of disabled script -->
 <script src="./static/debug-css-loading.js?v=1"></script>
 <!-- Force glassmorphism styles -->
 <script src="./static/force-glassmorphism-styles.js?v=1"></script>
+<!-- Verify V4 is loaded -->
+<script src="./static/verify-v4.js?v=1"></script>
 </body></html>
