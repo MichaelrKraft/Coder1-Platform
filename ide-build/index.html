@@ -1,10 +1,30 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="./static/api-config.js?v=6"></script><script defer="defer" src="./static/js/main.a1cfdcd5.js?v=11"></script><link href="./static/css/main.5c128812.css?v=11" rel="stylesheet"><link href="./static/terminal-voice.css?v=33" rel="stylesheet">
 <link href="./static/fix-terminal-header.css?v=2" rel="stylesheet">
 <link href="./static/special-views-unified.css?v=1" rel="stylesheet">
-</head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><!-- Temporarily disabling scripts to find the issue -->
+</head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><!-- Load special views FIRST before other scripts -->
+<script src="./static/coder1-special-views-v2.js?v=9"></script>
+<script>
+// Verify special views loaded
+setTimeout(function() {
+    if (typeof window.showSpecialView !== 'function') {
+        console.error('❌ CRITICAL: showSpecialView not loaded! Force loading...');
+        const script = document.createElement('script');
+        script.src = './static/coder1-special-views-v2.js?t=' + Date.now();
+        script.onload = function() {
+            console.log('✅ Force loaded coder1-special-views-v2.js');
+        };
+        document.body.appendChild(script);
+    } else {
+        console.log('✅ showSpecialView is available');
+    }
+}, 1000);
+</script>
+<!-- Temporarily disabling scripts to find the issue -->
 <script src="./static/api-injection.js?v=7"></script>
+<!-- DISABLED: These scripts interfere with special views UI
 <script src="./static/parallel-agents-modal.js?v=2"></script>
 <script src="./static/parallel-agents-fix.js?v=1"></script>
+-->
 <!-- <script src="./static/simple-stop-button.js?v=1"></script> -->
 <!-- <script src="./static/global-logo-final.js?v=2"></script> -->
 <!-- <script src="./static/hide-buttons-special-pages.js"></script> -->
@@ -321,17 +341,6 @@ End of disabled script -->
 <script src="./static/terminal-voice.js?v=28"></script>
 <script src="./static/remove-blue-x-aggressive.js?v=1"></script>
 <!-- <script src="./static/special-views-buttons.js?v=7"></script> Disabled - keep only original small buttons -->
-<script>
-// Force reload of special views script with timestamp
-(function() {
-    const script = document.createElement('script');
-    script.src = './static/coder1-special-views-v2.js?t=' + Date.now();
-    script.onload = function() {
-        console.log('✅ Loaded coder1-special-views-v2.js with timestamp:', Date.now());
-    };
-    document.body.appendChild(script);
-})();
-</script>
 <!-- <script src="./static/restore-coder1-logo.js?v=12"></script> Disabled - using global-logo-final instead -->
 <!-- <script src="./static/remove-blue-logos.js?v=1"></script> Causing white screen -->
 <!-- <script src="./static/logo-force-display.js?v=2"></script> Causing white screen -->
@@ -351,4 +360,9 @@ End of disabled script -->
 <!-- <script src="./static/prd-project-transfer.js"></script> -->
 <!-- <script src="./static/prd-final-working.js"></script> Removed test button -->
 <!-- <script src="./static/context-priming-integration.js?v=1"></script> Disabled - causing layout issues -->
-<!-- <script src="./static/check-terminal-header.js?v=1"></script> Diagnostic complete --></body></html>
+<!-- <script src="./static/check-terminal-header.js?v=1"></script> Diagnostic complete -->
+<!-- Force special views to work - loads last to override everything -->
+<script src="./static/special-views-force-override.js?v=1"></script>
+<!-- Debug test panel for special views -->
+<script src="./static/test-special-views.js?v=1"></script>
+</body></html>
