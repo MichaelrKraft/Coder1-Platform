@@ -321,7 +321,17 @@ End of disabled script -->
 <script src="./static/terminal-voice.js?v=28"></script>
 <script src="./static/remove-blue-x-aggressive.js?v=1"></script>
 <!-- <script src="./static/special-views-buttons.js?v=7"></script> Disabled - keep only original small buttons -->
-<script src="./static/coder1-special-views-v2.js?v=1"></script>
+<script>
+// Force reload of special views script with timestamp
+(function() {
+    const script = document.createElement('script');
+    script.src = './static/coder1-special-views-v2.js?t=' + Date.now();
+    script.onload = function() {
+        console.log('✅ Loaded coder1-special-views-v2.js with timestamp:', Date.now());
+    };
+    document.body.appendChild(script);
+})();
+</script>
 <!-- <script src="./static/restore-coder1-logo.js?v=12"></script> Disabled - using global-logo-final instead -->
 <!-- <script src="./static/remove-blue-logos.js?v=1"></script> Causing white screen -->
 <!-- <script src="./static/logo-force-display.js?v=2"></script> Causing white screen -->
