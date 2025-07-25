@@ -24,18 +24,6 @@
     function createCoder1Overlay() {
         const overlay = document.createElement('div');
         overlay.className = 'coder1-special-view-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: ${DESIGN_SYSTEM.colors.primaryBg};
-            z-index: 9999;
-            font-family: ${DESIGN_SYSTEM.fonts.primary};
-            color: ${DESIGN_SYSTEM.colors.textPrimary};
-            overflow-y: auto;
-        `;
         
         // Add animated background orbs like PRD generator
         overlay.innerHTML = `
@@ -550,11 +538,24 @@
     
     // Add Coder1 styles
     function addCoder1Styles() {
-        if (document.getElementById('coder1-special-views-styles')) return;
+        // Check if unified CSS is already loaded
+        if (document.getElementById('coder1-special-views-unified-css')) return;
         
-        const styles = document.createElement('style');
-        styles.id = 'coder1-special-views-styles';
-        styles.textContent = `
+        // Create link to external CSS
+        const link = document.createElement('link');
+        link.id = 'coder1-special-views-unified-css';
+        link.rel = 'stylesheet';
+        link.href = './static/special-views-unified.css?v=1';
+        document.head.appendChild(link);
+        
+        // Keep Font Awesome if not already loaded
+        if (!document.querySelector('link[href*="font-awesome"]')) {
+            const faLink = document.createElement('link');
+            faLink.rel = 'stylesheet';
+            faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+            document.head.appendChild(faLink);
+        }
+    }
             /* Coder1 Special Views Styles */
             
             /* Animated Background (from PRD generator) */
@@ -1348,10 +1349,6 @@
                     gap: 12px;
                 }
             }
-        `;
-        
-        document.head.appendChild(styles);
-    }
     
     // Override ONLY Infinite Loop button to use custom interface
     function overrideOriginalButtons() {
