@@ -12,11 +12,11 @@
         logo.className = 'coder1-logo-forced';
         logo.style.cssText = `
             position: fixed !important;
-            top: 15px !important;
-            left: 15px !important;
+            top: 8px !important;
+            left: 12px !important;
             z-index: 999999 !important;
-            width: 140px !important;
-            height: 140px !important;
+            width: 48px !important;
+            height: 48px !important;
             background-image: url('./static/coder1-logo.svg') !important;
             background-size: contain !important;
             background-repeat: no-repeat !important;
