@@ -30,7 +30,7 @@
                 
                 // If it's not our custom logo, replace the src
                 if (el.tagName === 'IMG' && !el.src.includes('coder1-logo.svg')) {
-                    el.src = '/ide/static/coder1-logo.svg';
+                    el.src = './static/coder1-logo.svg';
                     el.alt = 'Coder1 Logo';
                 }
                 
@@ -98,7 +98,7 @@
             z-index: 2147483647 !important;
             pointer-events: auto !important;
             cursor: pointer !important;
-            background-image: url('/ide/static/coder1-logo.svg') !important;
+            background-image: url('./static/coder1-logo.svg') !important;
             background-size: contain !important;
             background-repeat: no-repeat !important;
             background-position: center !important;
@@ -107,7 +107,7 @@
             opacity: 1 !important;
         `;
         
-        brandMark.onclick = () => window.location.href = '/';
+        brandMark.onclick = () => window.location.href = '../';
         brandMark.title = 'Back to Coder1 Home';
         
         // Ensure it's always in the body, not inside any other container
