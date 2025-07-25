@@ -2,7 +2,7 @@
 (function() {
     'use strict';
     
-    console.log('🎯 React Logo Override Loading...');
+    console.log('🎯 React Logo Override Loading... v2 with -280px positioning');
     
     function overrideLogo() {
         // Track if we found any logos
@@ -42,22 +42,32 @@
                 
                 // If it's not our custom logo, replace the src
                 if (el.tagName === 'IMG' && !el.src.includes('coder1-logo.svg')) {
-                    el.src = './static/coder1-logo.svg';
-                    el.alt = 'Coder1 Logo';
-                    foundExistingLogo = true;
+                    // Only process if this looks like a logo (in header area or has logo in class/src)
+                    const rect = el.getBoundingClientRect();
+                    const isLikelyLogo = selector.includes('logo') || 
+                                        el.alt?.toLowerCase().includes('logo') ||
+                                        el.src?.toLowerCase().includes('logo') ||
+                                        (rect.left < 200 && rect.top < 300);
                     
-                    // Add click handler to existing logo
-                    el.style.cursor = 'pointer';
-                    el.onclick = () => {
-                        // Check if we're on GitHub Pages
-                        if (window.location.hostname.includes('github.io')) {
-                            window.location.href = '../smart-prd-generator.html';
-                        } else {
-                            // For Render or local development
-                            window.location.href = '../';
-                        }
-                    };
-                    el.title = 'Back to Coder1 Home';
+                    if (isLikelyLogo) {
+                        el.src = './static/coder1-logo.svg';
+                        el.alt = 'Coder1 Logo';
+                        foundExistingLogo = true;
+                        console.log('🎯 Found and updating logo at position:', rect.top, rect.left);
+                        
+                        // Add click handler to existing logo
+                        el.style.cursor = 'pointer';
+                        el.onclick = () => {
+                            // Check if we're on GitHub Pages
+                            if (window.location.hostname.includes('github.io')) {
+                                window.location.href = '../smart-prd-generator.html';
+                            } else {
+                                // For Render or local development
+                                window.location.href = '../';
+                            }
+                        };
+                        el.title = 'Back to Coder1 Home';
+                    }
                 }
                 
                 console.log('✅ Overrode logo element:', el);
