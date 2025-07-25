@@ -25,8 +25,70 @@
         const overlay = document.createElement('div');
         overlay.className = 'coder1-special-view-overlay';
         
+        // Apply inline styles for immediate effect
+        overlay.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: #1a1a1a !important;
+            z-index: 9999 !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            color: #ffffff !important;
+            overflow-y: auto !important;
+        `;
+        
         // Add animated background orbs like PRD generator
         overlay.innerHTML = `
+            <style>
+                @keyframes float {
+                    0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+                    25% { transform: translateY(-50px) translateX(50px) scale(1.1); }
+                    50% { transform: translateY(50px) translateX(-50px) scale(0.9); }
+                    75% { transform: translateY(-30px) translateX(-30px) scale(1.05); }
+                }
+                .animated-background {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    z-index: 0 !important;
+                    overflow: hidden !important;
+                }
+                .gradient-orb {
+                    position: absolute !important;
+                    border-radius: 50% !important;
+                    filter: blur(100px) !important;
+                    opacity: 0.6 !important;
+                    animation: float 20s infinite ease-in-out !important;
+                }
+                .orb-1 {
+                    width: 600px !important;
+                    height: 600px !important;
+                    background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+                    top: -200px !important;
+                    left: -200px !important;
+                }
+                .orb-2 {
+                    width: 500px !important;
+                    height: 500px !important;
+                    background: linear-gradient(135deg, #10b981, #06b6d4) !important;
+                    bottom: -200px !important;
+                    right: -200px !important;
+                    animation-delay: 7s !important;
+                }
+                .orb-3 {
+                    width: 400px !important;
+                    height: 400px !important;
+                    background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    transform: translate(-50%, -50%) !important;
+                    animation-delay: 14s !important;
+                }
+            </style>
             <div class="animated-background">
                 <div class="gradient-orb orb-1"></div>
                 <div class="gradient-orb orb-2"></div>
@@ -40,6 +102,61 @@
     // Create glassmorphism container
     function createGlassContainer(title, content) {
         return `
+            <style>
+                .coder1-container {
+                    position: relative !important;
+                    padding: 24px !important;
+                    max-width: 1000px !important;
+                    margin: 0 auto !important;
+                    min-height: 100vh !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    z-index: 1 !important;
+                }
+                .coder1-glass-panel {
+                    background: rgba(42, 42, 42, 0.6) !important;
+                    backdrop-filter: blur(20px) !important;
+                    -webkit-backdrop-filter: blur(20px) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+                    border-radius: 12px !important;
+                    width: 100% !important;
+                    max-width: 800px !important;
+                    overflow: hidden !important;
+                }
+                .coder1-panel-header {
+                    padding: 16px 24px !important;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                }
+                .coder1-panel-header h2 {
+                    font-size: 1.25rem !important;
+                    font-weight: 600 !important;
+                    margin: 0 !important;
+                    color: #ffffff !important;
+                }
+                .coder1-exit-btn {
+                    background: transparent !important;
+                    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                    color: #a1a1aa !important;
+                    padding: 6px 10px !important;
+                    border-radius: 6px !important;
+                    cursor: pointer !important;
+                    font-size: 13px !important;
+                    transition: all 0.2s !important;
+                }
+                .coder1-exit-btn:hover {
+                    background: #ef4444 !important;
+                    border-color: #ef4444 !important;
+                    color: white !important;
+                }
+                .coder1-panel-content {
+                    padding: 20px 24px !important;
+                }
+            </style>
             <div class="coder1-container">
                 <div class="coder1-glass-panel">
                     <div class="coder1-panel-header">
@@ -135,6 +252,117 @@
     // Sleep Mode View - Clean Coder1 Style
     function createSleepModeView() {
         const content = `
+            <style>
+                @keyframes sleep-pulse {
+                    0% { transform: scale(0.9); opacity: 0.7; }
+                    50% { transform: scale(1.2); opacity: 0.3; }
+                    100% { transform: scale(0.9); opacity: 0.7; }
+                }
+                .coder1-sleep-center {
+                    text-align: center;
+                    padding: 40px 0;
+                }
+                .sleep-icon-container {
+                    position: relative;
+                    width: 120px;
+                    height: 120px;
+                    margin: 0 auto 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .sleep-pulse {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    background: rgba(139, 92, 246, 0.3);
+                    animation: sleep-pulse 3s infinite ease-out;
+                }
+                .sleep-icon {
+                    font-size: 60px;
+                    color: #8b5cf6;
+                    z-index: 1;
+                    position: relative;
+                }
+                .coder1-sleep-center h3 {
+                    font-size: 1.5rem;
+                    font-weight: 300;
+                    margin-bottom: 10px;
+                    color: #ffffff;
+                }
+                .coder1-sleep-center p {
+                    font-size: 0.9rem;
+                    color: #a1a1aa;
+                    margin-bottom: 40px;
+                }
+                .sleep-metrics {
+                    grid-template-columns: repeat(3, 1fr) !important;
+                    max-width: 600px !important;
+                    margin: 40px auto 0 !important;
+                }
+                .coder1-metrics-grid {
+                    display: grid !important;
+                    gap: 16px !important;
+                }
+                .coder1-metric-card {
+                    background: rgba(255, 255, 255, 0.05) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                    border-radius: 8px !important;
+                    padding: 16px !important;
+                    display: flex !important;
+                    gap: 12px !important;
+                    align-items: flex-start !important;
+                }
+                .coder1-metric-card.compact {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    text-align: center !important;
+                }
+                .metric-icon {
+                    width: 32px !important;
+                    height: 32px !important;
+                    background: #8b5cf6 !important;
+                    border-radius: 8px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    color: white !important;
+                    font-size: 14px !important;
+                }
+                .metric-value {
+                    font-size: 1.1rem !important;
+                    font-weight: 600 !important;
+                    color: #8b5cf6 !important;
+                    margin-bottom: 2px !important;
+                }
+                .metric-label {
+                    font-size: 0.8rem !important;
+                    color: #a1a1aa !important;
+                }
+                .sleep-actions {
+                    margin-top: 40px;
+                    text-align: center;
+                }
+                .coder1-btn {
+                    background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+                    border: none !important;
+                    color: white !important;
+                    padding: 8px 16px !important;
+                    border-radius: 6px !important;
+                    font-size: 0.875rem !important;
+                    font-weight: 500 !important;
+                    cursor: pointer !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    transition: all 0.2s !important;
+                }
+                .coder1-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+                }
+            </style>
             <div class="coder1-sleep-center">
                 <div class="sleep-icon-container">
                     <div class="sleep-pulse"></div>
