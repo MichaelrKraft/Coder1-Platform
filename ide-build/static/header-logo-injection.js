@@ -53,8 +53,8 @@
             transform: translateY(-50%);
             z-index: 9999;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 140px;
+            height: 140px;
         `;
         
         const logoImg = document.createElement('img');
