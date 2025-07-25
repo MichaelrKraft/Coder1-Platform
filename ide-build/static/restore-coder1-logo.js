@@ -40,7 +40,7 @@
         logoContainer.className = 'coder1-logo';
         logoContainer.style.cssText = `
             position: fixed;
-            top: 20px;
+            top: -35px;
             left: 20px;
             z-index: 10000;
             cursor: pointer;
