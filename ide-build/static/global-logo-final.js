@@ -107,7 +107,15 @@
             opacity: 1 !important;
         `;
         
-        brandMark.onclick = () => window.location.href = '../';
+        brandMark.onclick = () => {
+            // Check if we're on GitHub Pages
+            if (window.location.hostname.includes('github.io')) {
+                window.location.href = '../smart-prd-generator.html';
+            } else {
+                // For Render or local development
+                window.location.href = '../';
+            }
+        };
         brandMark.title = 'Back to Coder1 Home';
         
         // Ensure it's always in the body, not inside any other container
