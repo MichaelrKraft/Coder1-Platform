@@ -2,7 +2,7 @@
 (function() {
     'use strict';
     
-    console.log('🎯 React Logo Override Loading... v2 with -280px positioning');
+    console.log('🎯 React Logo Override Loading...');
     
     function overrideLogo() {
         // Track if we found any logos
@@ -36,36 +36,24 @@
                 el.style.setProperty('max-height', '140px', 'important');
                 el.style.setProperty('object-fit', 'contain', 'important');
                 
-                // Don't move individual images, we'll move the container instead
-                
                 // If it's not our custom logo, replace the src
                 if (el.tagName === 'IMG' && !el.src.includes('coder1-logo.svg')) {
-                    // Only process if this looks like a logo (in header area or has logo in class/src)
-                    const rect = el.getBoundingClientRect();
-                    const isLikelyLogo = selector.includes('logo') || 
-                                        el.alt?.toLowerCase().includes('logo') ||
-                                        el.src?.toLowerCase().includes('logo') ||
-                                        (rect.left < 200 && rect.top < 300);
+                    el.src = './static/coder1-logo.svg';
+                    el.alt = 'Coder1 Logo';
+                    foundExistingLogo = true;
                     
-                    if (isLikelyLogo) {
-                        el.src = './static/coder1-logo.svg';
-                        el.alt = 'Coder1 Logo';
-                        foundExistingLogo = true;
-                        console.log('🎯 Found and updating logo at position:', rect.top, rect.left);
-                        
-                        // Add click handler to existing logo
-                        el.style.cursor = 'pointer';
-                        el.onclick = () => {
-                            // Check if we're on GitHub Pages
-                            if (window.location.hostname.includes('github.io')) {
-                                window.location.href = '../smart-prd-generator.html';
-                            } else {
-                                // For Render or local development
-                                window.location.href = '../';
-                            }
-                        };
-                        el.title = 'Back to Coder1 Home';
-                    }
+                    // Add click handler to existing logo
+                    el.style.cursor = 'pointer';
+                    el.onclick = () => {
+                        // Check if we're on GitHub Pages
+                        if (window.location.hostname.includes('github.io')) {
+                            window.location.href = '../smart-prd-generator.html';
+                        } else {
+                            // For Render or local development
+                            window.location.href = '../';
+                        }
+                    };
+                    el.title = 'Back to Coder1 Home';
                 }
                 
                 console.log('✅ Overrode logo element:', el);
@@ -164,25 +152,6 @@
                 existingBrandMark.remove();
             }
         }
-        
-        // Move logo's container up instead of the logo itself
-        const logoImages = document.querySelectorAll('img[src*="coder1-logo.svg"], .logo-image');
-        logoImages.forEach(logo => {
-            // Look for the sidebar or panel container
-            let parent = logo.parentElement;
-            let levelsUp = 0;
-            while (parent && levelsUp < 10) {
-                const classes = parent.className || '';
-                // Check if this is a sidebar or panel
-                if (classes.includes('sidebar') || classes.includes('panel') || classes.includes('left')) {
-                    console.log('Moving container:', parent, 'up by 280px');
-                    parent.style.setProperty('margin-top', '-280px', 'important');
-                    break;
-                }
-                parent = parent.parentElement;
-                levelsUp++;
-            }
-        });
         
         return foundExistingLogo;
     }
