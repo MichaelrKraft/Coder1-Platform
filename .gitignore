@@ -48,3 +48,22 @@ temp/
 
 # Project files
 projects/.env
+
+# Test and debug files
+ide-build/test-*.html
+ide-build/static/debug-*.js
+ide-build/static/test-*.js
+ide-build/static/*-test.js
+ide-build/static/*-debug.js
+test-*.html
+test-*.txt
+
+# Temporary fix scripts
+*-fix.js
+*-fix.sh
+fix-*.sh
+setup-*.sh
+test-*.sh
+
+# Local utility scripts
+*.sh
