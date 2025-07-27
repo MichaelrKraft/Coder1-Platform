@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coder1 - Smart PRD & Wireframe Generator</title>
+    <link rel="stylesheet" href="static/coder1-unified-styles.css">
+    <link rel="stylesheet" href="static/product-creation-hub.css">
+    <link rel="stylesheet" href="static/problem-first-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Fix for logo positioning */
+        .header-logo {
+            position: relative !important;
+            z-index: 1;
+        }
+        
+        /* Hide error messages */
+        .chat-message:contains("Service temporarily unavailable") {
+            display: none !important;
+        }
+        
+        /* Ensure input area is accessible */
+        .chat-input-container {
+            position: relative;
+            z-index: 10;
+            background: var(--bg-primary);
+        }
+        
+        /* Fix microphone button positioning */
+        .voice-input-btn {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--accent-primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-input-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .voice-input-btn.recording {
+            color: #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-background">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <header class="header glassmorphism">
+            <img src="static/coder1-logo.svg" alt="Coder1" class="header-logo" onclick="window.location.href='/'">
+            <div class="header-content">
+                <div class="header-controls">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="header-divider"></div>
+                    <button class="ide-enter-btn" id="enterIDE">
+                        <i class="fas fa-code"></i>
+                        Enter Coder1 IDE
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="product-creation-layout">
+                <div class="prd-assistant-container">
+                    <div class="prd-panel glassmorphism" id="prdPanel">
+                        <div class="prd-header">
+                            <h3 class="prd-title"><i class="fas fa-file-alt"></i> Smart PRD & Wireframe Generator</h3>
+                        </div>
+                        <div class="prd-content" id="prdContent">
+                            <div class="prd-placeholder">
+                                <i class="fas fa-file-lines"></i>
+                                <p>Your PRD will appear here as you progress through the wizard</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-creation-sidebar">
+                    <div class="creation-panel glassmorphism" id="creationWizard">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-magic"></i> Product Creation Wizard</h3>
+                            <div class="wizard-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="wizardProgress" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text" id="progressText">Ready to Start</span>
+                            </div>
+                        </div>
+                        
+                        <div class="wizard-content">
+                            <div class="wizard-step active" id="step-1">
+                                <div class="step-icon">
+                                    <button class="glass-icon-btn" type="button">
+                                        <span class="glass-icon-btn__back" style="background: linear-gradient(hsl(223, 90%, 50%), hsl(208, 90%, 50%))"></span>
+                                        <span class="glass-icon-btn__front">
+                                            <span class="glass-icon-btn__icon">
+                                                <i class="fas fa-lightbulb"></i>
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="step-center-text">Step 1</div>
+                                <h4>1. Define Your Problem</h4>
+                                <p>Tell us what problem you're trying to solve</p>
+                                
+                                <!-- Problem Examples -->
+                                <div class="problem-examples" style="margin-top: 20px; margin-bottom: 20px; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 8px;">
+                                    <h5 style="color: #8b5cf6; margin-bottom: 10px; font-weight: 600;">
+                                        <i class="fas fa-lightbulb"></i> Example Problems:
+                                    </h5>
+                                    <ul style="font-size: 0.9em; opacity: 0.8; margin-left: 20px; line-height: 1.8;">
+                                        <li>Teams waste time searching for commonly used prompts</li>
+                                        <li>Developers recreate the same boilerplate code repeatedly</li>
+                                        <li>Small businesses struggle to track feedback across channels</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="step-actions">
+                                    <button class="wizard-btn primary" id="startWizard" disabled>
+                                        <i class="fas fa-rocket"></i>
+                                        Start Building
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container glassmorphism">
+                <div class="chat-header">
+                    <h3 class="chat-title"><i class="fas fa-comments"></i> AI Assistant</h3>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message">
+                        <div class="assistant">
+                            Welcome! I'll help you create a comprehensive PRD using the problem-first approach. Start by describing the problem you want to solve.
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <div class="input-wrapper glassmorphism">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Start by describing the problem you want to solve..."
+                            rows="2"
+                        ></textarea>
+                        <button class="voice-input-btn" id="voiceInputBtn" title="Use voice input">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <div class="input-controls">
+                            <button class="send-btn" id="sendMessage">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple demo implementation without backend
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendMessage');
+            const voiceBtn = document.getElementById('voiceInputBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            let isRecording = false;
+            let recognition = null;
+            
+            // Initialize speech recognition if available
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    messageInput.value = transcript;
+                    stopRecording();
+                };
+                
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    stopRecording();
+                };
+                
+                recognition.onend = () => {
+                    stopRecording();
+                };
+            }
+            
+            function startRecording() {
+                if (recognition && !isRecording) {
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                    recognition.start();
+                }
+            }
+            
+            function stopRecording() {
+                if (recognition && isRecording) {
+                    isRecording = false;
+                    voiceBtn.classList.remove('recording');
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    recognition.stop();
+                }
+            }
+            
+            voiceBtn.addEventListener('click', () => {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording();
+                }
+            });
+            
+            function addMessage(text, type = 'user') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function handleSend() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                addMessage(message, 'user');
+                messageInput.value = '';
+                
+                // Simple demo response
+                setTimeout(() => {
+                    addMessage(
+                        'This is a demo without backend functionality. In the full version, I would guide you through the problem-first flow to create a comprehensive PRD.',
+                        'assistant'
+                    );
+                }, 500);
+            }
+            
+            sendBtn.addEventListener('click', handleSend);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

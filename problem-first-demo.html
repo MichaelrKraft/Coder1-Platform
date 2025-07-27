@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coder1 - Problem-First PRD Demo</title>
+    <link rel="stylesheet" href="static/coder1-unified-styles.css">
+    <link rel="stylesheet" href="static/product-creation-hub.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Override to ensure proper layout */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            background: rgba(18, 18, 28, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            min-height: 300px;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        .problem-examples {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .demo-message {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-background">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <header class="header glassmorphism">
+                <img src="static/coder1-logo.svg" alt="Coder1" class="header-logo">
+                <h1>Problem-First PRD Generator (Demo)</h1>
+            </header>
+            
+            <div class="chat-area glassmorphism">
+                <div class="demo-message">
+                    <i class="fas fa-info-circle"></i> <strong>Demo Mode:</strong> This is a demonstration of the problem-first flow. Backend features are disabled.
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message">
+                        <div class="assistant">
+                            Welcome! Let's create a comprehensive PRD using the problem-first approach. 
+                            Start by describing the problem you want to solve.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="input-wrapper glassmorphism">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Start by describing the problem you want to solve..."
+                            rows="3"
+                        ></textarea>
+                        <button class="send-btn" id="sendMessage">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-creation-sidebar">
+            <div class="creation-panel glassmorphism">
+                <h3><i class="fas fa-magic"></i> Problem-First Wizard</h3>
+                
+                <div class="wizard-step active">
+                    <h4>1. Define Your Problem</h4>
+                    <p>Tell us what problem you're trying to solve</p>
+                    
+                    <div class="problem-examples">
+                        <h5><i class="fas fa-lightbulb"></i> Example Problems:</h5>
+                        <ul>
+                            <li>Teams waste time searching for commonly used prompts</li>
+                            <li>Developers recreate the same boilerplate code repeatedly</li>
+                            <li>Small businesses struggle to track feedback across channels</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="wizard-step">
+                    <h4>2. Propose Solution</h4>
+                    <p>How might we solve this problem?</p>
+                </div>
+                
+                <div class="wizard-step">
+                    <h4>3. Define MVP</h4>
+                    <p>What features are essential for v1?</p>
+                </div>
+                
+                <div class="wizard-step">
+                    <h4>4. Answer Questions</h4>
+                    <p>5-7 contextual questions</p>
+                </div>
+                
+                <div class="wizard-step">
+                    <h4>5. Generate PRD</h4>
+                    <p>Complete 11-section document</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple demo implementation
+        let currentStep = 'problem';
+        let problemStatement = '';
+        let solutionDescription = '';
+        
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendMessage');
+        
+        function addMessage(text, type = 'user') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function handleSend() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            setTimeout(() => {
+                if (currentStep === 'problem') {
+                    problemStatement = message;
+                    currentStep = 'solution';
+                    addMessage(
+                        `I understand the problem: "${message}"<br><br>` +
+                        `Now, how might we solve this problem? Please describe your solution idea.`,
+                        'assistant'
+                    );
+                    messageInput.placeholder = "Describe your solution to the problem...";
+                    
+                    // Update wizard UI
+                    document.querySelectorAll('.wizard-step')[0].classList.remove('active');
+                    document.querySelectorAll('.wizard-step')[1].classList.add('active');
+                    
+                } else if (currentStep === 'solution') {
+                    solutionDescription = message;
+                    currentStep = 'mvp';
+                    addMessage(
+                        `Great solution! I've captured:<br><br>` +
+                        `<strong>Problem:</strong> ${problemStatement}<br>` +
+                        `<strong>Solution:</strong> ${message}<br><br>` +
+                        `Would you like to define your MVP scope? Type "mvp" to see the feature selector, or "skip" to go straight to questions.`,
+                        'assistant'
+                    );
+                    messageInput.placeholder = "Type 'mvp' or 'skip'...";
+                    
+                    document.querySelectorAll('.wizard-step')[1].classList.remove('active');
+                    document.querySelectorAll('.wizard-step')[2].classList.add('active');
+                    
+                } else if (currentStep === 'mvp') {
+                    if (message.toLowerCase() === 'skip') {
+                        currentStep = 'questions';
+                        startQuestions();
+                    } else if (message.toLowerCase() === 'mvp') {
+                        addMessage(
+                            `<strong>MVP Feature Selection</strong><br><br>` +
+                            `In a full implementation, you would see a modal with checkboxes for:<br>` +
+                            `• User authentication<br>` +
+                            `• Core CRUD operations<br>` +
+                            `• Search and filtering<br>` +
+                            `• Collaboration features<br><br>` +
+                            `For this demo, let's proceed to questions. Type anything to continue.`,
+                            'assistant'
+                        );
+                        currentStep = 'questions';
+                    }
+                } else if (currentStep === 'questions') {
+                    startQuestions();
+                }
+            }, 500);
+        }
+        
+        function startQuestions() {
+            addMessage(
+                `Perfect! Based on your problem and solution, here are 5 targeted questions:<br><br>` +
+                `<strong>Question 1:</strong> Who specifically will use this solution for "${problemStatement}"?<br><br>` +
+                `(In the full version, you would answer each question interactively)`,
+                'assistant'
+            );
+            
+            document.querySelectorAll('.wizard-step')[2].classList.remove('active');
+            document.querySelectorAll('.wizard-step')[3].classList.add('active');
+            
+            messageInput.placeholder = "This is where you'd answer the questions...";
+            
+            // Show PRD preview after delay
+            setTimeout(() => {
+                addMessage(
+                    `<strong>PRD Preview</strong><br><br>` +
+                    `Your PRD would include these 11 sections:<br>` +
+                    `1. Elevator Pitch<br>` +
+                    `2. Problem Statement<br>` +
+                    `3. Target Audience<br>` +
+                    `4. USP (Unique Selling Proposition)<br>` +
+                    `5. Target Platforms<br>` +
+                    `6. Features List (User Story format)<br>` +
+                    `7. UX/UI Considerations<br>` +
+                    `8. Non-Functional Requirements<br>` +
+                    `9. Monetization Strategy<br>` +
+                    `10. Critical Questions<br>` +
+                    `11. Next Steps<br><br>` +
+                    `This demonstrates the complete problem-first flow!`,
+                    'assistant'
+                );
+                
+                document.querySelectorAll('.wizard-step')[3].classList.remove('active');
+                document.querySelectorAll('.wizard-step')[4].classList.add('active');
+            }, 3000);
+        }
+        
+        sendButton.addEventListener('click', handleSend);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+    </script>
+</body>
+</html>

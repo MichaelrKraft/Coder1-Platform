@@ -829,6 +829,11 @@ class TerminalVoice {
     }
 
     addVoiceSettings() {
+        // Don't add settings if special view is active
+        if (window.CODER1_SPECIAL_VIEW_ACTIVE) {
+            return;
+        }
+        
         // Create main settings section container
         let settingsSection = document.querySelector('.settings-section');
         if (!settingsSection) {

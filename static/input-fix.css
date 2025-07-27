@@ -1,0 +1,114 @@
+/**
+ * Fix for text input area formatting
+ */
+
+/* Fix the main chat input container */
+.chat-input-container {
+    width: 100%;
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+/* Fix the input wrapper */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px !important;
+    background: rgba(26, 27, 38, 0.8) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Fix the textarea styling */
+#messageInput {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 16px !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    resize: vertical;
+    min-height: 60px;
+    max-height: 200px;
+    line-height: 1.5;
+    transition: all 0.3s ease;
+}
+
+#messageInput:focus {
+    outline: none !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+}
+
+#messageInput::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Style the input controls (buttons) */
+.input-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input-controls button {
+    background: rgba(139, 92, 246, 0.2) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 10px 16px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    min-width: 44px;
+}
+
+.input-controls button:hover {
+    background: rgba(139, 92, 246, 0.3) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    transform: translateY(-1px);
+}
+
+/* Send button specific styling */
+#sendMessage {
+    padding: 10px 20px !important;
+    font-weight: 500;
+}
+
+/* Voice button in the input area */
+.voice-btn {
+    background: transparent !important;
+    border: none !important;
+    color: rgba(139, 92, 246, 0.8) !important;
+    padding: 8px !important;
+}
+
+.voice-btn:hover {
+    background: rgba(139, 92, 246, 0.1) !important;
+    color: rgba(139, 92, 246, 1) !important;
+}
+
+/* Ensure proper layout on smaller screens */
+@media (max-width: 768px) {
+    .chat-input-container {
+        padding: 0 15px;
+    }
+    
+    .input-wrapper {
+        padding: 12px !important;
+        gap: 8px;
+    }
+    
+    #messageInput {
+        font-size: 14px !important;
+        padding: 10px 14px !important;
+    }
+}

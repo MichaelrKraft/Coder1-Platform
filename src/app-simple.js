@@ -141,12 +141,28 @@ app.get('/health', (req, res) => {
 const { ClaudeCodeAPI } = require('./integrations/claude-code-api');
 const claudeAPI = new ClaudeCodeAPI(process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_API_KEY);
 
+// Import Enhanced PRD Generator
+const EnhancedPRDGenerator = require('./templates/enhanced-prd-generator');
+
 // Enhanced API endpoint for PRD generation using Claude
 app.post('/api/generate-prd', async (req, res) => {
   try {
     const { projectId, originalRequest, questions, answers, sessionId, analysis } = req.body;
     
     console.log('🚀 Generating PRD with Claude for project:', projectId);
+    
+    // Extract problem and solution from request if available
+    const projectData = {
+      id: projectId,
+      originalRequest,
+      problem: req.body.problem || null,
+      solution: req.body.solution || null,
+      questions,
+      answers,
+      mvpFeatures: req.body.mvpFeatures || 'default',
+      sessionId,
+      analysis: analysis || {}
+    };
     
     // Generate enhanced brief using Claude
     const brief = await claudeAPI.generateEnhancedBrief(
@@ -156,8 +172,11 @@ app.post('/api/generate-prd', async (req, res) => {
       analysis || {}
     );
     
-    // Generate structured PRD content
-    const prdContent = await generateEnhancedPRDContent(originalRequest, questions, answers, brief);
+    // Merge brief data into project data
+    projectData.analysis = { ...projectData.analysis, ...brief };
+    
+    // Generate structured PRD content using enhanced generator
+    const prdContent = EnhancedPRDGenerator.generatePRD(projectData);
     
     res.json({
       success: true,
@@ -173,23 +192,37 @@ app.post('/api/generate-prd', async (req, res) => {
           aiGenerated: true
         },
         sections: [
-          'Executive Summary',
-          'Project Overview',
+          'Elevator Pitch',
+          'Problem Statement',
           'Target Audience',
-          'Core Features',
-          'Technical Requirements',
-          'Design Requirements',
-          'Timeline & Budget',
-          'Success Metrics',
-          'AI Recommendations'
+          'USP',
+          'Target Platforms',
+          'Features List',
+          'UX/UI Considerations',
+          'Non-Functional Requirements',
+          'Monetization',
+          'Critical Questions',
+          'Next Steps'
         ]
       }
     });
   } catch (error) {
     console.error('❌ PRD generation error:', error);
     
-    // Fallback to basic generation if Claude fails
-    const prdContent = generatePRDContent(originalRequest, questions, answers);
+    // Fallback to enhanced generation without Claude
+    const projectData = {
+      id: projectId,
+      originalRequest,
+      problem: req.body.problem || null,
+      solution: req.body.solution || null,
+      questions,
+      answers,
+      mvpFeatures: req.body.mvpFeatures || 'default',
+      sessionId,
+      analysis: {}
+    };
+    
+    const prdContent = EnhancedPRDGenerator.generatePRD(projectData);
     
     res.json({
       success: true,

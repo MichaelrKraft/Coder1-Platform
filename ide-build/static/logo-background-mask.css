@@ -1,0 +1,113 @@
+/* Logo Background Mask - Visual masking to hide text bleeding behind logo */
+
+/* Create a dead zone in the upper left where the logo sits */
+.logo-mask-zone {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 200px !important;
+    height: 100px !important;
+    background: #1a1b26 !important; /* Match the main background color */
+    z-index: 999 !important; /* Below logo but above text */
+    pointer-events: none !important; /* Don't block clicks */
+}
+
+/* Enhanced mask with gradient for better blending */
+.logo-mask-zone::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(
+        135deg, 
+        #1a1b26 0%, 
+        #1a1b26 70%, 
+        rgba(26, 27, 38, 0.9) 85%, 
+        rgba(26, 27, 38, 0.7) 100%
+    ) !important;
+    z-index: 1 !important;
+}
+
+/* Target any potential text elements in the logo area and make them invisible */
+body *[style*="position: absolute"],
+body *[style*="position: fixed"] {
+    /* Check if element is in the logo zone */
+}
+
+/* Specifically target header area text elements */
+.header *,
+.terminal-header *,
+[class*="header"] *,
+[class*="Header"] * {
+    /* If text is in the upper left corner area, make it transparent */
+}
+
+/* Force hide any blue text in the logo area */
+body::before {
+    content: "" !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 180px !important;
+    height: 80px !important;
+    background: #1a1b26 !important;
+    z-index: 998 !important;
+    pointer-events: none !important;
+}
+
+/* Create a stronger mask specifically for text elements */
+/* This targets any element that might contain "Coder1" or "IDE" text in the logo area */
+*:not(.header-coder1-logo):not(.header-coder1-logo *) {
+    /* If element contains problematic text and is positioned in logo area */
+}
+
+/* Absolute positioning mask - guaranteed to cover the logo area */
+.absolute-logo-mask {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 160px !important;
+    height: 60px !important;
+    background: #1a1b26 !important;
+    z-index: 997 !important;
+    pointer-events: none !important;
+    border-radius: 0 0 8px 0 !important;
+}
+
+/* Enhanced logo container styling - to be used with existing logo injection */
+.header-coder1-logo {
+    background: radial-gradient(
+        circle at center, 
+        rgba(26, 27, 38, 0.95) 0%, 
+        rgba(26, 27, 38, 0.9) 40%, 
+        rgba(26, 27, 38, 0.8) 70%, 
+        rgba(26, 27, 38, 0.6) 100%
+    ) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+    z-index: 1000 !important;
+}
+
+/* Ensure logo image is on top */
+.header-coder1-logo img {
+    position: relative !important;
+    z-index: 1001 !important;
+}
+
+/* Force any text in the header left area to be invisible */
+.header .header-left *,
+.terminal-header *:first-child {
+    color: transparent !important;
+    text-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Nuclear option: Hide any text node in the logo area */
+*[style*="color: rgb(192, 202, 245)"],
+*[style*="color: #c0caf5"],
+*[style*="color: blue"] {
+    /* Apply only if in logo area - will be handled by JavaScript */
+}

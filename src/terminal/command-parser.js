@@ -17,7 +17,8 @@ class CommandParser {
         this.projectRoot = options.projectRoot || process.cwd();
         this.allowedCommands = new Set([
             'ui', 'create', 'generate', 'fix', 'explain', 
-            'refactor', 'test', 'help', 'context', 'save'
+            'refactor', 'test', 'help', 'context', 'save',
+            'landing', 'webapp', 'fullstack', 'todo'
         ]);
         
         this.contextManager = {
@@ -78,6 +79,14 @@ class CommandParser {
                 return await this.handleSaveCommand(parts.slice(1), options);
             case 'help':
                 return this.handleHelpCommand();
+            case 'landing':
+                return await this.handleLandingCommand(parts.slice(1), options);
+            case 'webapp':
+                return await this.handleWebAppCommand(parts.slice(1), options);
+            case 'fullstack':
+                return await this.handleFullStackCommand(parts.slice(1), options);
+            case 'todo':
+                return await this.handleTodoCommand(parts.slice(1), options);
             default:
                 return {
                     type: 'error',
@@ -542,6 +551,23 @@ Available Commands:
 
 /save <filename>       - Save last generated content
 
+Quick Project Commands:
+
+/landing <idea>        - Create a complete landing page
+  Example: /landing AI-powered code review tool
+
+/webapp <idea>         - Create a React web application
+  Example: /webapp expense tracking dashboard
+
+/fullstack <idea>      - Create a full-stack application
+  Example: /fullstack recipe sharing platform
+
+/todo                  - Manage development tasks
+  /todo add <task>     - Add a new task
+  /todo list           - Show all tasks
+  /todo complete <id>  - Mark task as done
+  /todo run            - Execute all pending tasks
+
 /help                  - Show this help message
 
 Tips:
@@ -610,6 +636,162 @@ Tips:
         };
         
         return typeMap[extension.toLowerCase()] || 'text';
+    }
+
+    /**
+     * Handle landing page generation shortcut
+     */
+    async handleLandingCommand(args, options) {
+        const idea = args.join(' ');
+        
+        if (!idea) {
+            return {
+                type: 'error',
+                message: 'Please provide a landing page idea. Example: /landing AI-powered code review tool'
+            };
+        }
+
+        // Create project name
+        const date = new Date().toISOString().split('T')[0];
+        const projectName = `${date}-${idea.toLowerCase().replace(/[^a-z0-9]+/g, '-').substring(0, 30)}`;
+        const projectPath = path.join(process.env.PROJECTS_PATH || '~/Documents/Coder1Projects', 'landing-pages', projectName);
+
+        // Convert to infinite loop command for landing page
+        const infiniteCommand = `/infinite "Create a modern, responsive landing page for: ${idea}. Include: hero section with compelling headline and CTA, features section with icons, benefits section, testimonials, pricing table, FAQ, and footer. Use Tailwind CSS, mobile-first design, smooth animations, and SEO optimization." ${projectPath} 10`;
+
+        // Return as if it's an infinite loop command
+        return {
+            type: 'command',
+            command: 'infinite',
+            projectPath,
+            projectName,
+            description: `Creating landing page for: ${idea}`,
+            fullCommand: infiniteCommand,
+            autoGitCommit: true,
+            projectType: 'landing-page'
+        };
+    }
+
+    /**
+     * Handle web app generation shortcut
+     */
+    async handleWebAppCommand(args, options) {
+        const idea = args.join(' ');
+        
+        if (!idea) {
+            return {
+                type: 'error',
+                message: 'Please provide a web app idea. Example: /webapp expense tracking dashboard'
+            };
+        }
+
+        const date = new Date().toISOString().split('T')[0];
+        const projectName = `${date}-${idea.toLowerCase().replace(/[^a-z0-9]+/g, '-').substring(0, 30)}`;
+        const projectPath = path.join(process.env.PROJECTS_PATH || '~/Documents/Coder1Projects', 'web-apps', projectName);
+
+        const infiniteCommand = `/infinite "Create a React web application for: ${idea}. Include: React Router for navigation, component-based architecture, state management with Context API or Redux, responsive design with Tailwind CSS, data fetching hooks, error boundaries, loading states, and proper TypeScript types." ${projectPath} 15`;
+
+        return {
+            type: 'command',
+            command: 'infinite',
+            projectPath,
+            projectName,
+            description: `Creating web app: ${idea}`,
+            fullCommand: infiniteCommand,
+            autoGitCommit: true,
+            projectType: 'webapp'
+        };
+    }
+
+    /**
+     * Handle full-stack app generation shortcut
+     */
+    async handleFullStackCommand(args, options) {
+        const idea = args.join(' ');
+        
+        if (!idea) {
+            return {
+                type: 'error',
+                message: 'Please provide a full-stack app idea. Example: /fullstack recipe sharing platform'
+            };
+        }
+
+        const date = new Date().toISOString().split('T')[0];
+        const projectName = `${date}-${idea.toLowerCase().replace(/[^a-z0-9]+/g, '-').substring(0, 30)}`;
+        const projectPath = path.join(process.env.PROJECTS_PATH || '~/Documents/Coder1Projects', 'full-stack', projectName);
+
+        // Use parallel agents for full-stack
+        return {
+            type: 'command',
+            command: 'parallel-agents',
+            projectPath,
+            projectName,
+            description: `Creating full-stack app: ${idea}`,
+            agents: [
+                {
+                    name: 'Database Architect',
+                    task: `Design PostgreSQL database schema for ${idea}. Include tables, relationships, indexes, and migrations.`
+                },
+                {
+                    name: 'Backend Engineer', 
+                    task: `Create Express.js API for ${idea}. Include authentication, CRUD endpoints, validation, and error handling.`
+                },
+                {
+                    name: 'Frontend Developer',
+                    task: `Build Next.js frontend for ${idea}. Include pages, components, forms, and API integration.`
+                }
+            ],
+            autoGitCommit: true,
+            projectType: 'fullstack'
+        };
+    }
+
+    /**
+     * Handle todo command for task management
+     */
+    async handleTodoCommand(args, options) {
+        const subCommand = args[0];
+        
+        if (!subCommand) {
+            return {
+                type: 'todo',
+                action: 'list'
+            };
+        }
+
+        switch (subCommand) {
+            case 'add':
+                return {
+                    type: 'todo',
+                    action: 'add',
+                    task: args.slice(1).join(' ')
+                };
+            
+            case 'list':
+                return {
+                    type: 'todo',
+                    action: 'list'
+                };
+            
+            case 'complete':
+                return {
+                    type: 'todo',
+                    action: 'complete',
+                    taskId: args[1]
+                };
+            
+            case 'run':
+                return {
+                    type: 'todo',
+                    action: 'run-all'
+                };
+            
+            default:
+                return {
+                    type: 'error',
+                    message: 'Unknown todo command. Use: /todo [add|list|complete|run]'
+                };
+        }
     }
 }
 

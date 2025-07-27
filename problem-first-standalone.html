@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem-First PRD Demo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 20, 30, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .right-panel {
+            width: 350px;
+            background: rgba(20, 20, 30, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            overflow-y: auto;
+        }
+        
+        h1 {
+            color: #8b5cf6;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 10, 20, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .message.user {
+            background: #8b5cf6;
+            margin-left: auto;
+            color: white;
+        }
+        
+        .message.assistant {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+            display: flex;
+            gap: 10px;
+        }
+        
+        textarea {
+            flex: 1;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            resize: none;
+            font-family: inherit;
+        }
+        
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #7c3aed;
+        }
+        
+        .step {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .step.active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+        
+        .step h3 {
+            color: #8b5cf6;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .step p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .examples {
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .examples h4 {
+            color: #8b5cf6;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .examples ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .examples li {
+            margin-bottom: 8px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        
+        .examples li:before {
+            content: "•";
+            color: #8b5cf6;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1><i class="fas fa-robot"></i> Problem-First PRD Generator</h1>
+            
+            <div class="chat-area">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        Welcome! I'll help you create a comprehensive PRD using the problem-first approach.
+                        <br><br>
+                        Start by describing the problem you want to solve. Be specific about who experiences this problem and what impact it has.
+                    </div>
+                </div>
+                
+                <div class="input-area">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Start by describing the problem you want to solve..."
+                        rows="3"
+                    ></textarea>
+                    <button id="sendBtn">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <h2 style="color: #8b5cf6; margin-bottom: 20px; font-size: 20px;">
+                <i class="fas fa-list-check"></i> Wizard Steps
+            </h2>
+            
+            <div class="step active" id="step1">
+                <h3>1. Define Your Problem</h3>
+                <p>Tell us what problem you're trying to solve</p>
+                
+                <div class="examples">
+                    <h4><i class="fas fa-lightbulb"></i> Example Problems:</h4>
+                    <ul>
+                        <li>Teams waste time searching for commonly used prompts</li>
+                        <li>Developers recreate the same boilerplate code repeatedly</li>
+                        <li>Small businesses struggle to track feedback across channels</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step" id="step2">
+                <h3>2. Propose Solution</h3>
+                <p>How might we solve this problem?</p>
+            </div>
+            
+            <div class="step" id="step3">
+                <h3>3. Define MVP Scope</h3>
+                <p>What features are essential for version 1?</p>
+            </div>
+            
+            <div class="step" id="step4">
+                <h3>4. Answer Smart Questions</h3>
+                <p>5-7 contextual questions based on your problem/solution</p>
+            </div>
+            
+            <div class="step" id="step5">
+                <h3>5. Generate Enhanced PRD</h3>
+                <p>Complete 11-section document following best practices</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let flowData = {
+            problem: '',
+            solution: '',
+            mvpChoice: '',
+            answers: []
+        };
+        
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        function addMessage(text, type = 'user') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function updateStep(stepNum) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${stepNum}`).classList.add('active');
+        }
+        
+        function handleSend() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            setTimeout(() => {
+                switch(currentStep) {
+                    case 1: // Problem definition
+                        flowData.problem = message;
+                        currentStep = 2;
+                        updateStep(2);
+                        addMessage(
+                            `I understand the problem: <strong>"${message}"</strong>
+                            <br><br>
+                            Now, let's think about the solution. How might we solve this problem? 
+                            Please describe your app or solution idea.`,
+                            'assistant'
+                        );
+                        messageInput.placeholder = "Describe your solution to this problem...";
+                        break;
+                        
+                    case 2: // Solution
+                        flowData.solution = message;
+                        currentStep = 3;
+                        updateStep(3);
+                        addMessage(
+                            `Great solution! I've captured:
+                            <br><br>
+                            <strong>Problem:</strong> ${flowData.problem}
+                            <br>
+                            <strong>Solution:</strong> ${message}
+                            <br><br>
+                            Would you like to define your MVP scope? 
+                            Type <strong>"mvp"</strong> to select features or <strong>"skip"</strong> to go straight to questions.`,
+                            'assistant'
+                        );
+                        messageInput.placeholder = "Type 'mvp' or 'skip'...";
+                        break;
+                        
+                    case 3: // MVP Decision
+                        flowData.mvpChoice = message.toLowerCase();
+                        if (message.toLowerCase() === 'mvp') {
+                            addMessage(
+                                `<strong>MVP Feature Selection</strong>
+                                <br><br>
+                                Core features to consider:
+                                <br>• User authentication
+                                <br>• Basic CRUD operations
+                                <br>• Search functionality
+                                <br>• Data export
+                                <br><br>
+                                For this demo, let's continue to questions. Type anything to proceed.`,
+                                'assistant'
+                            );
+                        }
+                        currentStep = 4;
+                        updateStep(4);
+                        messageInput.placeholder = "Answer the question...";
+                        
+                        setTimeout(() => {
+                            addMessage(
+                                `Let's gather more details. I'll ask you 5 targeted questions.
+                                <br><br>
+                                <strong>Question 1:</strong> Who specifically will use this solution? 
+                                Describe their role, technical expertise, and main needs.`,
+                                'assistant'
+                            );
+                        }, 1000);
+                        break;
+                        
+                    case 4: // Questions (simplified for demo)
+                        flowData.answers.push(message);
+                        currentStep = 5;
+                        updateStep(5);
+                        addMessage(
+                            `Thank you for the details! 
+                            <br><br>
+                            Based on your inputs, I would generate a comprehensive PRD with these sections:
+                            <br><br>
+                            <strong>1. Elevator Pitch</strong>
+                            <br><strong>2. Problem Statement</strong>
+                            <br><strong>3. Target Audience</strong>
+                            <br><strong>4. Unique Selling Proposition</strong>
+                            <br><strong>5. Target Platforms</strong>
+                            <br><strong>6. Features List</strong> (User Story format)
+                            <br><strong>7. UX/UI Considerations</strong>
+                            <br><strong>8. Non-Functional Requirements</strong>
+                            <br><strong>9. Monetization Strategy</strong>
+                            <br><strong>10. Critical Questions</strong>
+                            <br><strong>11. Next Steps</strong>
+                            <br><br>
+                            This completes the problem-first flow demonstration!`,
+                            'assistant'
+                        );
+                        messageInput.placeholder = "Demo complete! Refresh to try again.";
+                        break;
+                }
+            }, 500);
+        }
+        
+        sendBtn.addEventListener('click', handleSend);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+    </script>
+</body>
+</html>

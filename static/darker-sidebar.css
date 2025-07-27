@@ -1,0 +1,108 @@
+/**
+ * Darker Sidebar Styling Override
+ * Makes the glassmorphism panels darker with less transparency
+ */
+
+/* Override glassmorphism panels with darker background */
+.glassmorphism {
+    background: rgba(26, 27, 38, 0.85) !important; /* Much darker, less transparent */
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Darker sidebar panels */
+.creation-panel.glassmorphism {
+    background: rgba(26, 27, 38, 0.9) !important; /* Even darker for sidebars */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Header with darker theme */
+.header.glassmorphism {
+    background: rgba(26, 27, 38, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Input areas darker */
+.input-wrapper.glassmorphism {
+    background: rgba(26, 27, 38, 0.8) !important;
+}
+
+/* Chat container darker */
+.chat-container.glassmorphism {
+    background: rgba(26, 27, 38, 0.85) !important;
+}
+
+/* Adjust text colors for better contrast on darker background */
+.glassmorphism h2,
+.glassmorphism h3,
+.glassmorphism h4 {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.glassmorphism p,
+.glassmorphism label {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Voice button styling to stand out on darker background */
+.voice-input-btn {
+    background: rgba(139, 92, 246, 0.2) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.voice-input-btn:hover {
+    background: rgba(139, 92, 246, 0.3) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+}
+
+.voice-input-btn.listening {
+    background: rgba(239, 68, 68, 0.3) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+/* Form inputs darker */
+input[type="text"],
+input[type="email"],
+textarea,
+select {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus,
+select:focus {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+}
+
+/* Buttons on darker background */
+.btn {
+    background: rgba(139, 92, 246, 0.2) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.btn:hover {
+    background: rgba(139, 92, 246, 0.3) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+}
+
+/* Progress indicators */
+.progress-item {
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.progress-item.active {
+    background: rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Darker background gradient */
+body {
+    background: #0f0f14 !important;
+}
+
+.animated-background {
+    background: linear-gradient(135deg, #0f0f14 0%, #1a1b26 50%, #0f0f14 100%) !important;
+}

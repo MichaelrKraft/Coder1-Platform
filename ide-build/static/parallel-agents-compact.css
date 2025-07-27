@@ -1,0 +1,121 @@
+/* Compact styling for Parallel Agents configuration boxes */
+
+/* Target the flex container with inline styles - override more specifically */
+.agents-config-section div[style*="display: flex"] {
+    max-width: 600px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    gap: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+/* Target the individual config boxes with background colors */
+.agents-config-section div[style*="background: rgba(139, 92, 246"],
+.agents-config-section div[style*="background: rgba(16, 185, 129"] {
+    padding: 15px !important;
+    border-radius: 10px !important;
+}
+
+/* Smaller headings in config boxes */
+.agents-config-section div[style*="background: rgba(139, 92, 246"] h4,
+.agents-config-section div[style*="background: rgba(16, 185, 129"] h4 {
+    font-size: 14px !important;
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+    font-weight: 600 !important;
+}
+
+/* Smaller labels in config boxes */
+.agents-config-section div[style*="background: rgba(139, 92, 246"] label,
+.agents-config-section div[style*="background: rgba(16, 185, 129"] label {
+    font-size: 12px !important;
+    opacity: 0.8 !important;
+}
+
+/* Smaller input fields */
+.agents-config-section input[type="text"]#parallel-feature-name {
+    padding: 8px !important;
+    font-size: 13px !important;
+    margin-bottom: 12px !important;
+}
+
+/* Radio button labels in agent count selector */
+.agent-count-selector label {
+    cursor: pointer !important;
+}
+
+.agent-count-selector label span {
+    font-size: 13px !important;
+    margin-top: 4px !important;
+}
+
+.agent-count-selector input[type="radio"] {
+    margin-bottom: 4px !important;
+}
+
+/* Adjust radio button spacing */
+.agent-count-selector {
+    gap: 8px !important;
+}
+
+/* Radio options in plan selection */
+.radio-option {
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 6px !important;
+}
+
+/* Smaller note text */
+.agent-count-note {
+    font-size: 11px !important;
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
+    line-height: 1.3 !important;
+    opacity: 0.7 !important;
+}
+
+/* Adjust template section spacing */
+#agentTemplateSection h4 {
+    font-size: 15px !important;
+    margin-top: 15px !important;
+}
+
+/* Make template cards more compact */
+.agent-template-card {
+    padding: 12px !important;
+}
+
+.agent-template-card h5 {
+    font-size: 14px !important;
+    margin: 8px 0 !important;
+}
+
+.agent-template-card p {
+    font-size: 12px !important;
+    margin: 6px 0 !important;
+}
+
+/* Smaller info box */
+.parallel-info-box {
+    padding: 15px !important;
+    margin-top: 15px !important;
+}
+
+.parallel-info-box h4 {
+    font-size: 14px !important;
+    margin-bottom: 10px !important;
+}
+
+.parallel-info-box ul {
+    font-size: 13px !important;
+}
+
+/* Adjust Launch button */
+.config-actions {
+    margin-top: 20px !important;
+}

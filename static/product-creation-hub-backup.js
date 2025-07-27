@@ -304,13 +304,10 @@ class ProductCreationHub {
                 firstQuestionText: this.questions[0]?.question
             });
             
-            // Show MVP definition modal or continue to questions
             this.addMessageToChat(
-                `Excellent! I understand both the problem and your proposed solution. Before we dive into detailed questions, would you like to define the MVP scope?\n\nYou can:\n1. Type "skip" to go straight to questions\n2. Type "mvp" to define your minimum viable product features`,
+                `Great! I've analyzed your project idea. I'll now ask you 5 targeted questions to better understand your requirements and create a comprehensive PRD.`,
                 'assistant'
             );
-            
-            this.waitingForMVPDecision = true;
 
             this.updateProgress(10, 'Project idea captured');
             
@@ -578,11 +575,8 @@ class ProductCreationHub {
                 body: JSON.stringify({
                     projectId: this.currentProject.id,
                     originalRequest: this.currentProject.originalRequest,
-                    problem: this.problemStatement || this.currentProject.problem,
-                    solution: this.solutionDescription || this.currentProject.solution,
                     questions: this.questions,
                     answers: this.answers,
-                    mvpFeatures: this.mvpFeatures || 'default',
                     sessionId: this.sessionId
                 })
             });
