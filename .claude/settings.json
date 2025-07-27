@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "post-edit": [
+      {
+        "name": "auto-commit",
+        "script": ".claude/hooks/auto-commit.sh",
+        "description": "Automatically commit and push code changes to GitHub",
+        "enabled": true,
+        "run_on_error": false
+      }
+    ]
+  }
+}

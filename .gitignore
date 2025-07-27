@@ -67,3 +67,7 @@ test-*.sh
 
 # Local utility scripts
 *.sh
+
+# Allow Claude Code hooks
+!.claude/
+!.claude/**

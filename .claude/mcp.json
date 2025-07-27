@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "node",
+      "args": ["/Users/michaelkraft/mcp-servers/src/filesystem/dist/index.js"]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-3ba82c32a36249bc832f43a554c1f1b9"
+      }
+    }
+  }
+}
