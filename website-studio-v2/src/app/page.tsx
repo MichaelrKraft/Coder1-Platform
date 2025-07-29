@@ -202,8 +202,17 @@ export default function Home() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    // Trigger preview load by updating the URL state
-                    // The useEffect in WebsitePreview will handle the loading
+                    // Force re-trigger the preview loading by briefly clearing and resetting the URL
+                    const currentUrl = websiteUrl;
+                    setWebsiteUrl('');
+                    setTimeout(() => setWebsiteUrl(currentUrl), 10);
+                    
+                    // Show loading feedback
+                    toast({
+                      title: 'Loading Preview',
+                      description: 'Loading website preview...',
+                      variant: 'default',
+                    });
                   }
                 }}
                 placeholder="https://example.com or www.example.com"
