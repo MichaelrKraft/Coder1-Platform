@@ -4,9 +4,10 @@
   "description": "Coder1 - Complete Autonomous Coding Platform with Smart PRD Generator and IDE",
   "main": "electron-main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "node server.js",
+    "start-electron": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron .",
     "start-server": "node server.js",
-    "dev": "NODE_ENV=development electron .",
+    "dev": "NODE_ENV=development ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron .",
     "dev-server": "nodemon src/app-simple.js",
     "build": "electron-builder",
     "dist": "electron-builder --mac",
@@ -27,7 +28,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "electron": "^28.1.0",
+    "electron": "^37.2.4",
     "electron-builder": "^24.9.1",
     "nodemon": "^3.0.1"
   },
