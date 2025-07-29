@@ -199,7 +199,14 @@ export default function Home() {
                 type="url"
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                placeholder="https://example.com"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Trigger preview load by updating the URL state
+                    // The useEffect in WebsitePreview will handle the loading
+                  }
+                }}
+                placeholder="https://example.com or www.example.com"
                 className="w-full px-4 py-3 bg-[#1a1a1a] rounded-lg border border-white/10 focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all"
               />
             </Card>
