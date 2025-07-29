@@ -200,19 +200,11 @@ export default function Home() {
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
                 onKeyDown={(e) => {
+                  console.log('Key pressed:', e.key);
                   if (e.key === 'Enter') {
+                    console.log('Enter key detected!');
                     e.preventDefault();
-                    // Force re-trigger the preview loading by briefly clearing and resetting the URL
-                    const currentUrl = websiteUrl;
-                    setWebsiteUrl('');
-                    setTimeout(() => setWebsiteUrl(currentUrl), 10);
-                    
-                    // Show loading feedback
-                    toast({
-                      title: 'Loading Preview',
-                      description: 'Loading website preview...',
-                      variant: 'default',
-                    });
+                    console.log('Event prevented, current URL:', websiteUrl);
                   }
                 }}
                 placeholder="https://example.com or www.example.com"
