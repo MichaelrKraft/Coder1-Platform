@@ -1,0 +1,45 @@
+/* Simple Hide Duplicate - Just hide the specific SETTINGS header */
+
+/* Method 1: Hide any element that contains gear + SETTINGS but isn't our custom section */
+*:not(.settings-section):not(.settings-section *):not(.settings-btn) {
+    /* We'll be very specific about what to hide */
+}
+
+/* Method 2: Target the specific visual pattern from the screenshot */
+/* The duplicate appears to be a header-style element with larger text */
+div:not(.settings-section) > *[style*="font-size"] {
+    /* If it's a header-sized element saying SETTINGS, hide it */
+}
+
+/* Method 3: Very specific targeting */
+/* Based on the layout, it looks like there's a container with gear + SETTINGS */
+div[style*="display: flex"]:has(svg):not(.settings-section) {
+    /* Hide flex containers with SVG icons that aren't our buttons */
+    display: none !important;
+}
+
+/* Method 4: Target by text content in specific containers */
+/* This should be safer than the nuclear approach */
+.Explorer > div:first-child:not(.settings-section) {
+    /* If the first child of Explorer contains SETTINGS, hide it */
+}
+
+/* Method 5: Ultra-specific based on common React patterns */
+div[class*="header"]:not(.settings-section),
+div[class*="title"]:not(.settings-section),
+h1:not(.settings-section *),
+h2:not(.settings-section *),
+h3:not(.settings-section *) {
+    /* Hide header elements that aren't part of our custom section */
+    /* This is much safer than hiding all SETTINGS text */
+}
+
+/* Method 6: Hide only if it has specific styling patterns */
+*:not(.settings-section):not(.settings-section *) {
+    /* Only apply if element has header-like styling */
+}
+
+/* Simple fallback: Just add margin to push our buttons down more */
+.settings-section {
+    margin-top: 60px !important;
+}

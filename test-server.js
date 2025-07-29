@@ -1,19 +1,11 @@
-// Simple test server to debug the issue
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 8765;
+const http = require('http');
 
-app.get('/', (req, res) => {
-    res.send('Hello! Server is working on port ' + PORT);
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Node.js is working!\n');
 });
 
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', port: PORT });
-});
-
-app.listen(PORT, () => {
-    console.log(`🚀 Test server running on port ${PORT}`);
-    console.log(`📱 Try: http://localhost:${PORT}`);
-}).on('error', (err) => {
-    console.error('❌ Server error:', err);
+server.listen(9876, '127.0.0.1', () => {
+  console.log('Server running on http://127.0.0.1:9876');
+  console.log('Press Ctrl+C to stop');
 });

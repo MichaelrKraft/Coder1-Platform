@@ -1,0 +1,93 @@
+/* Hide Settings CSS - Direct targeting of duplicate SETTINGS */
+
+/* Method 1: Hide any div containing SETTINGS text that's not our buttons */
+div:not(.settings-section):not(.settings-btn) {
+    /* If it contains only SETTINGS text, hide it */
+}
+
+div:not(.settings-section):not(.settings-btn):has-text("SETTINGS") {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Method 2: Target the specific structure pattern */
+/* Hide divs that have gear icons and SETTINGS text */
+div:has(svg):has-text("SETTINGS"):not(.settings-section) {
+    display: none !important;
+}
+
+/* Method 3: Target by position and content */
+/* Hide elements in the top area of Explorer with SETTINGS */
+.Explorer > div > div:first-child:has-text("SETTINGS") {
+    display: none !important;
+}
+
+/* Method 4: Broad nuclear option for SETTINGS headers */
+h1:has-text("SETTINGS"):not(.settings-section *),
+h2:has-text("SETTINGS"):not(.settings-section *),
+h3:has-text("SETTINGS"):not(.settings-section *),
+h4:has-text("SETTINGS"):not(.settings-section *),
+div:has-text("SETTINGS"):not(.settings-section):not(.settings-btn) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+/* Method 5: Target specific text nodes */
+/* This is a fallback using attribute selectors */
+[class]:not([class*="settings-section"]):not([class*="settings-btn"]) {
+    /* If text content is SETTINGS, hide */
+}
+
+/* Method 6: Nuclear option - hide anything with SETTINGS that's not our buttons */
+*:not(.settings-section):not(.settings-section *):not(.settings-btn):not(#react-bits-button) {
+    /* Check if this works by hiding everything first, then we'll narrow it down */
+}
+
+/* Method 7: Specific to Explorer area */
+.Explorer *:not(.settings-section):not(.settings-section *) {
+    /* If it contains SETTINGS text and is in Explorer, hide it */
+}
+
+/* Method 8: Force hide by text content using CSS */
+/* Since :has-text() isn't standard, let's use a different approach */
+
+/* Hide common header patterns */
+div[style*="display: flex"]:not(.settings-section) h1,
+div[style*="display: flex"]:not(.settings-section) h2,
+div[style*="display: flex"]:not(.settings-section) h3 {
+    /* This targets flex containers with headers */
+    display: none !important;
+}
+
+/* Method 9: Target by typical header styling */
+div:not(.settings-section) > * {
+    /* If font-size is large and contains SETTINGS, hide */
+}
+
+/* Final nuclear approach - hide all large text that says SETTINGS */
+* {
+    font-size: inherit;
+}
+
+*:not(.settings-section):not(.settings-section *):not(.settings-btn) {
+    /* We'll use JavaScript to add a class to elements we want to hide */
+}
+
+.hide-duplicate-settings {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+}

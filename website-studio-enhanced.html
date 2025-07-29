@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Customization Studio - Live Preview</title>
+    <meta name="description" content="Transform any website with natural language commands. See live before/after preview!">
+    
+    <style>
+        /* CSS Variables for Consistent Theme */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #3b82f6;
+            --background: #0f0f23;
+            --surface: rgba(139, 92, 246, 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Components */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-glass);
+        }
+        
+        .glass-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+            padding: 2rem;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-badge {
+            background: var(--warning);
+            color: var(--background);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+        
+        /* App Grid */
+        .app-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Input Panel */
+        .input-panel {
+            position: sticky;
+            top: 6rem;
+            height: fit-content;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .platform-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Preview Panel */
+        .preview-panel {
+            background: #1a1a2e;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .preview-header {
+            background: var(--glass);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem;
+            border-radius: 6px;
+        }
+        
+        .preview-toggle button {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .preview-toggle button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .preview-content {
+            height: 600px;
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+        
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .preview-mockup {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Demo Website Mockup */
+        .demo-site {
+            height: 100%;
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
+        }
+        
+        .demo-header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .demo-nav {
+            background: #444;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .demo-nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+        }
+        
+        .demo-hero {
+            background: #f0f0f0;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .demo-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .demo-section {
+            padding: 40px 20px;
+        }
+        
+        .demo-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .demo-form input,
+        .demo-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* Output Section */
+        .output-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .output-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .code-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .code-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 5rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-glass);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        /* Syntax Highlighting */
+        .css-property { color: #f472b6; }
+        .css-value { color: #60a5fa; }
+        .css-selector { color: #34d399; }
+        .css-comment { color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Website Customization Studio</div>
+            <div class="demo-badge">Enhanced Preview Demo</div>
+        </div>
+    </nav>
+
+    <!-- Main Application -->
+    <div class="main-container">
+        <div class="app-grid">
+            <!-- Input Panel -->
+            <div class="glass-card input-panel">
+                <h2 style="margin-bottom: 1.5rem;">Customize Your Website</h2>
+                
+                <form id="customForm">
+                    <div class="form-group">
+                        <label class="form-label">Website URL</label>
+                        <input 
+                            type="url" 
+                            id="websiteUrl" 
+                            class="form-input" 
+                            placeholder="https://your-website.com"
+                            value="https://example.com"
+                            required
+                        >
+                        <span id="platformBadge" class="platform-badge" style="display: none;"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Describe Your Changes</label>
+                        <textarea 
+                            id="description" 
+                            class="form-textarea"
+                            placeholder="For example: 'Make the background purple gradient' or 'Change header to dark with rounded corners'"
+                            required
+                        ></textarea>
+                        <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 0.5rem;">
+                            Try: background, header, buttons, forms, navigation, text/fonts
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="generateBtn">
+                        <span id="btnText">Generate CSS</span>
+                        <span id="btnLoading" class="loading" style="display: none;"></span>
+                    </button>
+                </form>
+                
+                <!-- Output Section -->
+                <div id="outputSection" class="output-section">
+                    <h3 style="margin: 2rem 0 1rem; font-size: 1.25rem;">Generated CSS</h3>
+                    
+                    <div class="code-block" id="codeBlock"></div>
+                    
+                    <div class="code-actions">
+                        <button class="code-btn" onclick="copyCSS()">📋 Copy</button>
+                        <button class="code-btn" onclick="downloadCSS()">💾 Download</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <h3 style="margin: 0; font-size: 1.25rem;">Live Preview</h3>
+                    <div class="preview-toggle">
+                        <button id="beforeBtn" class="active" onclick="showPreview('before')">Before</button>
+                        <button id="afterBtn" onclick="showPreview('after')">After</button>
+                    </div>
+                </div>
+                
+                <div class="preview-content">
+                    <div class="preview-mockup" id="previewMockup">
+                        <!-- Demo website will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // State
+        let generatedCSS = '';
+        let detectedPlatform = 'custom';
+        let currentView = 'before';
+
+        // DOM Elements
+        const form = document.getElementById('customForm');
+        const urlInput = document.getElementById('websiteUrl');
+        const descriptionInput = document.getElementById('description');
+        const platformBadge = document.getElementById('platformBadge');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const outputSection = document.getElementById('outputSection');
+        const codeBlock = document.getElementById('codeBlock');
+        const notification = document.getElementById('notification');
+        const previewMockup = document.getElementById('previewMockup');
+        const beforeBtn = document.getElementById('beforeBtn');
+        const afterBtn = document.getElementById('afterBtn');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDemoSite();
+            detectPlatform();
+        });
+
+        // Event Listeners
+        form.addEventListener('submit', handleSubmit);
+        urlInput.addEventListener('input', detectPlatform);
+
+        // Render Demo Site
+        function renderDemoSite() {
+            const demoHTML = `
+                <div class="demo-site" id="demoSite">
+                    <header class="demo-header">
+                        <h1>Demo Website</h1>
+                        <p>Your Company Tagline</p>
+                    </header>
+                    
+                    <nav class="demo-nav">
+                        <a href="#">Home</a>
+                        <a href="#">About</a>
+                        <a href="#">Services</a>
+                        <a href="#">Contact</a>
+                    </nav>
+                    
+                    <section class="demo-hero">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: #333;">Welcome to Our Website</h2>
+                        <p style="font-size: 1.2rem; color: #666; margin-bottom: 2rem;">Experience the power of AI-driven customization</p>
+                        <button class="demo-button">Get Started</button>
+                        <button class="demo-button" style="background: #6c757d;">Learn More</button>
+                    </section>
+                    
+                    <section class="demo-section">
+                        <h3 style="font-size: 2rem; text-align: center; margin-bottom: 2rem; color: #333;">Our Services</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto;">
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                                <h4 style="color: #333;">Service One</h4>
+                                <p style="color: #666;">Description of your first service</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                                <h4 style="color: #333;">Service Two</h4>
+                                <p style="color: #666;">Description of your second service</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                                <h4 style="color: #333;">Service Three</h4>
+                                <p style="color: #666;">Description of your third service</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section class="demo-section" style="background: #f8f9fa;">
+                        <h3 style="font-size: 2rem; text-align: center; margin-bottom: 2rem; color: #333;">Contact Us</h3>
+                        <form class="demo-form">
+                            <input type="text" placeholder="Your Name">
+                            <input type="email" placeholder="Your Email">
+                            <textarea placeholder="Your Message" rows="4"></textarea>
+                            <button class="demo-button" type="submit" style="width: 100%;">Send Message</button>
+                        </form>
+                    </section>
+                    
+                    <footer style="background: #333; color: white; text-align: center; padding: 20px;">
+                        <p>&copy; 2024 Demo Website. All rights reserved.</p>
+                    </footer>
+                </div>
+            `;
+            
+            previewMockup.innerHTML = demoHTML;
+        }
+
+        // Platform Detection
+        function detectPlatform() {
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                platformBadge.style.display = 'none';
+                return;
+            }
+            
+            let platform = 'custom';
+            
+            if (url.includes('shopify') || url.includes('.myshopify.com')) {
+                platform = 'shopify';
+            } else if (url.includes('wordpress') || url.includes('wp-')) {
+                platform = 'wordpress';
+            } else if (url.includes('squarespace')) {
+                platform = 'squarespace';
+            } else if (url.includes('wix')) {
+                platform = 'wix';
+            }
+            
+            detectedPlatform = platform;
+            platformBadge.textContent = platform.charAt(0).toUpperCase() + platform.slice(1);
+            platformBadge.style.display = 'inline-block';
+        }
+
+        // Form Submit Handler
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const url = urlInput.value.trim();
+            const description = descriptionInput.value.trim();
+            
+            if (!url || !description) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-block';
+            
+            // Simulate processing
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Generate CSS
+            generatedCSS = generateCSS(description, detectedPlatform);
+            
+            // Display results
+            displayResults();
+            
+            // Apply CSS to preview
+            applyGeneratedCSS();
+            
+            // Switch to after view
+            showPreview('after');
+            
+            // Reset loading state
+            generateBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            
+            showNotification('CSS generated successfully! Check the preview.', 'success');
+        }
+
+        // Enhanced CSS Generation with Background Support
+        function generateCSS(description, platform) {
+            const desc = description.toLowerCase();
+            let css = '/* Website Customization Studio - Generated CSS */\n\n';
+            
+            // Background customization
+            if (desc.includes('background')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                const isGradient = desc.includes('gradient');
+                
+                css += `/* Background Customization */
+body, .main-content, .page-wrapper {
+    background: ${isGradient ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.2)} 100%)` : 
+        color} !important;
+    ${desc.includes('image') ? `background-image: url('your-image-url.jpg');\n    background-size: cover;\n    background-position: center;` : ''}
+    ${desc.includes('fixed') ? 'background-attachment: fixed;' : ''}
+    min-height: 100vh;
+    transition: background 0.5s ease;
+}
+
+/* Adjust text color for contrast */
+body ${isColorDark(color) ? '' : '{ color: #333; }'}
+`;
+                
+                // Add overlay if requested
+                if (desc.includes('overlay')) {
+                    css += `
+/* Background overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 1;
+}
+
+body > * {
+    position: relative;
+    z-index: 2;
+}\n\n`;
+                }
+            }
+            
+            // Header customization
+            if (desc.includes('header')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Header Customization */
+.header, header, .site-header, .main-header, .demo-header {
+    background: ${desc.includes('gradient') ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        color} !important;
+    ${desc.includes('rounded') ? 'border-radius: 0 0 20px 20px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);' : ''}
+    ${desc.includes('sticky') || desc.includes('fixed') ? 'position: sticky;\n    top: 0;\n    z-index: 1000;' : ''}
+    ${desc.includes('transparent') ? 'background: rgba(255, 255, 255, 0.1) !important;\n    backdrop-filter: blur(10px);' : ''}
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.header h1, header h1, .demo-header h1 {
+    ${isColorDark(color) ? 'color: white;' : 'color: #333;'}
+}\n\n`;
+            }
+            
+            // Navigation customization
+            if (desc.includes('nav') || desc.includes('menu')) {
+                const color = extractColor(desc) || '#444';
+                css += `/* Navigation Customization */
+.nav, nav, .navigation, .menu, .demo-nav {
+    background: ${color} !important;
+    ${desc.includes('rounded') ? 'border-radius: 8px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);' : ''}
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.nav a, nav a, .navigation a, .menu a, .demo-nav a {
+    color: ${isColorDark(color) ? 'white' : '#333'} !important;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.nav a:hover, nav a:hover, .demo-nav a:hover {
+    background: rgba(${isColorDark(color) ? '255, 255, 255' : '0, 0, 0'}, 0.1);
+    transform: translateY(-2px);
+}\n\n`;
+            }
+            
+            // Button customization
+            if (desc.includes('button') || desc.includes('btn')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Button Customization */
+.btn, .button, button, input[type="submit"], input[type="button"], .demo-button {
+    background: ${desc.includes('gradient') ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        color} !important;
+    border: none;
+    ${desc.includes('rounded') ? 'border-radius: 25px;' : 'border-radius: 6px;'}
+    color: ${isColorDark(color) ? 'white' : '#333'} !important;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);' : ''}
+}
+
+.btn:hover, .button:hover, button:hover, .demo-button:hover {
+    transform: translateY(-2px);
+    ${desc.includes('shadow') ? 'box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);' : ''}
+    filter: brightness(1.1);
+}\n\n`;
+            }
+            
+            // Form customization
+            if (desc.includes('form') || desc.includes('contact')) {
+                const color = extractColor(desc) || '#f8f9fa';
+                css += `/* Form Customization */
+.form, .contact-form, form, .demo-form {
+    ${desc.includes('right') ? 
+        'position: fixed;\n    right: 20px;\n    top: 50%;\n    transform: translateY(-50%);\n    max-width: 320px;' : 
+        'max-width: 600px;\n    margin: 2rem auto;'}
+    background: ${color} !important;
+    ${desc.includes('transparent') ? 'background: rgba(255, 255, 255, 0.95) !important;\n    backdrop-filter: blur(20px);' : ''}
+    padding: 2rem;
+    border-radius: 16px;
+    ${desc.includes('shadow') ? 'box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);' : ''}
+}
+
+.form input, .form textarea, form input, form textarea, .demo-form input, .demo-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form input:focus, .form textarea:focus, .demo-form input:focus, .demo-form textarea:focus {
+    outline: none;
+    border-color: ${extractColor(desc) || '#8b5cf6'};
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}\n\n`;
+            }
+            
+            // Text/Typography customization
+            if (desc.includes('text') || desc.includes('font') || desc.includes('typography')) {
+                const textColor = extractColor(desc) || '#333';
+                css += `/* Typography Customization */
+body, .content, p, .demo-site {
+    font-family: ${desc.includes('modern') ? 
+        "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" : 
+        desc.includes('serif') ? "'Georgia', 'Times New Roman', serif" : 'inherit'};
+    ${desc.includes('size') ? `font-size: ${desc.includes('large') ? '18px' : desc.includes('small') ? '14px' : '16px'};` : ''}
+    ${desc.includes('spacing') ? 'line-height: 1.8; letter-spacing: 0.02em;' : ''}
+    ${textColor !== '#333' ? `color: ${textColor} !important;` : ''}
+}
+
+h1, h2, h3, h4, h5, h6 {
+    ${desc.includes('bold') ? 'font-weight: 800;' : desc.includes('light') ? 'font-weight: 300;' : ''}
+    ${desc.includes('uppercase') ? 'text-transform: uppercase;' : ''}
+    ${extractColor(desc) ? `color: ${extractColor(desc)} !important;` : ''}
+    margin-bottom: 1rem;
+}\n\n`;
+            }
+            
+            // Section/Card customization
+            if (desc.includes('section') || desc.includes('card')) {
+                const color = extractColor(desc) || '#f8f9fa';
+                css += `/* Section/Card Customization */
+.section, section, .card, .panel, .demo-section > div {
+    background: ${color} !important;
+    ${desc.includes('rounded') ? 'border-radius: 16px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);' : ''}
+    ${desc.includes('border') ? `border: 2px solid ${adjustColor(color, -0.1)};` : ''}
+    padding: 2rem;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.section:hover, section:hover, .card:hover {
+    ${desc.includes('hover') ? 'transform: translateY(-4px);\n    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);' : ''}
+}\n\n`;
+            }
+            
+            // Add general enhancements if nothing specific requested
+            if (css === '/* Website Customization Studio - Generated CSS */\n\n') {
+                const primaryColor = extractColor(desc) || '#8b5cf6';
+                css += `/* General Website Enhancement */
+:root {
+    --primary-color: ${primaryColor};
+    --primary-dark: ${adjustColor(primaryColor, -0.1)};
+    --primary-light: ${adjustColor(primaryColor, 0.1)};
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Enhanced links */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Modern selection */
+::selection {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Improved focus states */
+:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}`;
+            }
+            
+            return css;
+        }
+
+        // Helper Functions
+        function extractColor(text) {
+            const colors = {
+                'purple': '#8b5cf6',
+                'blue': '#3b82f6',
+                'green': '#10b981',
+                'red': '#ef4444',
+                'orange': '#f59e0b',
+                'pink': '#ec4899',
+                'yellow': '#f59e0b',
+                'indigo': '#6366f1',
+                'teal': '#14b8a6',
+                'gray': '#6b7280',
+                'black': '#000000',
+                'white': '#ffffff',
+                'dark': '#1a1a1a',
+                'light': '#f8f9fa'
+            };
+            
+            for (const [name, hex] of Object.entries(colors)) {
+                if (text.includes(name)) return hex;
+            }
+            
+            // Check for hex colors
+            const hexMatch = text.match(/#[0-9a-fA-F]{6}/);
+            if (hexMatch) return hexMatch[0];
+            
+            return null;
+        }
+
+        function adjustColor(hex, factor) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(255 * factor);
+            const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+            const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
+            const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+            return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+        }
+
+        function isColorDark(hex) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const R = num >> 16;
+            const G = num >> 8 & 0x00FF;
+            const B = num & 0x0000FF;
+            const brightness = (R * 299 + G * 587 + B * 114) / 1000;
+            return brightness < 128;
+        }
+
+        function displayResults() {
+            // Show output section
+            outputSection.classList.add('show');
+            
+            // Display CSS with syntax highlighting
+            const highlightedCSS = generatedCSS
+                .replace(/\/\*.*?\*\//g, '<span class="css-comment">$&</span>')
+                .replace(/([a-zA-Z-]+):/g, '<span class="css-property">$1:</span>')
+                .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;')
+                .replace(/([.#][a-zA-Z-][a-zA-Z0-9-]*)/g, '<span class="css-selector">$1</span>');
+            
+            codeBlock.innerHTML = highlightedCSS;
+        }
+
+        function applyGeneratedCSS() {
+            // Remove any existing custom styles
+            const existingStyle = document.getElementById('customGeneratedStyles');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            
+            // Only apply styles when in "after" view
+            if (currentView === 'after') {
+                const styleElement = document.createElement('style');
+                styleElement.id = 'customGeneratedStyles';
+                styleElement.textContent = generatedCSS;
+                document.head.appendChild(styleElement);
+            }
+        }
+
+        function showPreview(view) {
+            currentView = view;
+            
+            // Update toggle buttons
+            beforeBtn.classList.toggle('active', view === 'before');
+            afterBtn.classList.toggle('active', view === 'after');
+            
+            // Remove existing styles if showing "before"
+            const existingStyle = document.getElementById('customGeneratedStyles');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            
+            // Apply styles if showing "after"
+            if (view === 'after' && generatedCSS) {
+                applyGeneratedCSS();
+            }
+        }
+
+        function copyCSS() {
+            navigator.clipboard.writeText(generatedCSS).then(() => {
+                showNotification('CSS copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy CSS', 'error');
+            });
+        }
+
+        function downloadCSS() {
+            const blob = new Blob([generatedCSS], { type: 'text/css' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `website-customization-${Date.now()}.css`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('CSS file downloaded!', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

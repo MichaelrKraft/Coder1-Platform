@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>React Bits Components - Dual Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #0f0f23;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .close-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .close-btn:hover {
+            background: #ef4444;
+        }
+        
+        .component-item {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .component-item:hover {
+            background: #2a2a3e;
+            border-color: #8b5cf6;
+        }
+        
+        .component-item.selected {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+        
+        .emoji {
+            font-size: 20px;
+            display: inline-block;
+            width: 30px;
+            text-align: center;
+        }
+        
+        /* Dual Preview Layout */
+        .preview-container {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            min-height: 0;
+        }
+        
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #2a2a3e;
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .preview-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #aaa;
+        }
+        
+        .preview-area {
+            flex: 1;
+            background: white;
+            border-radius: 0 0 8px 8px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .preview-area.modified {
+            background: #f9fafb;
+            border: 2px dashed #8b5cf6;
+        }
+        
+        /* Modification Controls */
+        .mod-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .preview-area.modified:hover .mod-controls {
+            opacity: 1;
+        }
+        
+        .mod-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .mod-btn:hover {
+            background: #7c3aed;
+        }
+        
+        /* Code Section */
+        .code-section {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 15px;
+            overflow: hidden;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .code-panel {
+            flex: 1;
+        }
+        
+        .code-area {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-x: auto;
+            color: #e0e0ff;
+            margin: 10px 0;
+            min-height: 100px;
+            background: #1a1a2e;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        
+        .copy-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #7c3aed;
+        }
+        
+        /* Style Editor Modal */
+        .style-editor {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0f0f23;
+            border: 2px solid #8b5cf6;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .style-editor.active {
+            display: block;
+        }
+        
+        .style-editor h3 {
+            margin-bottom: 15px;
+            color: #8b5cf6;
+        }
+        
+        .style-input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 4px;
+        }
+        
+        .style-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+        
+        .style-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Components</h2>
+        <div id="components">
+            <div class="component-item" data-id="glow-btn">
+                <span class="emoji">✨</span>
+                <span>Glowing Button</span>
+            </div>
+            <div class="component-item" data-id="gradient-btn">
+                <span class="emoji">🌈</span>
+                <span>Gradient Button</span>
+            </div>
+            <div class="component-item" data-id="glass-card">
+                <span class="emoji">🪟</span>
+                <span>Glass Card</span>
+            </div>
+            <div class="component-item" data-id="glow-input">
+                <span class="emoji">💫</span>
+                <span>Glowing Input</span>
+            </div>
+            <div class="component-item" data-id="gradient-text">
+                <span class="emoji">🎨</span>
+                <span>Gradient Text</span>
+            </div>
+            <div class="component-item" data-id="animated-card">
+                <span class="emoji">🎭</span>
+                <span>Animated Card</span>
+            </div>
+            <div class="component-item" data-id="neon-badge">
+                <span class="emoji">🔥</span>
+                <span>Neon Badge</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main">
+        <div class="header">
+            <h1>React Bits Visual Components - Dual Preview</h1>
+            <a href="./index.html" class="close-btn">Close</a>
+        </div>
+        
+        <div class="preview-container">
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <span class="preview-title">ORIGINAL</span>
+                </div>
+                <div class="preview-area" id="preview-original">
+                    <p style="color: #999;">Select a component to preview</p>
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <span class="preview-title">MODIFIED</span>
+                </div>
+                <div class="preview-area modified" id="preview-modified">
+                    <p style="color: #999;">Select a component to modify</p>
+                    <div class="mod-controls">
+                        <button class="mod-btn" onclick="editStyles()">Edit Styles</button>
+                        <button class="mod-btn" onclick="resetModifications()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="code-section">
+            <div class="code-panel">
+                <h3>Original Code:</h3>
+                <div class="code-area" id="code-original">// Select a component to see its code</div>
+                <button class="copy-btn" onclick="copyCode('original')">Copy Original</button>
+            </div>
+            <div class="code-panel">
+                <h3>Modified Code:</h3>
+                <div class="code-area" id="code-modified">// Modified code will appear here</div>
+                <button class="copy-btn" onclick="copyCode('modified')">Copy Modified</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Style Editor Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="style-editor" id="style-editor">
+        <h3>Edit Component Styles</h3>
+        <input type="color" class="style-input" id="bg-color" value="#8b5cf6">
+        <label style="color: #aaa; font-size: 12px;">Background Color</label>
+        
+        <input type="color" class="style-input" id="text-color" value="#ffffff">
+        <label style="color: #aaa; font-size: 12px;">Text Color</label>
+        
+        <input type="number" class="style-input" id="padding" value="12" min="0" max="50">
+        <label style="color: #aaa; font-size: 12px;">Padding (px)</label>
+        
+        <input type="number" class="style-input" id="border-radius" value="8" min="0" max="50">
+        <label style="color: #aaa; font-size: 12px;">Border Radius (px)</label>
+        
+        <div class="style-actions">
+            <button class="copy-btn" onclick="applyStyles()">Apply</button>
+            <button class="copy-btn" style="background: #666;" onclick="closeStyleEditor()">Cancel</button>
+        </div>
+    </div>
+    
+    <script>
+        const components = {
+            'glow-btn': {
+                preview: '<button class="component" style="padding: 12px 24px; background: #8b5cf6; color: white; border: none; border-radius: 8px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); cursor: pointer; font-size: 16px; transition: all 0.3s;">Glowing Button</button>',
+                code: '<button className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:shadow-purple-600/50 transition-all">Glowing Button</button>',
+                type: 'button'
+            },
+            'gradient-btn': {
+                preview: '<button class="component" style="padding: 12px 24px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Gradient Button</button>',
+                code: '<button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg">Gradient Button</button>',
+                type: 'button'
+            },
+            'glass-card': {
+                preview: '<div class="component" style="padding: 24px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; max-width: 300px;"><h3 style="margin-bottom: 10px;">Glass Card</h3><p>Beautiful glassmorphism effect</p></div>',
+                code: '<div className="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl">\n  <h3>Glass Card</h3>\n  <p>Beautiful glassmorphism effect</p>\n</div>',
+                type: 'card'
+            },
+            'glow-input': {
+                preview: '<input class="component" type="text" placeholder="Type something..." style="padding: 8px 16px; background: #1a1a2e; border: 2px solid #8b5cf6; border-radius: 6px; color: white; outline: none; font-size: 14px;">',
+                code: '<input type="text" placeholder="Type something..." className="px-4 py-2 bg-gray-800 border-2 border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-600" />',
+                type: 'input'
+            },
+            'gradient-text': {
+                preview: '<h2 class="component" style="font-size: 32px; font-weight: bold; background: linear-gradient(135deg, #8b5cf6, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Gradient Text</h2>',
+                code: '<h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Gradient Text</h2>',
+                type: 'text'
+            },
+            'animated-card': {
+                preview: '<div class="component" style="padding: 24px; background: #2a2a3e; border: 2px solid #8b5cf6; border-radius: 12px; max-width: 300px; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'"><h3 style="margin-bottom: 10px; color: #8b5cf6;">Animated Card</h3><p>Hover to see animation</p></div>',
+                code: '<div className="p-6 bg-gray-800 border-2 border-purple-600 rounded-xl hover:scale-105 transition-transform cursor-pointer">\n  <h3 className="text-purple-600">Animated Card</h3>\n  <p>Hover to see animation</p>\n</div>',
+                type: 'card'
+            },
+            'neon-badge': {
+                preview: '<span class="component" style="padding: 6px 16px; background: #ff006e; color: white; border-radius: 20px; font-size: 14px; font-weight: 600; box-shadow: 0 0 15px #ff006e, inset 0 0 15px rgba(255, 0, 110, 0.3);">HOT</span>',
+                code: '<span className="px-4 py-1.5 bg-pink-600 text-white rounded-full text-sm font-semibold shadow-lg shadow-pink-600/50">HOT</span>',
+                type: 'badge'
+            }
+        };
+        
+        let selectedComponent = null;
+        let selectedId = null;
+        let modifications = {};
+        
+        // Initialize
+        document.getElementById('components').addEventListener('click', (e) => {
+            const item = e.target.closest('.component-item');
+            if (item) {
+                document.querySelectorAll('.component-item').forEach(el => el.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                selectedId = item.dataset.id;
+                selectedComponent = components[selectedId];
+                
+                // Set original preview
+                document.getElementById('preview-original').innerHTML = selectedComponent.preview;
+                
+                // Set modified preview (apply any existing modifications)
+                updateModifiedPreview();
+                
+                // Update code displays
+                updateCodeDisplays();
+            }
+        });
+        
+        function updateModifiedPreview() {
+            if (!selectedComponent) return;
+            
+            const modifiedHtml = selectedComponent.preview;
+            document.getElementById('preview-modified').innerHTML = modifiedHtml;
+            
+            // Apply modifications if any exist
+            if (modifications[selectedId]) {
+                const component = document.querySelector('#preview-modified .component');
+                if (component) {
+                    Object.assign(component.style, modifications[selectedId]);
+                }
+            }
+        }
+        
+        function updateCodeDisplays() {
+            if (!selectedComponent) return;
+            
+            // Original code
+            document.getElementById('code-original').textContent = selectedComponent.code;
+            
+            // Modified code
+            if (modifications[selectedId]) {
+                const mods = modifications[selectedId];
+                let modifiedCode = selectedComponent.code;
+                
+                // Generate modified Tailwind classes based on style changes
+                if (mods.background && mods.background !== '#8b5cf6') {
+                    modifiedCode = modifiedCode.replace('bg-purple-600', 'bg-[' + mods.background + ']');
+                }
+                if (mods.color && mods.color !== '#ffffff') {
+                    modifiedCode = modifiedCode.replace('text-white', 'text-[' + mods.color + ']');
+                }
+                if (mods.padding) {
+                    const paddingClass = `p-[${mods.padding}px]`;
+                    modifiedCode = modifiedCode.replace(/p(?:x|y)?-\d+/g, paddingClass);
+                }
+                if (mods.borderRadius) {
+                    const radiusClass = `rounded-[${mods.borderRadius}px]`;
+                    modifiedCode = modifiedCode.replace(/rounded-\w+/g, radiusClass);
+                }
+                
+                document.getElementById('code-modified').textContent = modifiedCode;
+            } else {
+                document.getElementById('code-modified').textContent = selectedComponent.code;
+            }
+        }
+        
+        function editStyles() {
+            if (!selectedComponent) return;
+            
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('style-editor').classList.add('active');
+            
+            // Set current values
+            const currentMods = modifications[selectedId] || {};
+            document.getElementById('bg-color').value = currentMods.background || '#8b5cf6';
+            document.getElementById('text-color').value = currentMods.color || '#ffffff';
+            document.getElementById('padding').value = parseInt(currentMods.padding) || 12;
+            document.getElementById('border-radius').value = parseInt(currentMods.borderRadius) || 8;
+        }
+        
+        function applyStyles() {
+            if (!selectedId) return;
+            
+            const bgColor = document.getElementById('bg-color').value;
+            const textColor = document.getElementById('text-color').value;
+            const padding = document.getElementById('padding').value;
+            const borderRadius = document.getElementById('border-radius').value;
+            
+            modifications[selectedId] = {
+                background: bgColor,
+                color: textColor,
+                padding: padding + 'px',
+                borderRadius: borderRadius + 'px'
+            };
+            
+            updateModifiedPreview();
+            updateCodeDisplays();
+            closeStyleEditor();
+        }
+        
+        function closeStyleEditor() {
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('style-editor').classList.remove('active');
+        }
+        
+        function resetModifications() {
+            if (!selectedId) return;
+            
+            delete modifications[selectedId];
+            updateModifiedPreview();
+            updateCodeDisplays();
+        }
+        
+        function copyCode(type) {
+            if (!selectedComponent) return;
+            
+            const codeElement = document.getElementById(`code-${type}`);
+            const code = codeElement.textContent;
+            
+            navigator.clipboard.writeText(code);
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+        
+        // Close style editor on overlay click
+        document.getElementById('overlay').addEventListener('click', closeStyleEditor);
+    </script>
+</body>
+</html>

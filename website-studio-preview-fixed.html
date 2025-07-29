@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Customization Studio - Live Preview</title>
+    <meta name="description" content="Transform any website with natural language commands. See live before/after preview!">
+    
+    <style>
+        /* CSS Variables for Consistent Theme */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #3b82f6;
+            --background: #0f0f23;
+            --surface: rgba(139, 92, 246, 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Left Panel - Input */
+        .input-panel {
+            width: 400px;
+            background: rgba(139, 92, 246, 0.05);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* Right Panel - Preview */
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a2e;
+        }
+        
+        /* Preview Controls */
+        .preview-controls {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle-group {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        
+        .toggle-btn {
+            padding: 0.5rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Preview Frame */
+        .preview-frame {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        
+        /* Form Styles */
+        .logo {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Output Section */
+        .output-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            display: none;
+        }
+        
+        .output-section.show {
+            display: block;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            max-height: 200px;
+            margin-bottom: 1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+        
+        .notification.success {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        /* Syntax Highlighting */
+        .css-comment { color: #6b7280; }
+        .css-property { color: #f472b6; }
+        .css-value { color: #60a5fa; }
+        .css-selector { color: #34d399; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .input-panel {
+                width: 100%;
+                height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid var(--glass-border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Panel - Input -->
+        <div class="input-panel">
+            <div class="logo">✨</div>
+            <h1>Website Customization Studio</h1>
+            <p class="subtitle">Transform any website with natural language</p>
+            
+            <form id="customForm">
+                <div class="form-group">
+                    <label class="form-label">Website URL</label>
+                    <input 
+                        type="url" 
+                        id="websiteUrl" 
+                        class="form-input" 
+                        placeholder="https://example.com"
+                        value="https://example.com"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Describe Your Changes</label>
+                    <textarea 
+                        id="description" 
+                        class="form-textarea"
+                        placeholder="e.g., Make the background purple gradient, change header to blue with rounded corners"
+                        required
+                    ></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="generateBtn">
+                    <span id="btnText">Generate CSS</span>
+                    <span id="btnLoading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+            
+            <!-- Output Section -->
+            <div id="outputSection" class="output-section">
+                <h3 style="font-size: 1rem; margin-bottom: 1rem;">Generated CSS</h3>
+                <div class="code-block" id="codeBlock"></div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="copyCSS()">📋 Copy</button>
+                    <button class="btn btn-secondary" onclick="downloadCSS()">💾 Download</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel - Preview -->
+        <div class="preview-panel">
+            <div class="preview-controls">
+                <div>
+                    <span style="font-weight: 600; margin-right: 1rem;">Preview Mode</span>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Toggle to see changes</span>
+                </div>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" id="beforeBtn" onclick="showPreview('before')">Before</button>
+                    <button class="toggle-btn" id="afterBtn" onclick="showPreview('after')">After</button>
+                </div>
+            </div>
+            
+            <div class="preview-frame">
+                <iframe id="previewIframe" class="preview-iframe" srcdoc=""></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        // Demo website HTML template
+        const demoWebsiteHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .header, header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            background: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .btn, .button, button {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover, .button:hover, button:hover {
+            background: #2980b9;
+        }
+        
+        .features {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card, .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover, .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .form-section {
+            padding: 4rem 0;
+            background: white;
+        }
+        
+        .form-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+        
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">Demo Website</div>
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <h1>Welcome to Our Demo Site</h1>
+        <p>This is a sample website to demonstrate CSS customization</p>
+        <button class="btn">Get Started</button>
+    </section>
+    
+    <section class="features">
+        <div class="container">
+            <h2>Our Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card card">
+                    <h3>Feature One</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                    <button class="button">Learn More</button>
+                </div>
+                <div class="feature-card card">
+                    <h3>Feature Two</h3>
+                    <p>Sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+                    <button class="button">Learn More</button>
+                </div>
+                <div class="feature-card card">
+                    <h3>Feature Three</h3>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+                    <button class="button">Learn More</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="form-section">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <form>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea placeholder="Your message"></textarea>
+                </div>
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+        </div>
+    </section>
+    
+    <footer class="footer">
+        <p>&copy; 2024 Demo Website. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+        `;
+        
+        // State
+        let generatedCSS = '';
+        let currentView = 'before';
+        
+        // DOM Elements
+        const form = document.getElementById('customForm');
+        const urlInput = document.getElementById('websiteUrl');
+        const descriptionInput = document.getElementById('description');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const outputSection = document.getElementById('outputSection');
+        const codeBlock = document.getElementById('codeBlock');
+        const previewIframe = document.getElementById('previewIframe');
+        const beforeBtn = document.getElementById('beforeBtn');
+        const afterBtn = document.getElementById('afterBtn');
+        const notification = document.getElementById('notification');
+        
+        // Initialize preview with demo website
+        previewIframe.srcdoc = demoWebsiteHTML;
+        
+        // Wait for iframe to load
+        previewIframe.onload = function() {
+            console.log('Preview iframe loaded');
+        };
+        
+        // Event Listeners
+        form.addEventListener('submit', handleSubmit);
+        
+        // Form Submit Handler
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const description = descriptionInput.value.trim();
+            if (!description) {
+                showNotification('Please describe your changes', 'error');
+                return;
+            }
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-block';
+            
+            // Simulate processing
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Generate CSS
+            generatedCSS = generateCSS(description);
+            
+            // Update UI
+            displayResults();
+            
+            // Auto-switch to "After" view to show changes
+            showPreview('after');
+            
+            // Reset loading state
+            generateBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            
+            showNotification('CSS generated! Click "After" to see changes', 'success');
+        }
+        
+        // CSS Generation Logic (same as before)
+        function generateCSS(description) {
+            const desc = description.toLowerCase();
+            let css = '/* Generated CSS - Website Customization Studio */\n\n';
+            
+            // Background customization
+            if (desc.includes('background')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                const isGradient = desc.includes('gradient');
+                
+                css += `/* Background Customization */
+body {
+    background: ${isGradient ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.2)} 100%)` : 
+        color} !important;
+    ${isColorDark(color) ? 'color: #ffffff !important;' : ''}
+}
+
+.hero, .features, .form-section {
+    background: ${isGradient ? 
+        `linear-gradient(135deg, ${adjustColor(color, 0.05)} 0%, ${adjustColor(color, -0.15)} 100%)` : 
+        adjustColor(color, 0.05)} !important;
+}\n\n`;
+            }
+            
+            // Header customization
+            if (desc.includes('header')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Header Customization */
+.header, header {
+    background: ${desc.includes('gradient') ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        color} !important;
+    ${desc.includes('rounded') ? 'border-radius: 0 0 20px 20px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);' : ''}
+    ${desc.includes('sticky') || desc.includes('fixed') ? 'position: sticky;\n    top: 0;\n    z-index: 1000;' : ''}
+    transition: all 0.3s ease;
+}\n\n`;
+            }
+            
+            // Button customization
+            if (desc.includes('button')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Button Customization */
+.btn, .button, button {
+    background: ${desc.includes('gradient') ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        color} !important;
+    border: none !important;
+    ${desc.includes('rounded') ? 'border-radius: 50px;' : 'border-radius: 8px;'}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);' : ''}
+    transition: all 0.3s ease;
+}
+
+.btn:hover, .button:hover, button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.1);
+}\n\n`;
+            }
+            
+            // Form customization
+            if (desc.includes('form')) {
+                css += `/* Form Customization */
+form {
+    ${desc.includes('modern') ? 'background: rgba(255, 255, 255, 0.95) !important;\n    backdrop-filter: blur(10px);' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);' : ''}
+    ${desc.includes('rounded') ? 'border-radius: 16px;' : ''}
+}
+
+input:focus, textarea:focus {
+    border-color: ${extractColor(desc) || '#8b5cf6'} !important;
+    box-shadow: 0 0 0 3px ${extractColor(desc) || '#8b5cf6'}33;
+}\n\n`;
+            }
+            
+            // Card customization
+            if (desc.includes('card')) {
+                const color = extractColor(desc) || '#ffffff';
+                css += `/* Card Customization */
+.card, .feature-card {
+    background: ${color} !important;
+    ${desc.includes('gradient') ? `background: linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.05)} 100%) !important;` : ''}
+    ${desc.includes('rounded') ? 'border-radius: 16px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);' : ''}
+}
+
+.card:hover, .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}\n\n`;
+            }
+            
+            return css;
+        }
+        
+        // Helper Functions
+        function extractColor(text) {
+            const colors = {
+                'purple': '#8b5cf6',
+                'blue': '#3b82f6',
+                'green': '#10b981',
+                'red': '#ef4444',
+                'orange': '#f59e0b',
+                'pink': '#ec4899',
+                'yellow': '#f59e0b',
+                'indigo': '#6366f1',
+                'teal': '#14b8a6',
+                'gray': '#6b7280',
+                'black': '#000000',
+                'white': '#ffffff',
+                'dark': '#1a1a1a',
+                'light': '#f8f9fa'
+            };
+            
+            for (const [name, hex] of Object.entries(colors)) {
+                if (text.includes(name)) return hex;
+            }
+            
+            const hexMatch = text.match(/#[0-9a-fA-F]{6}/);
+            return hexMatch ? hexMatch[0] : null;
+        }
+        
+        function adjustColor(hex, factor) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(255 * factor);
+            const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+            const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
+            const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+            return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+        }
+        
+        function isColorDark(hex) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const R = num >> 16;
+            const G = num >> 8 & 0x00FF;
+            const B = num & 0x0000FF;
+            const brightness = (R * 299 + G * 587 + B * 114) / 1000;
+            return brightness < 128;
+        }
+        
+        function displayResults() {
+            outputSection.classList.add('show');
+            
+            // Display CSS with syntax highlighting
+            const highlightedCSS = generatedCSS
+                .replace(/\/\*.*?\*\//g, '<span class="css-comment">$&</span>')
+                .replace(/([a-zA-Z-]+):/g, '<span class="css-property">$1:</span>')
+                .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;')
+                .replace(/([.#][a-zA-Z-][a-zA-Z0-9-]*)/g, '<span class="css-selector">$1</span>');
+            
+            codeBlock.innerHTML = highlightedCSS;
+        }
+        
+        function updatePreview() {
+            // Make sure iframe is loaded
+            if (!previewIframe.contentDocument && !previewIframe.contentWindow) {
+                console.error('Iframe not accessible');
+                return;
+            }
+            
+            try {
+                const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+                
+                // Wait a bit if document isn't ready
+                if (!iframeDoc || !iframeDoc.head) {
+                    setTimeout(updatePreview, 100);
+                    return;
+                }
+                
+                // Remove any existing custom styles
+                const existingStyle = iframeDoc.getElementById('customStyles');
+                if (existingStyle) {
+                    existingStyle.remove();
+                }
+                
+                // Add new styles if in "after" view
+                if (currentView === 'after' && generatedCSS) {
+                    const styleElement = iframeDoc.createElement('style');
+                    styleElement.id = 'customStyles';
+                    styleElement.textContent = generatedCSS;
+                    iframeDoc.head.appendChild(styleElement);
+                    console.log('CSS applied to preview');
+                } else {
+                    console.log('Preview reset to original');
+                }
+            } catch (error) {
+                console.error('Error updating preview:', error);
+            }
+        }
+        
+        function showPreview(view) {
+            currentView = view;
+            
+            // Update toggle buttons
+            beforeBtn.classList.toggle('active', view === 'before');
+            afterBtn.classList.toggle('active', view === 'after');
+            
+            // Update preview
+            updatePreview();
+        }
+        
+        function copyCSS() {
+            navigator.clipboard.writeText(generatedCSS).then(() => {
+                showNotification('CSS copied!', 'success');
+            });
+        }
+        
+        function downloadCSS() {
+            const blob = new Blob([generatedCSS], { type: 'text/css' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `website-custom-${Date.now()}.css`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showNotification('CSS downloaded!', 'success');
+        }
+        
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

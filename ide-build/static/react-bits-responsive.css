@@ -1,0 +1,67 @@
+/* React Bits Button Responsive Styles */
+
+/* Default button positioning */
+#react-bits-button {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 1000 !important;
+}
+
+/* Small laptop screens (height < 800px) */
+@media (max-height: 800px) {
+    #react-bits-button {
+        bottom: 10px !important;
+        padding: 4px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    /* Hide the emoji icon on small screens */
+    #react-bits-button .icon {
+        display: none !important;
+    }
+}
+
+/* Very small screens (height < 650px) - move to top */
+@media (max-height: 650px) {
+    #react-bits-button {
+        bottom: auto !important;
+        top: 10px !important;
+        right: 10px !important;
+    }
+    
+    /* Ensure settings stay at bottom */
+    .settings-section {
+        position: fixed !important;
+        bottom: 10px !important;
+        left: 10px !important;
+    }
+}
+
+/* Mobile landscape */
+@media (max-height: 500px) {
+    #react-bits-button {
+        /* Keep visible but very compact */
+        bottom: auto !important;
+        top: 5px !important;
+        right: 5px !important;
+        padding: 3px 8px !important;
+        font-size: 10px !important;
+    }
+}
+
+/* Ensure button is always visible */
+#react-bits-button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Laptop screens - move to top to avoid settings */
+@media (min-height: 650px) and (max-height: 800px) {
+    #react-bits-button {
+        bottom: auto !important;
+        top: 20px !important;
+        right: 20px !important;
+    }
+}

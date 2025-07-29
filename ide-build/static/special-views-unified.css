@@ -14,14 +14,7 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* Force hide settings when special view container exists */
-.coder1-special-view-container ~ * .settings-section,
-body:has(.coder1-special-view-container) .settings-section {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
+/* Removed problematic CSS that was breaking main IDE layout */
 
 /* Overlay Container */
 .coder1-special-view-overlay {

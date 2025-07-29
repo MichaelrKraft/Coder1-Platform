@@ -1,0 +1,49 @@
+/* Explorer Scrollbar Styles */
+
+/* Style scrollbar for webkit browsers */
+.Explorer::-webkit-scrollbar,
+[class*="Explorer"]::-webkit-scrollbar,
+[class*="explorer"]::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+[class*="sidebar"]::-webkit-scrollbar {
+    width: 8px;
+}
+
+.Explorer::-webkit-scrollbar-track,
+[class*="Explorer"]::-webkit-scrollbar-track,
+[class*="explorer"]::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track,
+[class*="sidebar"]::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.Explorer::-webkit-scrollbar-thumb,
+[class*="Explorer"]::-webkit-scrollbar-thumb,
+[class*="explorer"]::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb,
+[class*="sidebar"]::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.Explorer::-webkit-scrollbar-thumb:hover,
+[class*="Explorer"]::-webkit-scrollbar-thumb:hover,
+[class*="explorer"]::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover,
+[class*="sidebar"]::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Ensure settings section has proper spacing */
+.settings-section {
+    margin-top: 40px !important;
+    margin-bottom: 20px !important;
+    position: relative !important;
+}
+
+/* Ensure React Bits button has proper spacing */
+#react-bits-button {
+    margin: 20px !important;
+    position: relative !important;
+}

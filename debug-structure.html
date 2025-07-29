@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Structure</title>
+    <script>
+        window.onload = function() {
+            // Find the textarea
+            const textarea = document.getElementById('messageInput');
+            const wrapper = document.querySelector('.input-wrapper');
+            
+            if (textarea) {
+                console.log('=== TEXTAREA DEBUG ===');
+                console.log('Textarea found:', textarea);
+                console.log('Parent element:', textarea.parentElement);
+                console.log('Parent HTML:', textarea.parentElement.outerHTML);
+                console.log('Computed style width:', window.getComputedStyle(textarea).width);
+                console.log('Computed style flex:', window.getComputedStyle(textarea).flex);
+                console.log('offsetWidth:', textarea.offsetWidth);
+                console.log('clientWidth:', textarea.clientWidth);
+                
+                // Check if there are any cloned elements
+                const allTextareas = document.querySelectorAll('textarea');
+                console.log('Total textareas on page:', allTextareas.length);
+                
+                // Check wrapper
+                if (wrapper) {
+                    console.log('=== WRAPPER DEBUG ===');
+                    console.log('Wrapper computed width:', window.getComputedStyle(wrapper).width);
+                    console.log('Wrapper computed display:', window.getComputedStyle(wrapper).display);
+                    console.log('Wrapper children:', wrapper.children.length);
+                }
+                
+                // Write debug info to page
+                document.body.innerHTML += '<div style="position: fixed; top: 0; left: 0; background: white; color: black; padding: 20px; z-index: 9999;">' +
+                    '<h3>Debug Info</h3>' +
+                    '<p>Textarea width: ' + window.getComputedStyle(textarea).width + '</p>' +
+                    '<p>Wrapper width: ' + (wrapper ? window.getComputedStyle(wrapper).width : 'N/A') + '</p>' +
+                    '<p>Total textareas: ' + allTextareas.length + '</p>' +
+                    '</div>';
+            }
+        };
+    </script>
+</head>
+<body>
+    <iframe src="/smart-prd-generator.html" style="width: 100%; height: 600px;"></iframe>
+</body>
+</html>

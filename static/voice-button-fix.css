@@ -1,0 +1,45 @@
+/* Override smart-prd-voice.js positioning to move microphone to left */
+.voice-input-wrapper .voice-input-btn {
+    right: auto !important;
+    left: 10px !important;
+    top: auto !important;
+    bottom: 6px !important;
+    transform: none !important;
+    
+    /* Style to match IDE microphone */
+    background: rgba(139, 92, 246, 0.2) !important;
+    border: 1px solid rgba(139, 92, 246, 0.4) !important;
+    color: #a78bfa !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+}
+
+.voice-input-wrapper .voice-input-btn:hover {
+    background: rgba(139, 92, 246, 0.3) !important;
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    transform: scale(1.05) !important;
+}
+
+.voice-input-wrapper .voice-input-btn.listening {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #ef4444 !important;
+}
+
+.voice-input-wrapper textarea {
+    padding-left: 52px !important;
+    padding-right: 12px !important;
+}
+
+/* Ensure the voice button appears correctly */
+#messageInput + .voice-input-btn {
+    position: absolute !important;
+    left: 10px !important;
+    right: auto !important;
+}

@@ -95,6 +95,34 @@ class TerminalVoice {
             
             console.log('🔍 TERMINAL DETECTION: Checking', allInputs.length, 'inputs');
             
+            // SIMPLIFIED DETECTION: Find ANY text input in the bottom half of the screen
+            allInputs.forEach(input => {
+                const rect = input.getBoundingClientRect();
+                const isVisible = rect.width > 0 && rect.height > 0;
+                const isTextInput = (input.type === 'text' || input.type === '' || !input.type) && input.tagName === 'INPUT';
+                const isInBottomHalf = rect.top > window.innerHeight * 0.5;
+                const isWideEnough = rect.width > 200; // Terminal inputs are usually wide
+                
+                // Also check for React-specific classes that indicate terminal
+                const className = (input.className || '').toLowerCase();
+                const hasReactTerminalClass = className.includes('xterm') || 
+                                            className.includes('terminal') ||
+                                            input.closest('[class*="terminal"]') ||
+                                            input.closest('[class*="xterm"]');
+                
+                if (isVisible && isTextInput && (isInBottomHalf || hasReactTerminalClass) && isWideEnough) {
+                    console.log('🎯 FOUND TERMINAL INPUT!', input);
+                    // Always add as high priority candidate with correct property names
+                    terminalCandidates.push({
+                        input: input,
+                        score: hasReactTerminalClass ? 200 : 100, // Higher score for React terminal classes
+                        rect: rect
+                    });
+                    // Skip placeholder/class checking for simple bottom inputs
+                    return;
+                }
+            });
+            
             allInputs.forEach((input, index) => {
                 const rect = input.getBoundingClientRect();
                 const isVisible = rect.width > 0 && rect.height > 0;
@@ -162,8 +190,15 @@ class TerminalVoice {
                     if (score >= 30) {
                         terminalCandidates.push({ input, rect, score });
                         console.log(`  ✅ TERMINAL CANDIDATE with score ${score}`);
-                    } else {
-                        console.log(`  ❌ NOT A TERMINAL: Score ${score} below threshold`);
+                    } else if (!terminalCandidates.some(c => c.input === input)) {
+                        // If not already added by simple detection, check if it might still be terminal
+                        // Lower threshold for bottom inputs
+                        if (score >= 20 && rect.top > window.innerHeight * 0.5) {
+                            terminalCandidates.push({ input, rect, score });
+                            console.log(`  ✅ TERMINAL CANDIDATE (lower threshold) with score ${score}`);
+                        } else {
+                            console.log(`  ❌ NOT A TERMINAL: Score ${score} below threshold`);
+                        }
                     }
                 }
             });
@@ -234,7 +269,7 @@ class TerminalVoice {
                 // Still set up observer for future inputs
                 this.observeForNewInputs();
             }
-        }, 500);
+        }, 1000);
     }
 
     observeForNewInputs() {
@@ -341,21 +376,17 @@ class TerminalVoice {
         
         console.log('✅ ADDING MICROPHONE to input');
         
-        // Create a wrapper if the input doesn't have one
-        let wrapper = inputElement.parentElement;
-        if (!wrapper || !wrapper.classList.contains('terminal-input-wrapper')) {
-            wrapper = document.createElement('div');
-            wrapper.className = 'terminal-input-wrapper';
-            // Don't use inline styles - let CSS handle it
-            inputElement.parentNode.insertBefore(wrapper, inputElement);
-            wrapper.appendChild(inputElement);
+        // Use the input's parent directly as wrapper (simpler approach)
+        const wrapper = inputElement.parentElement;
+        if (wrapper && !wrapper.style.position) {
+            wrapper.style.position = 'relative';
         }
         
         // Create voice button with absolute positioning relative to wrapper
         const voiceBtn = document.createElement('button');
         voiceBtn.className = this.isMobile ? 'voice-toggle-btn terminal-voice-btn' : 'mic-prompt terminal-voice-btn';
         voiceBtn.title = this.isMobile ? 'Tap to record' : 'Hold to speak (or press Ctrl+Space)';
-        voiceBtn.innerHTML = '🎤'; // Use emoji as fallback if FontAwesome not available
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>'; // Use FontAwesome icon
         
         // Use CSS classes for positioning instead of inline styles for the position
         voiceBtn.style.cssText = `
@@ -366,10 +397,18 @@ class TerminalVoice {
             z-index: 1000 !important;
         `;
         
+        // Add extra styling to ensure visibility
+        voiceBtn.style.display = 'flex !important';
+        voiceBtn.style.visibility = 'visible !important';
+        voiceBtn.style.opacity = '1 !important';
+        
         // Add to wrapper so it moves with the input
         wrapper.appendChild(voiceBtn);
         
         console.log('🎤 Created voice button in wrapper');
+        console.log('🔍 DEBUG: Button element:', voiceBtn);
+        console.log('🔍 DEBUG: Button parent:', voiceBtn.parentElement);
+        console.log('🔍 DEBUG: Button computed style:', window.getComputedStyle(voiceBtn).display);
 
         // Add left padding to input to make room for button
         const paddingNeeded = 40; // Fixed padding for microphone space (reduced for smaller button)
@@ -874,17 +913,7 @@ class TerminalVoice {
             }
         };
 
-        // Add Voice Settings button
-        const voiceToggleBtn = document.createElement('button');
-        voiceToggleBtn.className = 'settings-btn voice-settings-btn';
-        voiceToggleBtn.innerHTML = '<span>🎤 Voice Settings</span>';
-        voiceToggleBtn.onclick = () => {
-            const panel = document.querySelector('.voice-settings');
-            if (panel) {
-                const isVisible = panel.style.display !== 'none';
-                panel.style.display = isVisible ? 'none' : 'block';
-            }
-        };
+        // Voice Settings button removed as requested
         
         // Add IDE Settings button
         const ideSettingsBtn = document.createElement('button');
@@ -947,20 +976,34 @@ class TerminalVoice {
                 alert('Please click the robot icon (🤖) in the top header bar to open IDE documentation.');
             }
         };
+
+        // Replace with showSpecialView call
+        ideSettingsBtn.onclick = () => {
+            if (typeof window.showSpecialView === 'function') {
+                window.showSpecialView('ide-settings');
+            } else {
+                console.error('showSpecialView function not available');
+                alert('IDE Settings feature is loading. Please try again in a moment.');
+            }
+        };
         
         // Add Documentation button (moved from header)
         const docBtn = document.createElement('button');
         docBtn.className = 'settings-btn documentation-btn';
         docBtn.innerHTML = '<span>🤖 Documentation</span>';
         docBtn.onclick = () => {
-            // Preserve original documentation functionality
-            window.open('https://docs.anthropic.com/en/docs/claude-code', '_blank');
+            if (typeof window.showSpecialView === 'function') {
+                window.showSpecialView('documentation');
+            } else {
+                console.error('showSpecialView function not available');
+                // Fallback to external documentation
+                window.open('https://docs.anthropic.com/en/docs/claude-code', '_blank');
+            }
         };
         
-        // Clear existing buttons and add in order
+        // Clear existing buttons and add in order (Voice Settings button removed)
         buttonsContainer.innerHTML = '';
-        buttonsContainer.appendChild(contextPrimingBtn);  // NEW - Context Priming first
-        buttonsContainer.appendChild(voiceToggleBtn);     // Voice Settings
+        buttonsContainer.appendChild(contextPrimingBtn);  // Context Priming first
         buttonsContainer.appendChild(ideSettingsBtn);     // IDE Settings
         buttonsContainer.appendChild(docBtn);             // Documentation
         

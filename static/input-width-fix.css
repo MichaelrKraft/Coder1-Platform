@@ -1,0 +1,48 @@
+/* Emergency fix for input width issue */
+.chat-container {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.chat-input-container {
+    width: 100% !important;
+}
+
+.input-wrapper {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+}
+
+/* Remove ALL width constraints on textarea */
+.input-wrapper > textarea,
+.input-wrapper #messageInput,
+#messageInput,
+textarea#messageInput {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure input controls don't flex */
+.input-controls {
+    flex: 0 0 auto !important;
+}
+
+/* Debug - remove after fixing */
+.chat-container {
+    border: 2px solid red !important;
+}
+.chat-input-container {
+    border: 2px solid yellow !important;
+}
+.input-wrapper {
+    border: 2px solid blue !important;
+}
+#messageInput {
+    border: 2px solid green !important;
+}

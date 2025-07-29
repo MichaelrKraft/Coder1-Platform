@@ -1,0 +1,15 @@
+/* Explorer Bottom Padding - Ensures all content is accessible */
+
+/* Add padding to the bottom of Explorer content */
+.Explorer > *:last-child,
+[class*="Explorer"] > *:last-child,
+[class*="explorer"] > *:last-child,
+.sidebar > *:last-child,
+[class*="sidebar"] > *:last-child {
+    margin-bottom: 200px;
+}
+
+/* Ensure React Bits button is visible */
+#react-bits-button {
+    margin-bottom: 40px;
+}

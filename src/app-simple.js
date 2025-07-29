@@ -10,7 +10,7 @@ const EventEmitter = require('events');
 global.terminalEmitter = new EventEmitter();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Enable CORS
 app.use(cors());
@@ -67,6 +67,29 @@ app.get('/context-priming', (req, res) => {
         if (err) {
             console.error('Error serving context priming page:', err);
             res.status(404).send('Context priming page not found');
+        }
+    });
+});
+
+// Website Customization Studio routes
+app.get('/website-studio', (req, res) => {
+    const filePath = path.join(__dirname, '../website-studio-landing.html');
+    console.log('Serving website studio landing page from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving website studio landing page:', err);
+            res.status(404).send('Website Studio landing page not found');
+        }
+    });
+});
+
+app.get('/website-studio-app', (req, res) => {
+    const filePath = path.join(__dirname, '../website-studio-app.html');
+    console.log('Serving website studio app from:', filePath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error serving website studio app:', err);
+            res.status(404).send('Website Studio app not found');
         }
     });
 });
@@ -975,6 +998,39 @@ try {
   console.log('✅ Context management routes loaded successfully');
 } catch (error) {
   console.warn('⚠️ Failed to load context routes:', error.message);
+}
+
+// Load Website Customization Studio routes
+try {
+  const websiteDetectRoutes = require('./routes/website-detect-platform');
+  app.use('/api/website', websiteDetectRoutes);
+  console.log('✅ Website platform detection routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load website platform detection routes:', error.message);
+}
+
+try {
+  const websiteGenerateRoutes = require('./routes/website-generate-css');
+  app.use('/api/website', websiteGenerateRoutes);
+  console.log('✅ Website CSS generation routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load website CSS generation routes:', error.message);
+}
+
+try {
+  const websiteMockupRoutes = require('./routes/website-create-mockup');
+  app.use('/api/website', websiteMockupRoutes);
+  console.log('✅ Website mockup creation routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load website mockup creation routes:', error.message);
+}
+
+try {
+  const websiteAuthRoutes = require('./routes/website-auth');
+  app.use('/api/website', websiteAuthRoutes);
+  console.log('✅ Website authentication routes loaded successfully');
+} catch (error) {
+  console.warn('⚠️ Failed to load website authentication routes:', error.message);
 }
 
 // Load 21st.dev Magic routes for React Bits

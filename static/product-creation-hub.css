@@ -67,7 +67,7 @@ body {
 .orb-3 {
     width: 400px;
     height: 400px;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    background: linear-gradient(135deg, #ec4899, #f43f5e);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -328,7 +328,7 @@ body {
 .main-content {
     flex: 1;
     display: flex;
-    gap: 80px;
+    gap: 40px;
     padding: 20px;
 }
 
@@ -337,7 +337,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 60%;
 }
 
 .product-creation-sidebar {
@@ -356,6 +355,8 @@ body {
     border-radius: 12px;
     overflow: hidden;
     max-height: 600px;
+    width: 100%;
+    min-width: 0;
 }
 
 .chat-header {
@@ -435,39 +436,44 @@ body {
 .chat-input-container {
     padding: 20px;
     border-top: 1px solid var(--glass-border);
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.input-wrapper {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    padding: 15px;
-    border-radius: 12px;
+.chat-container .input-wrapper {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: flex-end !important;
+    padding: 15px !important;
+    border-radius: 12px !important;
 }
 
-#messageInput {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    padding: 12px 16px;
-    border-radius: 8px;
-    resize: none;
-    font-family: inherit;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    transition: all 0.3s ease;
+.chat-container #messageInput {
+    flex: 1 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-primary) !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    resize: none !important;
+    font-family: inherit !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+    transition: all 0.3s ease !important;
+    min-height: 20px !important;
+    max-height: 120px !important;
 }
 
-#messageInput:focus {
-    outline: none;
-    border-color: var(--accent-primary);
-    background: rgba(255, 255, 255, 0.15);
+.chat-container #messageInput:focus {
+    outline: none !important;
+    border-color: var(--accent-primary) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
 }
 
 .input-controls {
     display: flex;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .send-btn {
@@ -486,6 +492,43 @@ body {
 .send-btn:hover {
     background: var(--accent-secondary);
     transform: translateY(-1px);
+}
+
+/* Voice Input Button */
+.voice-input-btn {
+    position: absolute;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--accent-primary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    z-index: 2;
+}
+
+.voice-input-btn:hover {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.voice-input-btn.recording {
+    color: #ef4444;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 /* Creation Panel */
@@ -796,6 +839,48 @@ body {
     padding: 12px;
     max-height: 800px;
     overflow-y: auto;
+}
+
+/* Problem Examples Box */
+.problem-examples {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.problem-examples h5 {
+    color: var(--accent-primary);
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.problem-examples ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.problem-examples li {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.problem-examples li:before {
+    content: "•";
+    color: var(--accent-primary);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
 }
 
 .wizard-step {

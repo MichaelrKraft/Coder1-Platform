@@ -1,0 +1,28 @@
+/* Fix Logo Background - Minimal CSS to remove blue logo only */
+
+/* Target blue React logo specifically without affecting anything else */
+img[src*="logo.svg"]:not(.header-coder1-logo img) {
+    display: none !important;
+}
+
+/* Hide any blue SVG logos that aren't our gradient logo */
+svg[fill*="00d8ff"],
+svg[fill*="61dafb"],
+svg path[fill*="00d8ff"],
+svg path[fill*="61dafb"] {
+    display: none !important;
+}
+
+/* Ensure our gradient logo is visible and on top */
+.header-coder1-logo {
+    position: relative !important;
+    z-index: 10000 !important;
+}
+
+.header-coder1-logo img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* That's it - no backgrounds, no masks, no body::before */

@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Bits Enhanced - Component Browser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin': 'spin 1s linear infinite',
+                        'grid-move': 'grid-move 10s linear infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        'grid-move': {
+                            '0%': { 'transform': 'translate(0, 0)' },
+                            '100%': { 'transform': 'translate(20px, 20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        /* Enable backdrop filter for glassmorphism */
+        .glass-effect {
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+        }
+        .glass-effect:hover {
+            backdrop-filter: blur(16px) saturate(200%);
+            -webkit-backdrop-filter: blur(16px) saturate(200%);
+        }
+        .component-browser {
+            background: #24283b;
+            border: 1px solid #414868;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: calc(100vh - 100px);
+            display: flex;
+            flex-direction: column;
+        }
+        .magic-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            background: #7aa2f7;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .category-tab {
+            padding: 6px 12px;
+            background: #1a1b26;
+            border: 1px solid #414868;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .category-tab:hover {
+            background: #2a2e42;
+            border-color: #565f89;
+        }
+        .category-tab.active {
+            background: #7aa2f7;
+            border-color: #7aa2f7;
+            color: #1a1b26;
+        }
+        .component-item {
+            background: #1a1b26;
+            border: 1px solid #414868;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .component-item:hover {
+            background: #2a2e42;
+            border-color: #7aa2f7;
+            transform: translateX(4px);
+        }
+        .component-item.selected {
+            background: #2a2e42;
+            border-color: #bb9af7;
+            box-shadow: 0 0 0 2px #bb9af7;
+        }
+        .preview-area {
+            background: linear-gradient(135deg, #1a1b26 0%, #24283b 100%);
+            border: 1px solid #414868;
+            border-radius: 8px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Add background pattern for better glass effect visibility */
+        .preview-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%);
+            z-index: 0;
+        }
+        .preview-area > * {
+            position: relative;
+            z-index: 1;
+        }
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            background: #24283b;
+            border: 1px solid #414868;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .action-btn:hover {
+            background: #2a2e42;
+            border-color: #565f89;
+        }
+        .action-btn.primary {
+            background: #7aa2f7;
+            border-color: #7aa2f7;
+            color: #1a1b26;
+            font-weight: 500;
+        }
+        .action-btn.primary:hover {
+            background: #89b4fa;
+        }
+        /* Animations */
+        @keyframes gradient-x {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .animate-gradient-x {
+            background-size: 200% 200%;
+            animation: gradient-x 3s ease infinite;
+        }
+        .animate-shimmer {
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Glitch effect keyframes */
+        @keyframes glitch1 {
+            0%, 100% { transform: translate(0px, 0px); }
+            20% { transform: translate(-2px, 0px); }
+            40% { transform: translate(2px, 0px); }
+            60% { transform: translate(-1px, 0px); }
+            80% { transform: translate(1px, 0px); }
+        }
+        
+        @keyframes glitch2 {
+            0%, 100% { transform: translate(0px, 0px); }
+            20% { transform: translate(2px, 0px); }
+            40% { transform: translate(-2px, 0px); }
+            60% { transform: translate(1px, 0px); }
+            80% { transform: translate(-1px, 0px); }
+        }
+        
+        /* Typewriter Animation - Enhanced */
+        .typewriter-text {
+            overflow: hidden;
+            border-right: 2px solid #c0caf5;
+            white-space: nowrap;
+            width: 0;
+            animation: typing 3s steps(20, end) infinite, blink-cursor 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            0% { width: 0; }
+            40% { width: 100%; }
+            60% { width: 100%; }
+            100% { width: 0; }
+        }
+        
+        @keyframes blink-cursor {
+            from, to { border-color: transparent; }
+            50% { border-color: #c0caf5; }
+        }
+        
+        /* Enhanced Shiny Text */
+        .shiny-text {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6, #ec4899);
+            background-size: 400% 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s ease-in-out infinite;
+        }
+        
+        @keyframes shine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Grid movement animation - Enhanced */
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(10px, 5px); }
+            50% { transform: translate(20px, 20px); }
+            75% { transform: translate(5px, 15px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .animate-grid-move {
+            animation: grid-move 15s ease-in-out infinite;
+        }
+        
+        @keyframes grid-move-alt {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5px, 10px); }
+            50% { transform: translate(-10px, -10px); }
+            75% { transform: translate(15px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .animate-grid-move-alt {
+            animation: grid-move-alt 20s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-8 relative">
+            <h1 class="text-4xl font-bold mb-2 text-purple-400">React Bits Enhanced</h1>
+            <p class="text-gray-400">Interactive component browser with 21st.dev Magic integration</p>
+            <a href="./index.html" class="absolute top-0 right-0 px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Close
+            </a>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+            <!-- Component Browser -->
+            <div class="component-browser">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Components</h3>
+                    <span class="magic-badge" id="magicStatus">✨ Magic</span>
+                </div>
+
+                <!-- Search -->
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Search components..." 
+                    class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white mb-4"
+                >
+
+                <!-- Category Tabs -->
+                <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                    <button class="category-tab active" data-category="all">All</button>
+                    <button class="category-tab" data-category="buttons">🔘 Buttons</button>
+                    <button class="category-tab" data-category="text">📝 Text</button>
+                    <button class="category-tab" data-category="cards">🎨 Cards</button>
+                    <button class="category-tab" data-category="forms">📋 Forms</button>
+                    <button class="category-tab" data-category="backgrounds">🌌 Backgrounds</button>
+                    <button class="category-tab" data-category="loaders">⏳ Loaders</button>
+                </div>
+
+                <!-- Component List -->
+                <div id="componentList" class="flex-1 overflow-y-auto space-y-2">
+                    <!-- Components will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Preview and Code -->
+            <div class="col-span-2 space-y-6">
+                <!-- Live Preview -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-semibold">Live Preview</h3>
+                        <div class="flex gap-2">
+                            <button class="action-btn" onclick="toggleView()">
+                                <span id="viewToggle">👁️ Show Code</span>
+                            </button>
+                            <button class="action-btn" onclick="copyCode()">📋 Copy</button>
+                            <button class="action-btn primary" onclick="useComponent()">➕ Use Component</button>
+                        </div>
+                    </div>
+                    <div id="previewArea" class="preview-area">
+                        <p class="text-gray-500">Select a component to preview</p>
+                    </div>
+                </div>
+
+                <!-- Code View -->
+                <div id="codeView" class="hidden">
+                    <h3 class="text-lg font-semibold mb-3">Component Code</h3>
+                    <div class="code-block">
+                        <pre id="codeDisplay">// Select a component to view its code</pre>
+                    </div>
+                </div>
+
+                <!-- /ui Command Demo -->
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold mb-2">Try /ui Commands</h3>
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="uiCommand" 
+                            placeholder="/ui create a modern glowing button" 
+                            class="flex-1 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white"
+                        >
+                        <button onclick="executeUICommand()" class="action-btn primary">Run</button>
+                    </div>
+                    <div id="commandResult" class="mt-3 text-sm text-gray-400"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Component Library
+        const componentLibrary = {
+            buttons: [
+                {
+                    id: 'btn-glow',
+                    name: 'Glowing Button',
+                    icon: '✨',
+                    description: 'Button with animated glow effect',
+                    preview: '<button class="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all duration-300">Click Me</button>',
+                    code: `export const GlowingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-purple-600 text-white rounded-lg 
+                 shadow-lg shadow-purple-500/50 hover:shadow-xl 
+                 hover:shadow-purple-500/60 transition-all duration-300"
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-pulse',
+                    name: 'Pulse Button',
+                    icon: '💫',
+                    description: 'Button with pulsing animation',
+                    preview: '<button class="px-6 py-3 bg-blue-600 text-white rounded-lg animate-pulse">Pulse Button</button>',
+                    code: `export const PulseButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-blue-600 text-white rounded-lg animate-pulse"
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-gradient',
+                    name: 'Gradient Button',
+                    icon: '🌈',
+                    description: 'Modern gradient button',
+                    preview: '<button class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300">Gradient</button>',
+                    code: `export const GradientButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 
+                 text-white rounded-lg hover:from-purple-700 
+                 hover:to-pink-700 transition-all duration-300"
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-neon',
+                    name: 'Neon Button',
+                    icon: '💡',
+                    description: 'Glowing neon-style button',
+                    preview: '<button class="px-6 py-3 bg-transparent border-2 border-cyan-400 text-cyan-400 rounded-lg hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 font-bold uppercase tracking-wider animate-pulse" style="text-shadow: 0 0 10px currentColor; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);">Neon Style</button>',
+                    code: `export const NeonButton = ({ children, onClick, color = 'cyan' }) => {
+  const colorClasses = {
+    cyan: 'border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:shadow-cyan-400/50',
+    pink: 'border-pink-400 text-pink-400 hover:bg-pink-400 hover:shadow-pink-400/50',
+    green: 'border-green-400 text-green-400 hover:bg-green-400 hover:shadow-green-400/50'
+  };
+  
+  return (
+    <button
+      onClick={onClick}
+      className={\`px-6 py-3 bg-transparent border-2 rounded-lg 
+                 hover:text-black hover:shadow-lg transition-all 
+                 duration-300 font-bold uppercase tracking-wider 
+                 \${colorClasses[color]}\`}
+    >
+      {children}
+    </button>
+  );
+};`
+                },
+                {
+                    id: 'btn-morphing',
+                    name: 'Morphing Button',
+                    icon: '🔄',
+                    description: 'Button that morphs on hover',
+                    preview: '<button class="group px-8 py-3 bg-gray-800 text-white rounded-full hover:rounded-lg hover:bg-purple-600 transition-all duration-500 transform hover:scale-110 overflow-hidden relative"><span class="relative z-10">Morph Me</span><div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div></button>',
+                    code: `export const MorphingButton = ({ children, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="group px-8 py-3 bg-gray-800 text-white rounded-full 
+                 hover:rounded-lg hover:bg-purple-600 transition-all 
+                 duration-500 transform hover:scale-110 overflow-hidden 
+                 relative"
+    >
+      <span className="relative z-10">{children}</span>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 
+                      to-pink-600 opacity-0 group-hover:opacity-100 
+                      transition-opacity duration-500" />
+    </button>
+  );
+};`
+                }
+            ],
+            text: [
+                {
+                    id: 'txt-shiny',
+                    name: 'Shiny Text',
+                    icon: '✨',
+                    description: 'Text with shimmering effect',
+                    preview: '<h2 class="text-3xl font-bold shiny-text">✨ Shiny Text Animation ✨</h2>',
+                    code: `export const ShinyText = ({ children }) => {
+  return (
+    <span className="relative inline-block">
+      <span className="relative z-10 bg-gradient-to-r from-purple-400 
+                       via-pink-400 to-purple-400 bg-clip-text 
+                       text-transparent animate-gradient-x">
+        {children}
+      </span>
+    </span>
+  );
+};`
+                },
+                {
+                    id: 'txt-typewriter',
+                    name: 'Typewriter Text',
+                    icon: '⌨️',
+                    description: 'Typewriter animation effect',
+                    preview: '<h2 class="text-2xl font-mono text-green-400" id="typewriter-demo">Hello, World! ⌨️</h2>',
+                    code: `export const TypewriterText = ({ text, speed = 100 }) => {
+  const [displayText, setDisplayText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showCursor, setShowCursor] = useState(true);
+  
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, text, speed]);
+  
+  useEffect(() => {
+    const cursorTimer = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 500);
+    return () => clearInterval(cursorTimer);
+  }, []);
+  
+  return (
+    <span className="font-mono">
+      {displayText}
+      <span className={\`inline-block w-0.5 h-6 bg-current ml-1 \${showCursor ? 'opacity-100' : 'opacity-0'}\`}>
+        |
+      </span>
+    </span>
+  );
+};`
+                },
+                {
+                    id: 'txt-glitch',
+                    name: 'Glitch Text',
+                    icon: '⚡',
+                    description: 'Cyberpunk glitch effect text',
+                    preview: '<div class="relative inline-block"><h2 class="text-3xl font-bold text-white relative z-10">GLITCH</h2><h2 class="absolute top-0 left-0 text-3xl font-bold text-red-500 opacity-70 animate-ping" style="transform: translate(2px, 0);">GLITCH</h2><h2 class="absolute top-0 left-0 text-3xl font-bold text-blue-500 opacity-50 animate-pulse" style="transform: translate(-2px, 0);">GLITCH</h2></div>',
+                    code: `export const GlitchText = ({ children, className = '' }) => {
+  return (
+    <div className={\`relative \${className}\`}>
+      <span className="absolute top-0 left-0 text-red-500 opacity-80 
+                       animate-ping">{children}</span>
+      <span className="absolute top-0 left-0 text-blue-500 opacity-60 
+                       animate-pulse" style={{ transform: 'translate(2px, 0)' }}>
+        {children}
+      </span>
+      <span className="relative text-white font-bold">{children}</span>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'txt-neon-glow',
+                    name: 'Neon Glow Text',
+                    icon: '💫',
+                    description: 'Bright neon glow effect',
+                    preview: '<h2 class="text-3xl font-bold text-cyan-400 animate-pulse" style="text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;">NEON GLOW</h2>',
+                    code: `export const NeonGlowText = ({ children, color = 'cyan', className = '' }) => {
+  const colorClasses = {
+    cyan: 'text-cyan-400',
+    pink: 'text-pink-400',
+    green: 'text-green-400',
+    purple: 'text-purple-400'
+  };
+  
+  return (
+    <span 
+      className={\`font-bold \${colorClasses[color]} \${className}\`}
+      style={{
+        textShadow: '0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor'
+      }}
+    >
+      {children}
+    </span>
+  );
+};`
+                },
+                {
+                    id: 'txt-wave',
+                    name: 'Wave Text',
+                    icon: '🌊',
+                    description: 'Animated wave text effect',
+                    preview: '<div class="text-2xl font-bold text-blue-500"><span class="inline-block animate-bounce" style="animation-delay: 0s;">W</span><span class="inline-block animate-bounce" style="animation-delay: 0.1s;">A</span><span class="inline-block animate-bounce" style="animation-delay: 0.2s;">V</span><span class="inline-block animate-bounce" style="animation-delay: 0.3s;">E</span><span class="inline-block animate-bounce" style="animation-delay: 0.4s;"> </span><span class="inline-block animate-bounce" style="animation-delay: 0.5s;">T</span><span class="inline-block animate-bounce" style="animation-delay: 0.6s;">E</span><span class="inline-block animate-bounce" style="animation-delay: 0.7s;">X</span><span class="inline-block animate-bounce" style="animation-delay: 0.8s;">T</span></div>',
+                    code: `export const WaveText = ({ text, className = '' }) => {
+  const letters = text.split('');
+  
+  return (
+    <div className={\`\${className}\`}>
+      {letters.map((letter, index) => (
+        <span
+          key={index}
+          className="inline-block animate-bounce"
+          style={{
+            animationDelay: \`\${index * 0.1}s\`
+          }}
+        >
+          {letter === ' ' ? '\u00A0' : letter}
+        </span>
+      ))}
+    </div>
+  );
+};`
+                }
+            ],
+            cards: [
+                {
+                    id: 'card-glass',
+                    name: 'Glass Card',
+                    icon: '🪟',
+                    description: 'Glassmorphic card design',
+                    preview: `<div class="group p-6 bg-white/15 glass-effect border border-white/30 rounded-xl hover:bg-white/25 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:-translate-y-1 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <h3 class="relative text-lg font-semibold mb-2 text-white group-hover:text-purple-200 transition-colors">Glass Card</h3>
+                        <p class="relative text-gray-300 group-hover:text-gray-200 transition-colors">Hover me to see the glass effect animation!</p>
+                        <div class="relative mt-4 flex gap-2">
+                            <span class="inline-block px-3 py-1 bg-purple-500/30 rounded-full text-xs group-hover:bg-purple-500/50 transition-colors">Glassmorphism</span>
+                            <span class="inline-block px-3 py-1 bg-pink-500/30 rounded-full text-xs group-hover:bg-pink-500/50 transition-colors">Hover Effect</span>
+                        </div>
+                    </div>`,
+                    code: `export const GlassCard = ({ title, content, tags }) => {
+  return (
+    <div className="group p-6 bg-white/10 backdrop-blur-md border 
+                    border-white/20 rounded-xl hover:bg-white/20 
+                    hover:border-white/30 hover:shadow-xl 
+                    hover:shadow-purple-500/20 transition-all 
+                    duration-300 cursor-pointer transform 
+                    hover:scale-105">
+      <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+      <p className="text-gray-300">{content}</p>
+      {tags && (
+        <div className="mt-4 flex gap-2">
+          {tags.map(tag => (
+            <span key={tag} className="inline-block px-3 py-1 
+                                     bg-purple-500/20 rounded-full text-xs">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'card-hover',
+                    name: 'Hover Card',
+                    icon: '🎯',
+                    description: 'Card with 3D hover effects',
+                    preview: `<div class="group relative p-6 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-xl border border-purple-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 transform hover:-translate-y-2 cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-pink-600/0 group-hover:from-purple-600/30 group-hover:to-pink-600/30 rounded-xl transition-all duration-300"></div>
+                        <h3 class="relative text-lg font-semibold mb-2 text-white">3D Hover Card</h3>
+                        <p class="relative text-gray-300">Lifts up and glows on hover!</p>
+                        <div class="relative mt-4 text-purple-400 group-hover:text-purple-300 transition-colors">
+                            Hover me →
+                        </div>
+                    </div>`,
+                    code: `export const HoverCard = ({ title, content, cta }) => {
+  return (
+    <div className="group relative p-6 bg-gradient-to-br 
+                    from-purple-600/20 to-pink-600/20 rounded-xl 
+                    border border-purple-500/30 transition-all 
+                    duration-300 hover:shadow-2xl 
+                    hover:shadow-purple-500/30 transform 
+                    hover:-translate-y-2 cursor-pointer">
+      <div className="absolute inset-0 bg-gradient-to-br 
+                      from-purple-600/0 to-pink-600/0 
+                      group-hover:from-purple-600/30 
+                      group-hover:to-pink-600/30 rounded-xl 
+                      transition-all duration-300" />
+      <h3 className="relative text-xl font-semibold mb-2 text-white">
+        {title}
+      </h3>
+      <p className="relative text-gray-300">{content}</p>
+      {cta && (
+        <div className="relative mt-4 text-purple-400 
+                        group-hover:text-purple-300 transition-colors">
+          {cta} →
+        </div>
+      )}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'card-gradient',
+                    name: 'Gradient Border Card',
+                    icon: '🌈',
+                    description: 'Card with animated gradient border',
+                    preview: `<div class="relative p-[2px] rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-gradient-x">
+                        <div class="bg-gray-900 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold mb-2 text-white">Gradient Border</h3>
+                            <p class="text-gray-300">Watch the border colors flow!</p>
+                        </div>
+                    </div>`,
+                    code: `export const GradientBorderCard = ({ title, content }) => {
+  return (
+    <div className="relative p-[2px] rounded-xl bg-gradient-to-r 
+                    from-purple-500 via-pink-500 to-purple-500 
+                    animate-gradient-x">
+      <div className="bg-gray-900 rounded-xl p-6">
+        <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+        <p className="text-gray-300">{content}</p>
+      </div>
+    </div>
+  );
+};`
+                }
+            ],
+            forms: [
+                {
+                    id: 'form-input',
+                    name: 'Modern Input',
+                    icon: '✏️',
+                    description: 'Floating label input field',
+                    preview: '<input type="text" placeholder="Enter text..." class="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 transition-colors">',
+                    code: `export const ModernInput = ({ label, value, onChange }) => {
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        value={value}
+        onChange={onChange}
+        className="peer px-4 py-2 bg-gray-800 border border-gray-600 
+                   rounded-lg text-white focus:border-purple-500 
+                   transition-colors"
+        placeholder=" "
+      />
+      <label className="absolute left-4 -top-2.5 bg-gray-900 px-1 
+                        text-sm text-gray-400 transition-all 
+                        peer-placeholder-shown:top-2 
+                        peer-placeholder-shown:text-base 
+                        peer-focus:-top-2.5 peer-focus:text-sm 
+                        peer-focus:text-purple-500">
+        {label}
+      </label>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'form-search',
+                    name: 'Search Bar',
+                    icon: '🔍',
+                    description: 'Animated search input with icon',
+                    preview: '<div class="relative"><input type="text" placeholder="Search..." class="pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-full text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all w-64"><div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div></div>',
+                    code: `export const SearchBar = ({ placeholder = "Search...", onSearch, className = '' }) => {
+  const [value, setValue] = useState('');
+  
+  return (
+    <div className={\`relative \${className}\`}>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && onSearch?.(value)}
+        placeholder={placeholder}
+        className="pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 
+                   rounded-full text-white focus:border-purple-500 
+                   focus:ring-2 focus:ring-purple-500/20 transition-all 
+                   w-full"
+      />
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 
+                      text-gray-400">
+        <SearchIcon className="w-5 h-5" />
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'form-toggle',
+                    name: 'Toggle Switch',
+                    icon: '🔘',
+                    description: 'Animated toggle switch',
+                    preview: '<div class="flex items-center space-x-3"><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div></label><span class="text-white">Dark Mode</span></div>',
+                    code: `export const ToggleSwitch = ({ label, checked, onChange, className = '' }) => {
+  return (
+    <div className={\`flex items-center space-x-3 \${className}\`}>
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          className="sr-only peer"
+        />
+        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none 
+                        peer-focus:ring-4 peer-focus:ring-purple-300 
+                        rounded-full peer peer-checked:after:translate-x-full 
+                        peer-checked:after:border-white after:content-[''] 
+                        after:absolute after:top-[2px] after:left-[2px] 
+                        after:bg-white after:rounded-full after:h-5 
+                        after:w-5 after:transition-all peer-checked:bg-purple-600" />
+      </label>
+      {label && <span className="text-white">{label}</span>}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'form-textarea',
+                    name: 'Auto-resize Textarea',
+                    icon: '📝',
+                    description: 'Textarea that grows with content',
+                    preview: '<textarea placeholder="Start typing..." class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none" rows="3"></textarea>',
+                    code: `export const AutoTextarea = ({ placeholder, value, onChange, className = '' }) => {
+  const textareaRef = useRef(null);
+  
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [value]);
+  
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={\`w-full px-4 py-3 bg-gray-800 border border-gray-600 
+                 rounded-lg text-white focus:border-purple-500 
+                 focus:ring-2 focus:ring-purple-500/20 transition-all 
+                 resize-none \${className}\`}
+      rows={3}
+    />
+  );
+};`
+                },
+                {
+                    id: 'form-select',
+                    name: 'Custom Select',
+                    icon: '📋',
+                    description: 'Styled dropdown select',
+                    preview: '<div class="relative"><select class="appearance-none w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all pr-10"><option>Choose an option...</option><option>Option 1</option><option>Option 2</option><option>Option 3</option></select><div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div>',
+                    code: `export const CustomSelect = ({ options, value, onChange, placeholder, className = '' }) => {
+  return (
+    <div className={\`relative \${className}\`}>
+      <select
+        value={value}
+        onChange={onChange}
+        className="appearance-none w-full px-4 py-3 bg-gray-800 
+                   border border-gray-600 rounded-lg text-white 
+                   focus:border-purple-500 focus:ring-2 
+                   focus:ring-purple-500/20 transition-all pr-10"
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center 
+                      pr-3 pointer-events-none">
+        <ChevronDownIcon className="w-5 h-5 text-gray-400" />
+      </div>
+    </div>
+  );
+};`
+                }
+            ],
+            backgrounds: [
+                {
+                    id: 'bg-gradient-mesh',
+                    name: 'Gradient Mesh',
+                    icon: '🌈',
+                    description: 'Animated gradient mesh background',
+                    preview: `<div class="w-full h-40 bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400 rounded-lg relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-pulse"></div>
+                        <div class="absolute top-4 left-4 text-white/80 font-medium">Gradient Mesh</div>
+                    </div>`,
+                    code: `export const GradientMesh = ({ className = '' }) => {
+  return (
+    <div className={\`relative overflow-hidden \${className}\`}>
+      <div className="absolute inset-0 bg-gradient-to-br 
+                      from-purple-400 via-pink-400 to-indigo-400 
+                      animate-gradient-x" />
+      <div className="absolute inset-0 bg-gradient-to-tr 
+                      from-transparent via-white/10 to-transparent 
+                      animate-pulse" />
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-floating-shapes',
+                    name: 'Floating Shapes',
+                    icon: '🎈',
+                    description: 'Animated floating geometric shapes',
+                    preview: `<div class="w-full h-40 bg-gray-900 rounded-lg relative overflow-hidden">
+                        <div class="absolute top-8 left-8 w-6 h-6 bg-purple-500 rounded-full animate-bounce opacity-80"></div>
+                        <div class="absolute top-16 right-12 w-4 h-4 bg-pink-500 rounded opacity-60 animate-pulse"></div>
+                        <div class="absolute bottom-12 left-16 w-8 h-8 bg-blue-500 rounded-full animate-ping opacity-40"></div>
+                        <div class="absolute bottom-8 right-8 w-3 h-3 bg-green-500 rounded-full animate-bounce opacity-70" style="animation-delay: 1s;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/60 text-sm">Floating Shapes</div>
+                    </div>`,
+                    code: `export const FloatingShapes = ({ shapes = 8, className = '' }) => {
+  const [floatingShapes, setFloatingShapes] = useState([]);
+  
+  useEffect(() => {
+    const newShapes = Array.from({ length: shapes }, (_, i) => ({
+      id: i,
+      x: Math.random() * 90,
+      y: Math.random() * 90,
+      size: Math.random() * 20 + 10,
+      color: ['purple', 'pink', 'blue', 'green'][Math.floor(Math.random() * 4)],
+      animation: ['bounce', 'pulse', 'ping'][Math.floor(Math.random() * 3)],
+      delay: Math.random() * 3
+    }));
+    setFloatingShapes(newShapes);
+  }, [shapes]);
+  
+  return (
+    <div className={\`relative overflow-hidden bg-gray-900 \${className}\`}>
+      {floatingShapes.map(shape => (
+        <div
+          key={shape.id}
+          className={\`absolute w-\${Math.floor(shape.size/4)} h-\${Math.floor(shape.size/4)} 
+                     bg-\${shape.color}-500 rounded-full animate-\${shape.animation} 
+                     opacity-70\`}
+          style={{
+            left: \`\${shape.x}%\`,
+            top: \`\${shape.y}%\`,
+            animationDelay: \`\${shape.delay}s\`
+          }}
+        />
+      ))}
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-animated-grid',
+                    name: 'Animated Grid',
+                    icon: '⚡',
+                    description: 'Glowing animated grid pattern',
+                    preview: `<div class="w-full h-40 bg-black rounded-lg relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-40 animate-grid-move" style="background-image: linear-gradient(rgba(139, 92, 246, 0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.8) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        <div class="absolute inset-0 opacity-25 animate-grid-move-alt" style="background-image: linear-gradient(rgba(236, 72, 153, 0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(236, 72, 153, 0.6) 1px, transparent 1px); background-size: 30px 30px;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-purple-300 text-sm font-medium bg-black/60 px-3 py-1 rounded backdrop-blur-sm">Animated Grid</div>
+                    </div>`,
+                    code: `export const AnimatedGrid = ({ gridSize = 20, className = '' }) => {
+  return (
+    <div className={\`relative overflow-hidden bg-black \${className}\`}>
+      <div 
+        className="absolute inset-0 opacity-20 animate-grid-move"
+        style={{
+          backgroundImage: \`
+            linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+          \`,
+          backgroundSize: \`\${gridSize}px \${gridSize}px\`
+        }}
+      />
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};
+
+// Add to CSS:
+// @keyframes grid-move {
+//   0% { transform: translate(0, 0); }
+//   100% { transform: translate(20px, 20px); }
+// }`
+                },
+                {
+                    id: 'bg-particle-field',
+                    name: 'Particle Field',
+                    icon: '✨',
+                    description: 'Animated particle field effect',
+                    preview: `<div class="w-full h-40 bg-gradient-to-br from-indigo-900 to-purple-900 rounded-lg relative overflow-hidden">
+                        <div class="absolute top-4 left-4 w-1 h-1 bg-cyan-400 rounded-full animate-ping shadow-lg shadow-cyan-400/50"></div>
+                        <div class="absolute top-12 right-8 w-1 h-1 bg-pink-400 rounded-full animate-pulse shadow-lg shadow-pink-400/50"></div>
+                        <div class="absolute bottom-16 left-12 w-1 h-1 bg-blue-400 rounded-full animate-ping shadow-lg shadow-blue-400/50" style="animation-delay: 0.5s;"></div>
+                        <div class="absolute bottom-8 right-16 w-1 h-1 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" style="animation-delay: 1s;"></div>
+                        <div class="absolute top-8 left-1/2 w-1 h-1 bg-yellow-400 rounded-full animate-ping shadow-lg shadow-yellow-400/50" style="animation-delay: 1.5s;"></div>
+                        <div class="absolute bottom-12 left-1/3 w-1 h-1 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50" style="animation-delay: 2s;"></div>
+                        <div class="absolute top-1/4 right-1/4 w-1 h-1 bg-red-400 rounded-full animate-ping shadow-lg shadow-red-400/50" style="animation-delay: 0.7s;"></div>
+                        <div class="absolute bottom-1/4 right-1/3 w-1 h-1 bg-indigo-400 rounded-full animate-pulse shadow-lg shadow-indigo-400/50" style="animation-delay: 1.3s;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/70 text-sm bg-black/40 px-3 py-1 rounded backdrop-blur-sm">Particle Field</div>
+                    </div>`,
+                    code: `export const ParticleField = ({ particleCount = 50, className = '' }) => {
+  const [particles, setParticles] = useState([]);
+  
+  useEffect(() => {
+    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      animation: Math.random() > 0.5 ? 'ping' : 'pulse',
+      delay: Math.random() * 3,
+      opacity: Math.random() * 0.8 + 0.2
+    }));
+    setParticles(newParticles);
+  }, [particleCount]);
+  
+  return (
+    <div className={\`relative overflow-hidden bg-gradient-to-br 
+                     from-indigo-900 to-purple-900 \${className}\`}>
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          className={\`absolute w-1 h-1 bg-white rounded-full 
+                     animate-\${particle.animation}\`}
+          style={{
+            left: \`\${particle.x}%\`,
+            top: \`\${particle.y}%\`,
+            opacity: particle.opacity,
+            animationDelay: \`\${particle.delay}s\`
+          }}
+        />
+      ))}
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'bg-aurora',
+                    name: 'Aurora Background',
+                    icon: '🌊',
+                    description: 'Flowing aurora-like background',
+                    preview: `<div class="w-full h-40 bg-black rounded-lg relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600/30 via-pink-600/20 to-blue-600/30 animate-pulse"></div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent via-cyan-400/10 to-transparent animate-ping"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/70 text-sm">Aurora Background</div>
+                    </div>`,
+                    code: `export const AuroraBackground = ({ className = '' }) => {
+  return (
+    <div className={\`relative overflow-hidden bg-black \${className}\`}>
+      <div className="absolute inset-0 bg-gradient-to-r 
+                      from-purple-600/30 via-pink-600/20 to-blue-600/30 
+                      animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-br 
+                      from-transparent via-cyan-400/10 to-transparent 
+                      animate-ping" />
+      <div className="absolute inset-0 bg-gradient-to-tl 
+                      from-green-400/5 via-transparent to-purple-400/5 
+                      animate-bounce" />
+      <div className="relative z-10">
+        {/* Your content here */}
+      </div>
+    </div>
+  );
+};`
+                }
+            ],
+            loaders: [
+                {
+                    id: 'load-spinner',
+                    name: 'Spinner',
+                    icon: '🌀',
+                    description: 'Classic spinning loader',
+                    preview: '<div class="flex justify-center"><div class="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin shadow-lg shadow-purple-500/30"></div></div>',
+                    code: `export const Spinner = ({ size = 'md' }) => {
+  const sizes = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+  
+  return (
+    <div className={\`\${sizes[size]} border-4 border-purple-600 
+                     border-t-transparent rounded-full animate-spin\`} />
+  );
+};`
+                },
+                {
+                    id: 'load-dots',
+                    name: 'Bouncing Dots',
+                    icon: '⚫',
+                    description: 'Three bouncing dot loader',
+                    preview: '<div class="flex justify-center"><div class="flex space-x-2"><div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce shadow-sm"></div><div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce shadow-sm" style="animation-delay: 0.1s;"></div><div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce shadow-sm" style="animation-delay: 0.2s;"></div></div></div>',
+                    code: `export const BouncingDots = ({ size = 'md', color = 'purple' }) => {
+  const sizes = {
+    sm: 'w-2 h-2',
+    md: 'w-3 h-3',
+    lg: 'w-4 h-4'
+  };
+  
+  const colors = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    pink: 'bg-pink-600'
+  };
+  
+  return (
+    <div className="flex space-x-2">
+      {[0, 1, 2].map(i => (
+        <div
+          key={i}
+          className={\`\${sizes[size]} \${colors[color]} rounded-full animate-bounce\`}
+          style={{ animationDelay: \`\${i * 0.1}s\` }}
+        />
+      ))}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'load-pulse',
+                    name: 'Pulse Loader',
+                    icon: '💓',
+                    description: 'Pulsing circle loader',
+                    preview: '<div class="flex justify-center"><div class="relative w-16 h-16 flex items-center justify-center"><div class="absolute w-16 h-16 bg-purple-600 rounded-full animate-ping opacity-20"></div><div class="absolute w-12 h-12 bg-purple-600 rounded-full animate-pulse opacity-60"></div><div class="w-8 h-8 bg-purple-600 rounded-full shadow-lg shadow-purple-500/50"></div></div></div>',
+                    code: `export const PulseLoader = ({ size = 'md' }) => {
+  const sizes = {
+    sm: { outer: 'w-12 h-12', middle: 'w-8 h-8', inner: 'w-6 h-6' },
+    md: { outer: 'w-16 h-16', middle: 'w-12 h-12', inner: 'w-8 h-8' },
+    lg: { outer: 'w-20 h-20', middle: 'w-16 h-16', inner: 'w-12 h-12' }
+  };
+  
+  return (
+    <div className={\`relative \${sizes[size].outer} flex items-center justify-center\`}>
+      <div className={\`absolute \${sizes[size].outer} bg-purple-600 
+                      rounded-full animate-ping opacity-20\`} />
+      <div className={\`absolute \${sizes[size].middle} bg-purple-600 
+                      rounded-full animate-pulse\`} />
+      <div className={\`\${sizes[size].inner} bg-purple-600 rounded-full\`} />
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'load-bars',
+                    name: 'Dancing Bars',
+                    icon: '📊',
+                    description: 'Animated bar chart loader',
+                    preview: '<div class="flex justify-center"><div class="flex items-end space-x-1 h-8"><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 20px; animation-delay: 0s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 32px; animation-delay: 0.1s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 16px; animation-delay: 0.2s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 24px; animation-delay: 0.3s;"></div><div class="w-2 bg-purple-600 rounded-t animate-pulse shadow-sm" style="height: 28px; animation-delay: 0.4s;"></div></div></div>',
+                    code: `export const DancingBars = ({ barCount = 5, color = 'purple' }) => {
+  const colors = {
+    purple: 'bg-purple-600',
+    blue: 'bg-blue-600',
+    pink: 'bg-pink-600'
+  };
+  
+  const heights = ['16px', '24px', '32px', '20px', '28px'];
+  
+  return (
+    <div className="flex items-end space-x-1 h-8">
+      {Array.from({ length: barCount }, (_, i) => (
+        <div
+          key={i}
+          className={\`w-2 \${colors[color]} rounded-t animate-pulse\`}
+          style={{
+            height: heights[i % heights.length],
+            animationDelay: \`\${i * 0.1}s\`
+          }}
+        />
+      ))}
+    </div>
+  );
+};`
+                },
+                {
+                    id: 'load-skeleton',
+                    name: 'Skeleton Loader',
+                    icon: '🦴',
+                    description: 'Content placeholder skeleton',
+                    preview: '<div class="space-y-3 w-64"><div class="h-4 bg-gray-600 rounded animate-pulse"></div><div class="h-4 bg-gray-600 rounded animate-pulse w-3/4"></div><div class="h-4 bg-gray-600 rounded animate-pulse w-1/2"></div><div class="flex space-x-2 mt-4"><div class="w-12 h-12 bg-gray-600 rounded-full animate-pulse"></div><div class="flex-1 space-y-2"><div class="h-3 bg-gray-600 rounded animate-pulse"></div><div class="h-3 bg-gray-600 rounded animate-pulse w-2/3"></div></div></div></div>',
+                    code: `export const SkeletonLoader = ({ lines = 3, showAvatar = false, className = '' }) => {
+  return (
+    <div className={\`space-y-3 \${className}\`}>
+      {/* Text lines */}
+      {Array.from({ length: lines }, (_, i) => (
+        <div
+          key={i}
+          className={\`h-4 bg-gray-600 rounded animate-pulse \${
+            i === lines - 1 ? 'w-3/4' : i === lines - 2 ? 'w-1/2' : 'w-full'
+          }\`}
+        />
+      ))}
+      
+      {/* Avatar + text section */}
+      {showAvatar && (
+        <div className="flex space-x-2 mt-4">
+          <div className="w-12 h-12 bg-gray-600 rounded-full animate-pulse" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-gray-600 rounded animate-pulse" />
+            <div className="h-3 bg-gray-600 rounded animate-pulse w-2/3" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};`
+                }
+            ]
+        };
+
+        let selectedComponent = null;
+        let showingCode = false;
+        let magicEnabled = false;
+
+        // Initialize
+        window.onload = () => {
+            renderComponents('all');
+            checkMagicStatus();
+            setupEventListeners();
+        };
+
+        // Check Magic API status
+        async function checkMagicStatus() {
+            try {
+                const response = await fetch('/api/magic/health');
+                const data = await response.json();
+                magicEnabled = data.magic21st?.connected || false;
+                document.getElementById('magicStatus').textContent = magicEnabled ? '✨ Magic' : '🔌 Local';
+            } catch (error) {
+                magicEnabled = false;
+                document.getElementById('magicStatus').textContent = '🔌 Local';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Category tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderComponents(e.target.dataset.category);
+                });
+            });
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                filterComponents(query);
+            });
+
+            // UI command enter key
+            document.getElementById('uiCommand').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') executeUICommand();
+            });
+        }
+
+        // Render components
+        function renderComponents(category) {
+            const list = document.getElementById('componentList');
+            list.innerHTML = '';
+
+            let components = [];
+            if (category === 'all') {
+                Object.values(componentLibrary).forEach(cat => {
+                    components = [...components, ...cat];
+                });
+            } else {
+                components = componentLibrary[category] || [];
+            }
+
+            components.forEach(comp => {
+                const item = document.createElement('div');
+                item.className = 'component-item';
+                item.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">${comp.icon}</span>
+                        <div>
+                            <h4 class="font-semibold">${comp.name}</h4>
+                            <p class="text-sm text-gray-400">${comp.description}</p>
+                        </div>
+                    </div>
+                `;
+                item.onclick = () => selectComponent(comp);
+                list.appendChild(item);
+            });
+        }
+
+        // Filter components
+        function filterComponents(query) {
+            const items = document.querySelectorAll('.component-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // Select component
+        function selectComponent(component) {
+            selectedComponent = component;
+            
+            // Update UI
+            document.querySelectorAll('.component-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Show preview
+            const previewArea = document.getElementById('previewArea');
+            previewArea.innerHTML = component.preview;
+            
+            // Initialize animations for specific components
+            setTimeout(() => {
+                if (component.id === 'txt-typewriter') {
+                    initializeTypewriter();
+                } else if (component.id === 'txt-shiny') {
+                    // Ensure shiny text animation is active
+                    const shinyElement = previewArea.querySelector('.shiny-text');
+                    if (shinyElement) {
+                        shinyElement.style.animation = 'shine 3s ease-in-out infinite';
+                    }
+                } else if (component.id === 'bg-animated-grid') {
+                    // Ensure grid animations are working
+                    const gridElements = previewArea.querySelectorAll('.animate-grid-move, .animate-grid-move-alt');
+                    gridElements.forEach((el, index) => {
+                        el.style.animation = index === 0 ? 'grid-move 15s ease-in-out infinite' : 'grid-move-alt 20s ease-in-out infinite';
+                    });
+                } else if (component.id === 'txt-glitch') {
+                    // Ensure glitch text animations are active
+                    const glitchElements = previewArea.querySelectorAll('.animate-ping, .animate-pulse');
+                    glitchElements.forEach(el => {
+                        el.style.animationDuration = '0.5s';
+                    });
+                } else if (component.id.includes('load-')) {
+                    // Force loader animations to restart
+                    const animatedElements = previewArea.querySelectorAll('[class*="animate-"]');
+                    animatedElements.forEach(el => {
+                        el.style.animation = 'none';
+                        setTimeout(() => {
+                            el.style.animation = '';
+                        }, 10);
+                    });
+                } else if (component.id.includes('bg-particle')) {
+                    // Ensure particle animations are visible
+                    const particles = previewArea.querySelectorAll('.animate-ping, .animate-pulse');
+                    particles.forEach(el => {
+                        el.style.animationDuration = Math.random() * 2 + 1 + 's';
+                    });
+                }
+            }, 100);
+            
+            document.getElementById('codeDisplay').textContent = component.code;
+        }
+
+        // Initialize typewriter animation
+        function initializeTypewriter() {
+            const typewriterElement = document.querySelector('#typewriter-demo') || document.querySelector('.typewriter-text');
+            if (typewriterElement) {
+                // Remove any existing classes and reset
+                typewriterElement.className = 'text-2xl font-mono text-green-400';
+                typewriterElement.id = 'typewriter-demo';
+                const text = "Hello, World! ⌨️";
+                const speed = 150;
+                let i = 0;
+                let isDeleting = false;
+                
+                typewriterElement.innerHTML = '';
+                typewriterElement.style.borderRight = '2px solid #10b981';
+                typewriterElement.style.width = 'auto';
+                typewriterElement.style.maxWidth = 'fit-content';
+                typewriterElement.style.display = 'inline-block';
+                typewriterElement.style.whiteSpace = 'nowrap';
+                
+                function typeWriter() {
+                    if (!isDeleting && i < text.length) {
+                        typewriterElement.innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, speed);
+                    } else if (!isDeleting && i === text.length) {
+                        // Pause at full text
+                        setTimeout(() => {
+                            isDeleting = true;
+                            typeWriter();
+                        }, 2000);
+                    } else if (isDeleting && i > 0) {
+                        typewriterElement.innerHTML = text.substring(0, i-1);
+                        i--;
+                        setTimeout(typeWriter, speed/2);
+                    } else if (isDeleting && i === 0) {
+                        // Start typing again
+                        isDeleting = false;
+                        setTimeout(typeWriter, 500);
+                    }
+                }
+                
+                typeWriter();
+                
+                // Blinking cursor
+                setInterval(() => {
+                    typewriterElement.style.borderRightColor = 
+                        typewriterElement.style.borderRightColor === 'transparent' ? '#10b981' : 'transparent';
+                }, 500);
+            }
+        }
+
+        // Toggle view
+        function toggleView() {
+            showingCode = !showingCode;
+            document.getElementById('previewArea').parentElement.classList.toggle('hidden');
+            document.getElementById('codeView').classList.toggle('hidden');
+            document.getElementById('viewToggle').textContent = showingCode ? '👁️ Show Preview' : '👁️ Show Code';
+        }
+
+        // Copy code
+        function copyCode() {
+            if (selectedComponent) {
+                navigator.clipboard.writeText(selectedComponent.code);
+                // Show feedback
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            }
+        }
+
+        // Use component
+        function useComponent() {
+            if (selectedComponent) {
+                // Simulate sending to editor
+                console.log('Inserting component:', selectedComponent.name);
+                alert(`Component "${selectedComponent.name}" would be inserted into the editor at cursor position.`);
+            }
+        }
+
+        // Execute /ui command
+        async function executeUICommand() {
+            const command = document.getElementById('uiCommand').value;
+            const resultDiv = document.getElementById('commandResult');
+            
+            if (!command.startsWith('/ui ')) {
+                resultDiv.textContent = '❌ Commands must start with /ui';
+                return;
+            }
+
+            const message = command.substring(4);
+            resultDiv.textContent = '⏳ Generating component...';
+
+            try {
+                const response = await fetch('/api/magic/ui', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    resultDiv.innerHTML = `✅ Generated ${data.customizations.detected} component! <button class="text-purple-400 underline ml-2" onclick='viewGeneratedCode(${JSON.stringify(data.component.code)})'>View Code</button>`;
+                    
+                    // Show in preview
+                    document.getElementById('previewArea').innerHTML = generatePreviewFromType(data.customizations.detected);
+                } else {
+                    resultDiv.textContent = '❌ ' + data.error;
+                }
+            } catch (error) {
+                resultDiv.textContent = '❌ Failed to generate component';
+            }
+        }
+
+        // View generated code
+        function viewGeneratedCode(code) {
+            document.getElementById('codeDisplay').textContent = code;
+            if (!showingCode) toggleView();
+        }
+
+        // Generate preview from type
+        function generatePreviewFromType(type) {
+            const previews = {
+                button: '<button class="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all duration-300">Generated Button</button>',
+                'shiny-text': '<h2 class="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">Generated Text</h2>',
+                card: '<div class="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl"><h3 class="text-lg font-semibold mb-2">Generated Card</h3><p class="text-gray-300">AI-generated component</p></div>',
+                loader: '<div class="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>'
+            };
+            return previews[type] || '<div class="text-gray-400">Preview generated component</div>';
+        }
+    </script>
+</body>
+</html>

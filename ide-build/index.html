@@ -1,22 +1,19 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style><script src="../static/electron-api-bridge.js"></script><script src="./static/api-config.js?v=6"></script><script defer="defer" src="./static/js/main.a1cfdcd5.js?v=11"></script><link href="./static/css/main.5c128812.css?v=11" rel="stylesheet"><link href="./static/terminal-voice.css?v=33" rel="stylesheet">
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Coder1 IDE - Advanced Development Environment with Supervision & Infinite Agent"/><title>Coder1 IDE - Advanced</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#1a1b26;color:#c0caf5;overflow:hidden}code{font-family:Monaco,Menlo,'Ubuntu Mono',monospace}*{box-sizing:border-box}</style>
+<script src="./static/fix-initial-load.js"></script><script src="../static/electron-api-bridge.js"></script><script src="./static/api-config.js?v=6"></script><script defer="defer" src="./static/js/main.a1cfdcd5.js?v=11"></script><link href="./static/css/main.5c128812.css?v=11" rel="stylesheet"><link href="./static/terminal-voice.css?v=40" rel="stylesheet">
 <link href="./static/fix-terminal-header.css?v=2" rel="stylesheet">
-<link href="./static/special-views-unified.css?v=11" rel="stylesheet">
+<link href="./static/special-views-unified.css?v=20" rel="stylesheet">
 <link href="./static/parallel-agents-compact.css?v=2" rel="stylesheet">
-<script>
-// Force reload CSS to ensure new styles are loaded
-(function() {
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = './static/special-views-unified.css?t=' + new Date().getTime() + Math.random();
-    document.head.appendChild(link);
-})();
-</script>
+<link href="./static/explorer-simple-scroll.css?v=1" rel="stylesheet">
+<link href="./static/fix-logo-background.css?v=1" rel="stylesheet">
+<!-- <link href="./static/conservative-hide-duplicate.css?v=1" rel="stylesheet"> Removed - was adding too much padding -->
+<!-- All scrollbar CSS disabled - using simple fixed positioning instead -->
+<!-- Removed CSS force reload to improve initial load time -->
 </head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><!-- Load special views FIRST before other scripts -->
 <script>
 // Force reload V4 with timestamp to bypass cache
 (function() {
     var script = document.createElement('script');
-    script.src = './static/coder1-special-views-v4.js?t=' + new Date().getTime() + '_v10';
+    script.src = './static/coder1-special-views-v4.js?t=' + new Date().getTime() + '_v45';
     script.onload = function() {
         console.log('✅ Loaded V4 with settings hiding functionality:', new Date().getTime());
     };
@@ -37,7 +34,7 @@ setTimeout(function() {
     } else {
         console.log('✅ showSpecialView V4 is available with full functionality');
     }
-}, 1000);
+}, 100);
 </script>
 <!-- Temporarily disabling scripts to find the issue -->
 <script src="./static/api-injection.js?v=7"></script>
@@ -45,7 +42,7 @@ setTimeout(function() {
 <!-- <script src="./static/parallel-agents-modal.js?v=2"></script> Disabled - conflicts with V4 special views -->
 <!-- <script src="./static/parallel-agents-fix.js?v=1"></script> -->
 <!-- <script src="./static/simple-stop-button.js?v=1"></script> -->
-<!-- <script src="./static/global-logo-final.js?v=2"></script> -->
+<!-- Logo scripts disabled - conflicts resolved -->
 <!-- <script src="./static/hide-buttons-special-pages.js"></script> -->
 <script src="./static/cleanup-header-buttons.js"></script>
 <!-- <script src="./static/special-views-helper.js?v=1"></script> -->
@@ -357,23 +354,12 @@ if (document.body) {
 
 End of disabled script -->
 <!-- Re-enabling essential scripts only -->
-<script src="./static/terminal-voice.js?v=29"></script>
+<script src="./static/terminal-voice.js?v=37"></script>
 <script src="./static/remove-blue-x-aggressive.js?v=1"></script>
 <!-- <script src="./static/special-views-buttons.js?v=7"></script> Disabled - keep only original small buttons -->
-<!-- <script src="./static/restore-coder1-logo.js?v=12"></script> Disabled - using global-logo-final instead -->
-<!-- <script src="./static/remove-blue-logos.js?v=1"></script> Causing white screen -->
-<!-- <script src="./static/logo-force-display.js?v=2"></script> Causing white screen -->
-<!-- <script src="./static/hide-terminal-title.js?v=2"></script> Disabled to fix terminal header -->
-<!-- <script src="./static/clean-terminal-header.js?v=1"></script> -->
-<!-- <script src="./static/remove-blue-text.js?v=1"></script> DISABLED - causing logo conflicts -->
-<!-- <script src="./static/hide-blue-coder1-text.js?v=1"></script> DISABLED - causing logo conflicts -->
-<!-- <script src="./static/remove-coder1-text-aggressively.js?v=1"></script> DISABLED - causing logo conflicts -->
-<!-- <script src="./static/global-logo-final.js?v=3"></script> Trying to move Explorer logo -->
+<!-- Logo-related scripts cleaned up to prevent conflicts -->
 <script src="./static/header-logo-injection.js?v=2"></script>
-<!-- <script src="./static/logo-absolute-position.js?v=1"></script> Made logo disappear -->
-<!-- <script src="./static/simple-text-removal.js?v=1"></script> DISABLED - causing logo conflicts -->
-<!-- <script src="./static/targeted-blue-text-removal.js?v=1"></script> DISABLED - causing logo conflicts -->
-<!-- <script src="./static/aggressive-text-cleanup.js?v=1"></script> DISABLED - causing logo conflicts -->
+<script src="./static/fix-blue-logo-background.js?v=1"></script>
 <!-- <script src="./static/fix-all-ui-issues.js?v=1"></script> Disabled - may be causing issues -->
 <!-- <script src="./static/prd-cleanup.js"></script> -->
 <!-- <script src="./static/prd-project-transfer.js"></script> -->
@@ -403,6 +389,22 @@ End of disabled script -->
 <!-- <script src="./static/dom-interceptor.js?v=1"></script> -->
 <!-- Button Hijacker - Direct button manipulation -->
 <!-- <script src="./static/button-hijacker.js?v=1"></script> -->
-<!-- Settings Controller - Simple settings visibility management -->
-<script src="./static/settings-controller.js?v=1"></script>
+<!-- Settings Controller - DISABLED to test if it's causing duplicate header -->
+<!-- <script src="./static/settings-controller.js?v=1"></script> -->
+<!-- Revert to Fixed - Re-enabled for functionality -->
+<script src="./static/revert-to-fixed.js?v=1"></script>
+<!-- ALL PREVIOUS SETTINGS REMOVAL DISABLED - Too many conflicts -->
+<!-- <script src="./static/remove-settings-label.js?v=1"></script> -->
+<!-- <link href="./static/hide-settings-text-only.css?v=1" rel="stylesheet"> -->
+<!-- <script src="./static/mark-settings-for-hiding.js?v=1"></script> -->
+<!-- <script src="./static/diagnose-settings-element.js?v=1"></script> -->
+<!-- <link href="./static/nuclear-hide-settings.css?v=1" rel="stylesheet"> -->
+<!-- <script src="./static/settings-mutation-override.js?v=1"></script> -->
+<!-- <script src="./static/css-injection-override.js?v=1"></script> -->
+<!-- <script src="./static/nuclear-fallback-scanner.js?v=1"></script> -->
+<!-- <script src="./static/remove-settings-by-position.js?v=1"></script> -->
+<!-- FINAL CLEAN APPROACH: Single focused solution -->
+<!-- <script src="./static/final-settings-fix.js?v=1"></script> -->
+<!-- ULTIMATE SETTINGS REMOVER: Comprehensive solution including Shadow DOM -->
+<script src="./static/ultimate-settings-remover.js?v=1"></script>
 </body></html>

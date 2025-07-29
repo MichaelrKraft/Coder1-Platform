@@ -1,0 +1,52 @@
+/* Conservative Hide Duplicate - Only target the exact duplicate SETTINGS */
+
+/* Very specific targeting to avoid hiding everything */
+/* Only hide elements that:
+   1. Are NOT our custom settings section
+   2. Have specific patterns indicating they're the duplicate header
+   3. Are positioned above our buttons */
+
+/* Target only text nodes that say "SETTINGS" and aren't our buttons */
+*:not(.settings-section):not(.settings-section *):not(.settings-btn):not(#react-bits-button) {
+    /* Only apply if this is specifically a header-like element */
+}
+
+/* Method 1: Target flex containers with gear icons that have SETTINGS text */
+/* But exclude our custom section entirely */
+div:not(.settings-section):not(.settings-btn):has(svg) {
+    /* Only hide if it also contains SETTINGS text and is positioned like a header */
+}
+
+/* Method 2: Very conservative - just add spacing to push our section down */
+.settings-section {
+    margin-top: 80px !important;
+    padding-top: 20px !important;
+}
+
+/* Method 3: Target only large text elements saying SETTINGS */
+/* This should be the safest approach */
+h1:not(.settings-section *):not(.settings-btn),
+h2:not(.settings-section *):not(.settings-btn),
+h3:not(.settings-section *):not(.settings-btn) {
+    /* Only hide if text content is exactly "SETTINGS" */
+    /* But CSS can't check text content, so this is limited */
+}
+
+/* Method 4: Ultra-conservative - just visually separate our section */
+.settings-section::before {
+    content: "";
+    display: block;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Ensure our buttons always remain visible */
+.settings-section,
+.settings-section *,
+.settings-btn,
+#react-bits-button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

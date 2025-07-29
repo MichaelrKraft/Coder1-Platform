@@ -1,0 +1,23 @@
+/* Just hide any SETTINGS text in the Explorer area */
+.Explorer > div:first-child,
+.Explorer > :first-child:not(.settings-section):not(button),
+[class*="explorer"] > div:first-child:not(.settings-section):not(button) {
+    display: none !important;
+}
+
+/* Also hide by content if it's just SETTINGS */
+div:not(.settings-section):not(.settings-btn) {
+    font-size: 0 !important;
+}
+
+div:not(.settings-section):not(.settings-btn)::before {
+    content: none !important;
+}
+
+/* Ensure our buttons show */
+.settings-section,
+.settings-btn,
+button {
+    font-size: 14px !important;
+    display: flex !important;
+}

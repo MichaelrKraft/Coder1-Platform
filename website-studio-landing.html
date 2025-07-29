@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Customization Studio - Transform Any Website Instantly</title>
+    <meta name="description" content="Revolutionary AI-powered platform that transforms any website with natural language commands. Try 3 customizations free!">
+    
+    <style>
+        /* CSS Variables for Glassmorphism Theme */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #3b82f6;
+            --background: #0f0f23;
+            --surface: rgba(139, 92, 246, 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Components */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-glass);
+        }
+        
+        .glass-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 0;
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: var(--gradient-hero);
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, #ffffff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+        
+        .free-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        /* Sections */
+        .section {
+            padding: 6rem 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Before/After Examples */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .example-card {
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .example-card h3 {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .before, .after {
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .before {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .after {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-card);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .pricing-card {
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .pricing-card.featured {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-period {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .plan-features li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+        }
+        
+        .plan-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .testimonial-card {
+            padding: 2rem;
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .author-info h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .author-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(15, 15, 35, 0.9);
+            padding: 3rem 0 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .before-after {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+            
+            .section {
+                padding: 3rem 0;
+            }
+        }
+        
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.2s forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Website Studio</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#examples">Examples</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+            </ul>
+            <a href="#pricing" class="btn btn-primary">Try Free</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1 class="loading">Transform Any Website with Natural Language</h1>
+            <p class="loading">Revolutionary AI-powered platform that customizes websites instantly. Just describe what you want, and watch the magic happen.</p>
+            <div class="hero-cta loading">
+                <a href="#pricing" class="btn btn-primary">
+                    Start Free Trial
+                    <span class="free-badge">3 Free</span>
+                </a>
+                <a href="#examples" class="btn btn-secondary">See Examples</a>
+            </div>
+            <div class="glass" style="padding: 1rem; margin-top: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                <p style="font-size: 0.875rem; color: var(--text-muted);">
+                    ⚡ "Make the header purple and add a contact form" → Done in seconds<br>
+                    🎨 "Change this to look more modern" → AI understands and applies<br>
+                    📱 "Make it mobile-friendly" → Responsive design applied
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before/After Examples -->
+    <section id="examples" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>See the Magic in Action</h2>
+                <p>Real examples of websites transformed with simple natural language commands</p>
+            </div>
+            <div class="examples-grid">
+                <div class="glass-card example-card animate-on-scroll">
+                    <h3>E-commerce Product Page</h3>
+                    <p><strong>Command:</strong> "Make the buy button more prominent and add customer reviews"</p>
+                    <div class="before-after">
+                        <div class="before">
+                            <strong>Before:</strong><br>
+                            • Small gray "Add to Cart"<br>
+                            • No social proof<br>
+                            • Generic layout
+                        </div>
+                        <div class="after">
+                            <strong>After:</strong><br>
+                            • Large purple "Buy Now" button<br>
+                            • 5-star review section<br>
+                            • Trust badges added
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card example-card animate-on-scroll">
+                    <h3>Restaurant Landing Page</h3>
+                    <p><strong>Command:</strong> "Add an online ordering system and make it look more appetizing"</p>
+                    <div class="before-after">
+                        <div class="before">
+                            <strong>Before:</strong><br>
+                            • Static menu PDF<br>
+                            • Plain text layout<br>
+                            • No call-to-action
+                        </div>
+                        <div class="after">
+                            <strong>After:</strong><br>
+                            • Interactive menu with cart<br>
+                            • Food photography<br>
+                            • "Order Now" prominently placed
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card example-card animate-on-scroll">
+                    <h3>SaaS Landing Page</h3>
+                    <p><strong>Command:</strong> "Convert more visitors with better social proof and urgency"</p>
+                    <div class="before-after">
+                        <div class="before">
+                            <strong>Before:</strong><br>
+                            • Generic "Sign Up" button<br>
+                            • No testimonials<br>
+                            • Boring color scheme
+                        </div>
+                        <div class="after">
+                            <strong>After:</strong><br>
+                            • "Start Free Trial" with timer<br>
+                            • Customer testimonials<br>
+                            • Trust badges & metrics
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Powerful Features, Simple Interface</h2>
+                <p>Everything you need to transform websites with the power of AI</p>
+            </div>
+            <div class="features-grid">
+                <div class="glass-card feature-card animate-on-scroll">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered Understanding</h3>
+                    <p>Our advanced AI understands natural language and translates your ideas into perfect code implementations.</p>
+                </div>
+                
+                <div class="glass-card feature-card animate-on-scroll">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Platform Detection</h3>
+                    <p>Automatically detects website platforms (WordPress, Shopify, custom) and applies appropriate modifications.</p>
+                </div>
+                
+                <div class="glass-card feature-card animate-on-scroll">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant Live Preview</h3>
+                    <p>See changes in real-time before applying them. Preview exactly how your website will look.</p>
+                </div>
+                
+                <div class="glass-card feature-card animate-on-scroll">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile-First Design</h3>
+                    <p>All modifications are automatically optimized for mobile devices and responsive design.</p>
+                </div>
+                
+                <div class="glass-card feature-card animate-on-scroll">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Design Best Practices</h3>
+                    <p>AI applies modern design principles, accessibility standards, and conversion optimization techniques.</p>
+                </div>
+                
+                <div class="glass-card feature-card animate-on-scroll">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Version Control</h3>
+                    <p>Easily revert changes or try different variations. Keep track of all modifications with built-in versioning.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>Start free and scale as you grow. No hidden fees, cancel anytime.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="glass-card pricing-card animate-on-scroll">
+                    <div class="plan-name">Free Trial</div>
+                    <div class="plan-price">$0</div>
+                    <div class="plan-period">Get started today</div>
+                    <ul class="plan-features">
+                        <li>3 website customizations</li>
+                        <li>Basic AI commands</li>
+                        <li>Live preview</li>
+                        <li>Email support</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="width: 100%;">Start Free Trial</a>
+                </div>
+                
+                <div class="glass-card pricing-card featured animate-on-scroll">
+                    <div class="plan-name">Basic</div>
+                    <div class="plan-price">$29</div>
+                    <div class="plan-period">per month</div>
+                    <ul class="plan-features">
+                        <li>20 customizations per month</li>
+                        <li>Advanced AI commands</li>
+                        <li>Platform detection</li>
+                        <li>Version control</li>
+                        <li>Priority support</li>
+                        <li>Mobile optimization</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" style="width: 100%;">Choose Basic</a>
+                </div>
+                
+                <div class="glass-card pricing-card animate-on-scroll">
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">$79</div>
+                    <div class="plan-period">per month</div>
+                    <ul class="plan-features">
+                        <li>Unlimited customizations</li>
+                        <li>Advanced AI + Custom Training</li>
+                        <li>White-label options</li>
+                        <li>Team collaboration</li>
+                        <li>API access</li>
+                        <li>Custom integrations</li>
+                        <li>24/7 phone support</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="width: 100%;">Choose Pro</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Our Customers Say</h2>
+                <p>Join thousands of satisfied customers transforming their websites</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="glass-card testimonial-card animate-on-scroll">
+                    <div class="testimonial-text">
+                        "This tool is absolutely incredible. I was able to completely redesign my e-commerce site in minutes, not hours. The AI understands exactly what I want."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SM</div>
+                        <div class="author-info">
+                            <h4>Sarah Miller</h4>
+                            <p>E-commerce Store Owner</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card testimonial-card animate-on-scroll">
+                    <div class="testimonial-text">
+                        "As a small business owner, I don't have time to learn web design. This platform lets me make professional changes to my website instantly."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">DJ</div>
+                        <div class="author-info">
+                            <h4>David Johnson</h4>
+                            <p>Restaurant Owner</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card testimonial-card animate-on-scroll">
+                    <div class="testimonial-text">
+                        "We've seen a 40% increase in conversions since using this tool. The AI suggestions are spot-on for optimization best practices."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AL</div>
+                        <div class="author-info">
+                            <h4>Anna Lee</h4>
+                            <p>Marketing Director</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#examples">Examples</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Status Page</a></li>
+                        <li><a href="#">Community</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Website Customization Studio. All rights reserved. | Built with AI-powered technology</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    entry.target.classList.add('animate-on-scroll');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animatable elements
+        document.querySelectorAll('.glass-card, .feature-card, .pricing-card, .testimonial-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Loading animation for hero elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingElements = document.querySelectorAll('.loading');
+            loadingElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(15, 15, 35, 0.95)';
+            } else {
+                nav.style.background = 'rgba(15, 15, 35, 0.9)';
+            }
+        });
+    </script>
+</body>
+</html>

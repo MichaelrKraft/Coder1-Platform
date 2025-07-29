@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Bits - Visual Component Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #0a0a1f;
+            color: #e0e0ff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .glass-panel {
+            background: rgba(20, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+        }
+        
+        .component-item {
+            background: rgba(30, 30, 50, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .component-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateX(4px);
+        }
+        
+        .component-item.selected {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+        }
+        
+        .component-item.recommended {
+            position: relative;
+        }
+        
+        .component-item.recommended::after {
+            content: 'Recommended';
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .element-highlight {
+            outline: 2px solid #8b5cf6 !important;
+            outline-offset: 2px !important;
+            position: relative !important;
+        }
+        
+        .element-highlight::after {
+            content: attr(data-element-info);
+            position: absolute;
+            top: -24px;
+            left: 0;
+            background: #8b5cf6;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10000;
+        }
+        
+        .status-bar {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+        
+        @keyframes gradient-x {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+        }
+        
+        .loading-skeleton {
+            background: linear-gradient(90deg, #1a1a2e 25%, #252540 50%, #1a1a2e 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex flex-col h-screen">
+        <!-- Header -->
+        <div class="glass-panel m-4 p-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-2xl font-bold text-purple-400 flex items-center gap-2">
+                    <span>🎨</span> React Bits Visual Integration
+                </h1>
+                <div class="status-bar">
+                    <div class="status-indicator"></div>
+                    <span id="previewStatus">Detecting project...</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="refreshBtn" class="px-3 py-1.5 bg-purple-600/20 border border-purple-600/30 rounded-lg hover:bg-purple-600/30 transition-colors text-sm">
+                    🔄 Refresh
+                </button>
+                <a href="./index.html" class="px-4 py-1.5 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors flex items-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Close
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex gap-4 px-4 pb-4 overflow-hidden">
+            <!-- Component Library Panel -->
+            <div class="glass-panel p-4 w-80 flex flex-col">
+                <div class="mb-4">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Search components..." 
+                        class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400"
+                    >
+                </div>
+
+                <div class="flex gap-2 mb-4 flex-wrap">
+                    <button class="category-btn px-3 py-1 text-xs bg-purple-600/20 border border-purple-600/30 rounded-lg hover:bg-purple-600/30 transition-colors" data-category="all">All</button>
+                    <button class="category-btn px-3 py-1 text-xs bg-gray-600/20 border border-gray-600/30 rounded-lg hover:bg-gray-600/30 transition-colors" data-category="buttons">Buttons</button>
+                    <button class="category-btn px-3 py-1 text-xs bg-gray-600/20 border border-gray-600/30 rounded-lg hover:bg-gray-600/30 transition-colors" data-category="cards">Cards</button>
+                    <button class="category-btn px-3 py-1 text-xs bg-gray-600/20 border border-gray-600/30 rounded-lg hover:bg-gray-600/30 transition-colors" data-category="inputs">Inputs</button>
+                    <button class="category-btn px-3 py-1 text-xs bg-gray-600/20 border border-gray-600/30 rounded-lg hover:bg-gray-600/30 transition-colors" data-category="text">Text</button>
+                </div>
+
+                <div id="componentList" class="flex-1 overflow-y-auto space-y-2">
+                    <!-- Components will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="flex-1 glass-panel p-4 flex flex-col">
+                <div class="mb-3 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold">Live Preview</h3>
+                    <div id="selectionInfo" class="text-sm text-gray-400"></div>
+                </div>
+                
+                <div id="previewContainer" class="flex-1 relative rounded-lg overflow-hidden bg-gray-900">
+                    <div id="loadingPreview" class="loading-skeleton absolute inset-0 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p class="text-gray-400">Detecting your project...</p>
+                        </div>
+                    </div>
+                    <iframe id="previewFrame" class="preview-frame hidden" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+                </div>
+
+                <div id="previewError" class="hidden mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <p class="text-red-400 text-sm"></p>
+                </div>
+            </div>
+
+            <!-- Code/Actions Panel -->
+            <div class="glass-panel p-4 w-96 flex flex-col">
+                <div id="actionPanel" class="hidden">
+                    <h3 class="text-lg font-semibold mb-4">Integration Options</h3>
+                    
+                    <div class="mb-4 p-3 bg-gray-800/50 rounded-lg">
+                        <p class="text-sm text-gray-400 mb-1">Selected Element:</p>
+                        <p id="selectedElement" class="font-mono text-sm text-purple-400"></p>
+                    </div>
+
+                    <div class="mb-4 p-3 bg-gray-800/50 rounded-lg">
+                        <p class="text-sm text-gray-400 mb-1">Component:</p>
+                        <p id="selectedComponent" class="font-semibold text-purple-400"></p>
+                    </div>
+
+                    <div class="space-y-2 mb-4">
+                        <button id="previewBtn" class="w-full px-4 py-2 bg-purple-600/20 border border-purple-600/30 rounded-lg hover:bg-purple-600/30 transition-colors">
+                            👁️ Preview in Place
+                        </button>
+                        <button id="copyCodeBtn" class="w-full px-4 py-2 bg-blue-600/20 border border-blue-600/30 rounded-lg hover:bg-blue-600/30 transition-colors">
+                            📋 Copy Component Code
+                        </button>
+                        <button id="replaceBtn" class="w-full px-4 py-2 bg-green-600/20 border border-green-600/30 rounded-lg hover:bg-green-600/30 transition-colors">
+                            ✨ Apply to File
+                        </button>
+                    </div>
+
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-sm text-gray-400 mb-2">Generated Code:</p>
+                        <div class="bg-gray-900 rounded-lg p-3 h-full overflow-auto">
+                            <pre id="codeDisplay" class="text-xs font-mono text-gray-300"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="welcomePanel" class="text-center py-8">
+                    <div class="text-6xl mb-4">🎯</div>
+                    <h3 class="text-lg font-semibold mb-2">Click to Select</h3>
+                    <p class="text-sm text-gray-400">Click any element in your preview to replace it with a React Bits component</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Component Library (same as before but organized)
+        const componentLibrary = {
+            buttons: [
+                {
+                    id: 'btn-glow',
+                    name: 'Glowing Button',
+                    icon: '✨',
+                    preview: '<button class="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:shadow-purple-600/50 transition-all duration-300 transform hover:scale-105">Click Me</button>',
+                    code: `<button className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:shadow-purple-600/50 transition-all duration-300 transform hover:scale-105">
+  Click Me
+</button>`,
+                    tags: ['button', 'glow', 'hover']
+                },
+                {
+                    id: 'btn-gradient',
+                    name: 'Gradient Button',
+                    icon: '🌈',
+                    preview: '<button class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg transform hover:scale-105 transition-transform">Gradient</button>',
+                    code: `<button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg transform hover:scale-105 transition-transform">
+  Gradient
+</button>`,
+                    tags: ['button', 'gradient', 'colorful']
+                }
+            ],
+            cards: [
+                {
+                    id: 'card-glass',
+                    name: 'Glass Card',
+                    icon: '🪟',
+                    preview: '<div class="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl"><h3 class="text-lg font-bold mb-2">Glass Card</h3><p class="text-gray-300">Beautiful glassmorphism effect</p></div>',
+                    code: `<div className="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl">
+  <h3 className="text-lg font-bold mb-2">Glass Card</h3>
+  <p className="text-gray-300">Beautiful glassmorphism effect</p>
+</div>`,
+                    tags: ['card', 'glass', 'blur']
+                }
+            ],
+            inputs: [
+                {
+                    id: 'input-glow',
+                    name: 'Glowing Input',
+                    icon: '💫',
+                    preview: '<input type="text" placeholder="Enter text..." class="px-4 py-2 bg-gray-800 border border-purple-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" />',
+                    code: `<input 
+  type="text" 
+  placeholder="Enter text..." 
+  className="px-4 py-2 bg-gray-800 border border-purple-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" 
+/>`,
+                    tags: ['input', 'form', 'glow']
+                }
+            ],
+            text: [
+                {
+                    id: 'text-gradient',
+                    name: 'Gradient Text',
+                    icon: '🎨',
+                    preview: '<h2 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Gradient Text</h2>',
+                    code: `<h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+  Gradient Text
+</h2>`,
+                    tags: ['text', 'gradient', 'heading']
+                }
+            ]
+        };
+
+        // State
+        let selectedElement = null;
+        let selectedComponent = null;
+        let previewUrl = null;
+        let projectType = 'unknown';
+
+        // Common development server ports
+        const commonPorts = [3000, 3001, 5173, 5174, 8080, 4200, 5000, 8000, 8081];
+
+        // Auto-detect running server
+        async function detectRunningServer() {
+            const statusEl = document.getElementById('previewStatus');
+            statusEl.textContent = 'Scanning for development servers...';
+            
+            console.log('Starting server detection...');
+
+            for (const port of commonPorts) {
+                console.log(`Checking port ${port}...`);
+                try {
+                    // Try to fetch with no-cors to check if server exists
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 500);
+                    
+                    await fetch(`http://localhost:${port}`, { 
+                        mode: 'no-cors',
+                        signal: controller.signal 
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    // If we get here, server exists
+                    console.log(`Found server on port ${port}`);
+                    return `http://localhost:${port}`;
+                } catch (e) {
+                    // Server doesn't exist or timed out, continue
+                    console.log(`Port ${port} failed:`, e.message);
+                    continue;
+                }
+            }
+            
+            console.log('No servers found, will use demo mode');
+            return null;
+        }
+
+        // Load preview
+        async function loadPreview() {
+            const frame = document.getElementById('previewFrame');
+            const loading = document.getElementById('loadingPreview');
+            const statusEl = document.getElementById('previewStatus');
+            const errorEl = document.getElementById('previewError');
+
+            try {
+                // First try to detect running server
+                const serverUrl = await detectRunningServer();
+                
+                if (serverUrl) {
+                    previewUrl = serverUrl;
+                    statusEl.textContent = `Connected to ${serverUrl}`;
+                    statusEl.previousElementSibling.style.background = '#10b981';
+                    
+                    frame.src = serverUrl;
+                    frame.classList.remove('hidden');
+                    loading.classList.add('hidden');
+                    
+                    // Setup iframe communication
+                    setupIframeInteraction();
+                } else {
+                    // No server found, load demo content
+                    statusEl.textContent = 'Demo Mode - Using sample website';
+                    statusEl.previousElementSibling.style.background = '#f59e0b';
+                    
+                    // Load demo HTML
+                    loadDemoSite();
+                }
+            } catch (error) {
+                console.error('Error loading preview:', error);
+                loading.classList.add('hidden');
+                errorEl.classList.remove('hidden');
+                errorEl.querySelector('p').textContent = 'Error loading preview: ' + error.message;
+            }
+        }
+
+        // Load demo site
+        function loadDemoSite() {
+            const frame = document.getElementById('previewFrame');
+            const loading = document.getElementById('loadingPreview');
+            
+            // Create demo HTML content
+            const demoHTML = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Demo Site - Click Elements to Replace</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: system-ui, -apple-system, sans-serif;
+                            background: #f3f4f6;
+                            color: #1f2937;
+                            line-height: 1.6;
+                        }
+                        header {
+                            background: #1f2937;
+                            color: white;
+                            padding: 1rem 0;
+                        }
+                        .container {
+                            max-width: 1200px;
+                            margin: 0 auto;
+                            padding: 0 20px;
+                        }
+                        nav {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        .logo {
+                            font-size: 1.5rem;
+                            font-weight: bold;
+                        }
+                        .nav-links {
+                            display: flex;
+                            gap: 2rem;
+                            list-style: none;
+                        }
+                        .nav-links a {
+                            color: white;
+                            text-decoration: none;
+                        }
+                        .hero {
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 4rem 0;
+                            text-align: center;
+                        }
+                        .hero h1 {
+                            font-size: 3rem;
+                            margin-bottom: 1rem;
+                        }
+                        .hero p {
+                            font-size: 1.25rem;
+                            margin-bottom: 2rem;
+                        }
+                        .btn-primary {
+                            background: #3b82f6;
+                            color: white;
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 6px;
+                            font-size: 16px;
+                            cursor: pointer;
+                            display: inline-block;
+                            text-decoration: none;
+                        }
+                        .features {
+                            padding: 4rem 0;
+                        }
+                        .features-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                            gap: 2rem;
+                            margin-top: 2rem;
+                        }
+                        .feature-card {
+                            background: white;
+                            padding: 2rem;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        }
+                        .feature-card h3 {
+                            margin-bottom: 1rem;
+                            color: #1f2937;
+                        }
+                        .form-section {
+                            background: white;
+                            padding: 4rem 0;
+                        }
+                        .form-group {
+                            margin-bottom: 1.5rem;
+                        }
+                        label {
+                            display: block;
+                            margin-bottom: 0.5rem;
+                            font-weight: 500;
+                        }
+                        input[type="text"],
+                        input[type="email"] {
+                            width: 100%;
+                            padding: 8px 12px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 4px;
+                            font-size: 16px;
+                        }
+                        .testimonial {
+                            background: #f9fafb;
+                            padding: 2rem;
+                            border-radius: 8px;
+                            text-align: center;
+                            margin: 2rem 0;
+                        }
+                        .testimonial p {
+                            font-style: italic;
+                            margin-bottom: 1rem;
+                        }
+                        footer {
+                            background: #1f2937;
+                            color: white;
+                            padding: 2rem 0;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <header>
+                        <div class="container">
+                            <nav>
+                                <div class="logo">DemoSite</div>
+                                <ul class="nav-links">
+                                    <li><a href="#">Home</a></li>
+                                    <li><a href="#">About</a></li>
+                                    <li><a href="#">Services</a></li>
+                                    <li><a href="#">Contact</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <section class="hero">
+                        <div class="container">
+                            <h1>Welcome to Our Demo Site</h1>
+                            <p>Click any element to replace it with a React Bits component</p>
+                            <button class="btn-primary">Get Started</button>
+                        </div>
+                    </section>
+
+                    <section class="features">
+                        <div class="container">
+                            <h2>Our Features</h2>
+                            <div class="features-grid">
+                                <div class="feature-card">
+                                    <h3>Feature One</h3>
+                                    <p>This is a standard card component that you can replace with a glassmorphism card.</p>
+                                    <button>Learn More</button>
+                                </div>
+                                <div class="feature-card">
+                                    <h3>Feature Two</h3>
+                                    <p>Another card that could use some React Bits magic to make it stand out.</p>
+                                    <button>Learn More</button>
+                                </div>
+                                <div class="feature-card">
+                                    <h3>Feature Three</h3>
+                                    <p>Transform these boring cards into beautiful, animated components.</p>
+                                    <button>Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <div class="container">
+                            <h2>Contact Us</h2>
+                            <form style="max-width: 500px;">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" placeholder="Enter your name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" placeholder="Enter your email">
+                                </div>
+                                <button type="submit" class="btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </section>
+
+                    <section class="testimonial">
+                        <div class="container">
+                            <p>"This text could be replaced with a gradient text effect!"</p>
+                            <strong>- Happy Customer</strong>
+                        </div>
+                    </section>
+
+                    <footer>
+                        <div class="container">
+                            <p>&copy; 2024 DemoSite. All rights reserved.</p>
+                        </div>
+                    </footer>
+                </body>
+                </html>
+            `;
+            
+            // Create blob URL for the demo content
+            const blob = new Blob([demoHTML], { type: 'text/html' });
+            const demoUrl = URL.createObjectURL(blob);
+            
+            frame.src = demoUrl;
+            frame.classList.remove('hidden');
+            loading.classList.add('hidden');
+            
+            // Setup iframe interaction after load
+            frame.onload = () => {
+                setupIframeInteraction();
+                // Clean up blob URL
+                URL.revokeObjectURL(demoUrl);
+            };
+        }
+
+        // Setup iframe interaction
+        function setupIframeInteraction() {
+            const frame = document.getElementById('previewFrame');
+            
+            // Wait for iframe to load
+            frame.onload = () => {
+                try {
+                    // Inject selection script into iframe
+                    const script = frame.contentDocument.createElement('script');
+                    script.textContent = `
+                        // Element selection in iframe
+                        let hoveredElement = null;
+                        let selectedElement = null;
+
+                        // Add styles for highlighting
+                        const style = document.createElement('style');
+                        style.textContent = \`
+                            .rb-hover { outline: 2px dashed #8b5cf6 !important; outline-offset: 2px !important; cursor: pointer !important; }
+                            .rb-selected { outline: 2px solid #8b5cf6 !important; outline-offset: 2px !important; }
+                        \`;
+                        document.head.appendChild(style);
+
+                        // Mouse over handler
+                        document.addEventListener('mouseover', (e) => {
+                            if (hoveredElement) {
+                                hoveredElement.classList.remove('rb-hover');
+                            }
+                            hoveredElement = e.target;
+                            hoveredElement.classList.add('rb-hover');
+                        });
+
+                        // Mouse out handler
+                        document.addEventListener('mouseout', (e) => {
+                            if (hoveredElement) {
+                                hoveredElement.classList.remove('rb-hover');
+                                hoveredElement = null;
+                            }
+                        });
+
+                        // Click handler
+                        document.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Remove previous selection
+                            if (selectedElement) {
+                                selectedElement.classList.remove('rb-selected');
+                            }
+                            
+                            // Add new selection
+                            selectedElement = e.target;
+                            selectedElement.classList.add('rb-selected');
+                            
+                            // Send selection info to parent
+                            const elementInfo = {
+                                tagName: selectedElement.tagName.toLowerCase(),
+                                className: selectedElement.className,
+                                id: selectedElement.id,
+                                text: selectedElement.textContent.slice(0, 50),
+                                path: getElementPath(selectedElement)
+                            };
+                            
+                            window.parent.postMessage({
+                                type: 'elementSelected',
+                                data: elementInfo
+                            }, '*');
+                        });
+
+                        // Get element path
+                        function getElementPath(el) {
+                            const path = [];
+                            while (el && el.nodeType === Node.ELEMENT_NODE) {
+                                let selector = el.tagName.toLowerCase();
+                                if (el.id) {
+                                    selector += '#' + el.id;
+                                    path.unshift(selector);
+                                    break;
+                                }
+                                if (el.className && typeof el.className === 'string') {
+                                    selector += '.' + el.className.split(' ').filter(c => c && !c.startsWith('rb-')).join('.');
+                                }
+                                path.unshift(selector);
+                                el = el.parentNode;
+                            }
+                            return path.join(' > ');
+                        }
+                    `;
+                    frame.contentDocument.body.appendChild(script);
+                } catch (error) {
+                    console.log('Could not inject selection script (cross-origin):', error);
+                    // For cross-origin, we'll need a different approach
+                }
+            };
+        }
+
+        // Handle messages from iframe
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'elementSelected') {
+                handleElementSelection(event.data.data);
+            }
+        });
+
+        // Handle element selection
+        function handleElementSelection(elementInfo) {
+            selectedElement = elementInfo;
+            
+            // Update UI
+            document.getElementById('selectionInfo').textContent = `Selected: ${elementInfo.path}`;
+            document.getElementById('selectedElement').textContent = elementInfo.path;
+            
+            // Show action panel
+            document.getElementById('welcomePanel').classList.add('hidden');
+            document.getElementById('actionPanel').classList.remove('hidden');
+            
+            // Recommend components based on element type
+            recommendComponents(elementInfo);
+        }
+
+        // Recommend components based on selected element
+        function recommendComponents(elementInfo) {
+            const componentItems = document.querySelectorAll('.component-item');
+            componentItems.forEach(item => item.classList.remove('recommended'));
+            
+            // Simple matching logic
+            const tagName = elementInfo.tagName;
+            const className = elementInfo.className.toLowerCase();
+            
+            let recommendedType = null;
+            if (tagName === 'button' || className.includes('btn') || className.includes('button')) {
+                recommendedType = 'buttons';
+            } else if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+                recommendedType = 'inputs';
+            } else if (tagName === 'div' && (className.includes('card') || className.includes('panel'))) {
+                recommendedType = 'cards';
+            } else if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span'].includes(tagName)) {
+                recommendedType = 'text';
+            }
+            
+            if (recommendedType) {
+                componentItems.forEach(item => {
+                    if (item.dataset.category === recommendedType) {
+                        item.classList.add('recommended');
+                    }
+                });
+            }
+        }
+
+        // Render components
+        function renderComponents(category = 'all') {
+            const list = document.getElementById('componentList');
+            list.innerHTML = '';
+
+            let components = [];
+            if (category === 'all') {
+                Object.values(componentLibrary).forEach(cat => {
+                    components = [...components, ...cat];
+                });
+            } else {
+                components = componentLibrary[category] || [];
+            }
+
+            components.forEach(comp => {
+                const item = document.createElement('div');
+                item.className = 'component-item';
+                item.dataset.category = Object.keys(componentLibrary).find(key => 
+                    componentLibrary[key].includes(comp)
+                );
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${comp.icon}</span>
+                        <div>
+                            <div class="font-medium">${comp.name}</div>
+                            <div class="text-xs text-gray-400">${comp.tags.join(', ')}</div>
+                        </div>
+                    </div>
+                `;
+                item.onclick = () => selectComponent(comp);
+                list.appendChild(item);
+            });
+        }
+
+        // Select component
+        function selectComponent(component) {
+            selectedComponent = component;
+            
+            // Update UI
+            document.querySelectorAll('.component-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            document.getElementById('selectedComponent').textContent = component.name;
+            document.getElementById('codeDisplay').textContent = component.code;
+            
+            // Enable action buttons
+            document.getElementById('previewBtn').disabled = false;
+            document.getElementById('copyCodeBtn').disabled = false;
+            document.getElementById('replaceBtn').disabled = false;
+        }
+
+        // State for preview mode
+        let isPreviewMode = false;
+        let originalElementHTML = null;
+        let previewedElement = null;
+
+        // Action handlers
+        document.getElementById('previewBtn').onclick = () => {
+            if (selectedComponent && selectedElement) {
+                togglePreviewMode();
+            }
+        };
+
+        // Toggle preview mode
+        function togglePreviewMode() {
+            const frame = document.getElementById('previewFrame');
+            const btn = document.getElementById('previewBtn');
+            
+            if (!isPreviewMode) {
+                // Enter preview mode
+                try {
+                    // Try to access iframe content (same-origin)
+                    const frameDoc = frame.contentDocument;
+                    previewedElement = frameDoc.querySelector(selectedElement.path);
+                    
+                    if (previewedElement) {
+                        // Store original HTML
+                        originalElementHTML = previewedElement.outerHTML;
+                        
+                        // Create temporary container with component
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = selectedComponent.preview;
+                        const newElement = tempDiv.firstElementChild;
+                        
+                        // Replace element
+                        previewedElement.parentNode.replaceChild(newElement, previewedElement);
+                        previewedElement = newElement;
+                        
+                        // Add preview indicator
+                        addPreviewBanner(frameDoc);
+                        
+                        // Update button
+                        btn.innerHTML = '↩️ Revert Preview';
+                        btn.classList.add('bg-orange-600/20', 'border-orange-600/30');
+                        btn.classList.remove('bg-purple-600/20', 'border-purple-600/30');
+                        
+                        isPreviewMode = true;
+                    }
+                } catch (e) {
+                    // Cross-origin iframe - show preview in modal instead
+                    showPreviewModal();
+                }
+            } else {
+                // Exit preview mode
+                revertPreview();
+            }
+        }
+
+        // Add preview banner to iframe
+        function addPreviewBanner(doc) {
+            const banner = doc.createElement('div');
+            banner.id = 'react-bits-preview-banner';
+            banner.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #f59e0b;
+                color: #000;
+                padding: 8px;
+                text-align: center;
+                font-family: system-ui, -apple-system, sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 99999;
+            `;
+            banner.textContent = '👁️ Preview Mode - This is a temporary preview';
+            doc.body.appendChild(banner);
+        }
+
+        // Revert preview
+        function revertPreview() {
+            if (!isPreviewMode) return;
+            
+            const frame = document.getElementById('previewFrame');
+            const btn = document.getElementById('previewBtn');
+            
+            try {
+                const frameDoc = frame.contentDocument;
+                
+                // Restore original element
+                if (previewedElement && originalElementHTML) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = originalElementHTML;
+                    const originalElement = tempDiv.firstElementChild;
+                    previewedElement.parentNode.replaceChild(originalElement, previewedElement);
+                }
+                
+                // Remove banner
+                const banner = frameDoc.getElementById('react-bits-preview-banner');
+                if (banner) banner.remove();
+                
+                // Reset button
+                btn.innerHTML = '👁️ Preview in Place';
+                btn.classList.remove('bg-orange-600/20', 'border-orange-600/30');
+                btn.classList.add('bg-purple-600/20', 'border-purple-600/30');
+                
+                isPreviewMode = false;
+                originalElementHTML = null;
+                previewedElement = null;
+            } catch (e) {
+                console.error('Error reverting preview:', e);
+            }
+        }
+
+        // Show preview modal for cross-origin iframes
+        function showPreviewModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass-panel p-6 max-w-2xl mx-4">
+                    <h3 class="text-lg font-semibold mb-4">Component Preview</h3>
+                    <p class="text-sm text-gray-400 mb-4">Cross-origin preview - showing component in isolation</p>
+                    <div class="bg-white rounded-lg p-8 mb-4">
+                        ${selectedComponent.preview}
+                    </div>
+                    <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                        Close Preview
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        document.getElementById('copyCodeBtn').onclick = () => {
+            if (selectedComponent) {
+                // Detect framework and generate appropriate code
+                const framework = detectFramework();
+                const codeWithImports = generateComponentCode(selectedComponent, framework);
+                
+                navigator.clipboard.writeText(codeWithImports);
+                const btn = document.getElementById('copyCodeBtn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = '📋 Copy Component Code', 2000);
+            }
+        };
+
+        document.getElementById('replaceBtn').onclick = () => {
+            if (selectedComponent && selectedElement) {
+                showApplyOptions();
+            }
+        };
+
+        // Detect project framework
+        function detectFramework() {
+            // Check for React indicators
+            const frame = document.getElementById('previewFrame');
+            try {
+                const frameDoc = frame.contentDocument;
+                const rootElement = frameDoc.getElementById('root');
+                const reactScripts = frameDoc.querySelectorAll('script[src*="react"]');
+                
+                if (rootElement || reactScripts.length > 0 || frame.src.includes(':3000')) {
+                    return 'react';
+                }
+                
+                // Check for Vue
+                const vueScripts = frameDoc.querySelectorAll('script[src*="vue"]');
+                if (vueScripts.length > 0 || frame.src.includes(':5173')) {
+                    return 'vue';
+                }
+            } catch (e) {
+                // Cross-origin, make educated guess based on port
+                if (frame.src.includes(':3000') || frame.src.includes(':3001')) return 'react';
+                if (frame.src.includes(':5173')) return 'vue';
+            }
+            
+            return 'html';
+        }
+
+        // Generate component code with framework-specific syntax
+        function generateComponentCode(component, framework) {
+            if (framework === 'react') {
+                // Convert HTML classes to className
+                let reactCode = component.code
+                    .replace(/class=/g, 'className=')
+                    .replace(/for=/g, 'htmlFor=');
+                
+                // Add imports if needed
+                const imports = [];
+                if (component.code.includes('useState')) imports.push("import { useState } from 'react';");
+                if (component.code.includes('useEffect')) imports.push("import { useEffect } from 'react';");
+                
+                return imports.join('\\n') + (imports.length ? '\\n\\n' : '') + reactCode;
+            } else if (framework === 'vue') {
+                // Wrap in Vue template
+                return `<template>\\n  ${component.preview}\\n</template>\\n\\n<script setup>\\n// Add component logic here\\n</script>`;
+            }
+            
+            // Default HTML
+            return component.preview;
+        }
+
+        // Show apply options modal
+        function showApplyOptions() {
+            const framework = detectFramework();
+            const code = generateComponentCode(selectedComponent, framework);
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass-panel p-6 max-w-2xl mx-4 max-h-[80vh] overflow-auto">
+                    <h3 class="text-lg font-semibold mb-4">Apply Component to Your Code</h3>
+                    
+                    <div class="mb-4 p-3 bg-gray-800/50 rounded-lg">
+                        <p class="text-sm text-gray-400 mb-1">Selected Element:</p>
+                        <p class="font-mono text-sm text-purple-400">${selectedElement.path}</p>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-gray-800/50 rounded-lg">
+                        <p class="text-sm text-gray-400 mb-1">Framework Detected:</p>
+                        <p class="font-semibold text-green-400">${framework.toUpperCase()}</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-4">
+                        <button onclick="copyTerminalCommand()" class="w-full px-4 py-2 bg-blue-600/20 border border-blue-600/30 rounded-lg hover:bg-blue-600/30 transition-colors text-left">
+                            <div class="font-medium mb-1">📟 Copy Terminal Command</div>
+                            <div class="text-sm text-gray-400">Generate a command to run in the IDE terminal</div>
+                        </button>
+                        
+                        <button onclick="copyCodeWithInstructions()" class="w-full px-4 py-2 bg-green-600/20 border border-green-600/30 rounded-lg hover:bg-green-600/30 transition-colors text-left">
+                            <div class="font-medium mb-1">📋 Copy Code with Instructions</div>
+                            <div class="text-sm text-gray-400">Get the code with integration instructions</div>
+                        </button>
+                        
+                        <button onclick="alert('Direct file integration coming soon!')" class="w-full px-4 py-2 bg-purple-600/20 border border-purple-600/30 rounded-lg hover:bg-purple-600/30 transition-colors text-left opacity-50">
+                            <div class="font-medium mb-1">✨ Apply Directly (Coming Soon)</div>
+                            <div class="text-sm text-gray-400">Automatically update your source file</div>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-400 mb-2">Generated Code:</p>
+                        <div class="bg-gray-900 rounded-lg p-3 max-h-64 overflow-auto">
+                            <pre id="generatedCode" class="text-xs font-mono text-gray-300">${code}</pre>
+                        </div>
+                    </div>
+                    
+                    <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Store for functions
+            window.generatedCode = code;
+            window.selectedElementPath = selectedElement.path;
+            window.componentName = selectedComponent.name;
+        }
+
+        // Copy terminal command
+        window.copyTerminalCommand = function() {
+            const command = `/replace "${window.selectedElementPath}" "${window.generatedCode.replace(/"/g, '\\"').replace(/\\n/g, '\\\\n')}"`;
+            navigator.clipboard.writeText(command);
+            alert('Terminal command copied! Paste it in the IDE terminal to apply the change.');
+        };
+
+        // Copy code with instructions
+        window.copyCodeWithInstructions = function() {
+            const instructions = `/* React Bits Component: ${window.componentName}
+ * 
+ * To integrate this component:
+ * 1. Find the element: ${window.selectedElementPath}
+ * 2. Replace it with the code below
+ * 3. Make sure to import any required dependencies
+ * 4. Adjust props and styling as needed
+ */
+
+${window.generatedCode}`;
+            
+            navigator.clipboard.writeText(instructions);
+            alert('Code and instructions copied to clipboard!');
+        };
+
+        // Search functionality
+        document.getElementById('searchInput').oninput = (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.component-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        };
+
+        // Category filters
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.remove('bg-purple-600/20', 'border-purple-600/30');
+                    b.classList.add('bg-gray-600/20', 'border-gray-600/30');
+                });
+                btn.classList.remove('bg-gray-600/20', 'border-gray-600/30');
+                btn.classList.add('bg-purple-600/20', 'border-purple-600/30');
+                renderComponents(btn.dataset.category);
+            };
+        });
+
+        // Refresh button
+        document.getElementById('refreshBtn').onclick = () => {
+            const frame = document.getElementById('previewFrame');
+            if (frame.src) {
+                frame.src = frame.src;
+            } else {
+                loadPreview();
+            }
+        };
+
+        // Initialize
+        renderComponents();
+        
+        // Add a timeout fallback in case detection hangs
+        setTimeout(() => {
+            const frame = document.getElementById('previewFrame');
+            const loading = document.getElementById('loadingPreview');
+            
+            // If still loading after 3 seconds, force demo mode
+            if (!frame.src && loading && !loading.classList.contains('hidden')) {
+                console.log('Timeout reached, forcing demo mode');
+                const statusEl = document.getElementById('previewStatus');
+                statusEl.textContent = 'Demo Mode - Using sample website';
+                statusEl.previousElementSibling.style.background = '#f59e0b';
+                loadDemoSite();
+            }
+        }, 3000);
+        
+        loadPreview();
+    </script>
+</body>
+</html>

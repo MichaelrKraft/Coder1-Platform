@@ -27,7 +27,7 @@
     --gradient-3: #0f0f23;
     --orb-1: rgba(147, 51, 234, 0.3);
     --orb-2: rgba(59, 130, 246, 0.3);
-    --orb-3: rgba(16, 185, 129, 0.3);
+    --orb-3: rgba(236, 72, 153, 0.3);
 }
 
 /* Light Theme Colors */
@@ -51,7 +51,7 @@ body.light-theme {
     --gradient-3: #f8fafc;
     --orb-1: rgba(147, 51, 234, 0.1);
     --orb-2: rgba(59, 130, 246, 0.1);
-    --orb-3: rgba(16, 185, 129, 0.1);
+    --orb-3: rgba(236, 72, 153, 0.1);
 }
 
 body {

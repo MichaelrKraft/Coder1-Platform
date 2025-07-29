@@ -1,0 +1,21 @@
+/* Explorer Padding Fix - Add space at bottom for settings */
+
+/* Add padding to Explorer content to prevent overlap with fixed settings */
+.Explorer,
+[class*="Explorer"],
+[class*="explorer"] {
+    padding-bottom: 350px !important; /* Space for settings + React Bits button */
+}
+
+/* Alternative selectors for the file tree container */
+div:has(> div > h3:contains("PROJECT FILES")),
+div:has(> [class*="project"]),
+#root > div > div:first-child {
+    padding-bottom: 350px !important;
+}
+
+/* Ensure project files section has space */
+[class*="project-files"],
+[class*="PROJECT FILES"] {
+    margin-bottom: 50px !important;
+}

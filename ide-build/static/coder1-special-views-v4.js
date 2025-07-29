@@ -179,7 +179,7 @@
                 <div class="coder1-glass-panel">
                     <div class="coder1-panel-header">
                         <h2>${title}</h2>
-                        <button class="coder1-exit-btn">
+                        <button class="coder1-exit-btn" onclick="console.log('X button clicked!'); try { const container = document.querySelector('.coder1-special-view-container'); if(container) { container.remove(); window.CODER1_SPECIAL_VIEW_ACTIVE = false; const settings = document.querySelector('.settings-section'); if(settings) settings.style.display = ''; } } catch(e) { console.error('Exit error:', e); } return false;" style="cursor: pointer; pointer-events: auto; z-index: 99999; position: relative;">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -380,6 +380,269 @@
         `;
         
         return createGlassContainer('🌙 Sleep Mode', content);
+    }
+    
+    // IDE Settings View - API Configuration and Features
+    function createIDESettingsView() {
+        const content = `
+            <div class="coder1-api-config-section">
+                <div class="api-config-header">
+                    <i class="fas fa-cloud"></i>
+                    <div>
+                        <h3>Claude API Configuration</h3>
+                        <p>Configure your Claude API key to enable SuperClaude AI features and live code assistance.</p>
+                    </div>
+                </div>
+                
+                <div class="api-key-section">
+                    <label for="claudeApiKey">Claude API Key:</label>
+                    <div class="api-key-input-container">
+                        <input type="password" id="claudeApiKey" class="glassmorphism-input" 
+                               placeholder="sk-ant-api03-..." 
+                               style="width: 100%; font-family: monospace; font-size: 14px;">
+                        <button id="toggleApiKeyVisibility" class="visibility-toggle" title="Toggle visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="api-actions">
+                    <button id="saveApiKeyBtn" class="coder1-btn save-btn">
+                        <i class="fas fa-save"></i>
+                        Save API Key
+                    </button>
+                    <button id="testConnectionBtn" class="coder1-btn test-btn">
+                        <i class="fas fa-plug"></i>
+                        Test Connection
+                    </button>
+                    <button id="clearApiKeyBtn" class="coder1-btn clear-btn">
+                        <i class="fas fa-trash"></i>
+                        Clear
+                    </button>
+                </div>
+                
+                <div class="api-help-section">
+                    <div class="help-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="help-content">
+                        <h4>📖 How to get your Claude API key:</h4>
+                        <ol>
+                            <li>Visit <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></li>
+                            <li>Sign up or log in to your account</li>
+                            <li>Navigate to API Keys section</li>
+                            <li>Create a new API key</li>
+                            <li>Copy and paste it above</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="connection-status">
+                    <span class="status-label">Current Status:</span>
+                    <div class="status-indicator" id="connectionStatus">
+                        <div class="status-dot offline"></div>
+                        <span>Not Connected</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="coder1-features-section">
+                <div class="features-header">
+                    <i class="fas fa-rocket"></i>
+                    <h3>IDE Features</h3>
+                </div>
+                
+                <div class="feature-cards">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h4>SuperClaude Commands:</h4>
+                            <p>Use /analyze, /build, /test, /security commands with AI assistance</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h4>ReactBits:</h4>
+                            <p>Generate React components with /ui commands</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h4>Terminal Integration:</h4>
+                            <p>Full Claude Code CLI integration coming soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return createGlassContainer('⚙️ IDE Settings', content);
+    }
+    
+    // Documentation View - Comprehensive IDE Guide
+    function createDocumentationView() {
+        const content = `
+            <div class="coder1-documentation-wrapper">
+                <div class="coder1-documentation-nav">
+                <div class="nav-header">
+                    <h3>🚀 Coder1 IDE Overview</h3>
+                    <p>Your comprehensive guide to using Coder1 IDE's powerful AI-assisted development features.</p>
+                </div>
+                
+                <div class="nav-sections">
+                    <div class="nav-item active" data-section="overview">
+                        <i class="fas fa-rocket"></i>
+                        <span>Coder1 IDE Overview</span>
+                    </div>
+                    <div class="nav-item" data-section="features">
+                        <i class="fas fa-star"></i>
+                        <span>IDE Features Guide</span>
+                    </div>
+                    <div class="nav-item" data-section="superclaude">
+                        <i class="fas fa-brain"></i>
+                        <span>SuperClaude AI Assistant</span>
+                    </div>
+                    <div class="nav-item" data-section="reactbits">
+                        <i class="fas fa-cube"></i>
+                        <span>React Bits Generator</span>
+                    </div>
+                    <div class="nav-item" data-section="shortcuts">
+                        <i class="fas fa-keyboard"></i>
+                        <span>Keyboard Shortcuts</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="coder1-documentation-content">
+                <div id="overviewSection" class="doc-section active">
+                    <div class="welcome-banner">
+                        <h2>Welcome to Coder1 IDE - your AI-powered development environment!</h2>
+                    </div>
+                    
+                    <div class="key-features">
+                        <h3>KEY FEATURES</h3>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <i class="fas fa-brain"></i>
+                                <div>
+                                    <strong>🤖 SuperClaude AI Assistant with 8 specialized commands</strong>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-cube"></i>
+                                <div>
+                                    <strong>⚛️ React Bits component generation</strong>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-paint-brush"></i>
+                                <div>
+                                    <strong>🎨 Visual Landing Page Builder</strong>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-terminal"></i>
+                                <div>
+                                    <strong>💻 Advanced terminal with autocomplete</strong>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-folder"></i>
+                                <div>
+                                    <strong>📁 Multi-tab file explorer</strong>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-eye"></i>
+                                <div>
+                                    <strong>👁️ Live preview panel</strong>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-keyboard"></i>
+                                <div>
+                                    <strong>⌨️ Comprehensive keyboard shortcuts</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="getting-started">
+                        <h3>GETTING STARTED</h3>
+                        <div class="step-list">
+                            <div class="step-item">
+                                <span class="step-number">1</span>
+                                <div>
+                                    <strong>Use the File Explorer to navigate your project</strong>
+                                    <p>Browse and open files in the left sidebar</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">2</span>
+                                <div>
+                                    <strong>Open files in the multi-tab editor</strong>
+                                    <p>Click files to open them in tabs at the top</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">3</span>
+                                <div>
+                                    <strong>Use the Terminal for SuperClaude and React Bits commands</strong>
+                                    <p>Access the powerful AI features via the bottom terminal</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">4</span>
+                                <div>
+                                    <strong>Preview your work in the Preview Panel</strong>
+                                    <p>See live updates of your HTML, CSS, and JavaScript</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">5</span>
+                                <div>
+                                    <strong>Access all features via the menu bar or keyboard shortcuts</strong>
+                                    <p>Use Cmd/Ctrl shortcuts for faster development</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="featuresSection" class="doc-section" style="display: none;">
+                    <h2>IDE Features Guide</h2>
+                    <p>Detailed guide to all IDE features coming soon...</p>
+                </div>
+                
+                <div id="superclaudeSection" class="doc-section" style="display: none;">
+                    <h2>SuperClaude AI Assistant</h2>
+                    <p>Complete SuperClaude documentation coming soon...</p>
+                </div>
+                
+                <div id="reactbitsSection" class="doc-section" style="display: none;">
+                    <h2>React Bits Generator</h2>
+                    <p>React Bits usage guide coming soon...</p>
+                </div>
+                
+                <div id="shortcutsSection" class="doc-section" style="display: none;">
+                    <h2>Keyboard Shortcuts</h2>
+                    <p>Complete keyboard shortcuts reference coming soon...</p>
+                </div>
+            </div>
+            </div>
+        `;
+        
+        return createGlassContainer('📖 Documentation', content);
     }
     
     // Infinite Loop View - Configuration state with full interactivity
@@ -770,6 +1033,12 @@
             case 'sleep-mode':
                 content = createSleepModeView();
                 break;
+            case 'ide-settings':
+                content = createIDESettingsView();
+                break;
+            case 'documentation':
+                content = createDocumentationView();
+                break;
             case 'infinite-loop':
                 content = createInfiniteLoopView();
                 break;
@@ -788,44 +1057,122 @@
             e.stopPropagation();
         }, true);
         
-        // Add exit functionality
-        const exitBtn = overlay.querySelector('.coder1-exit-btn');
-        if (exitBtn) {
-            exitBtn.addEventListener('click', () => {
-                // Stop sleep timer if active
-                if (sleepTimerInterval) {
-                    clearInterval(sleepTimerInterval);
-                    sleepTimerInterval = null;
-                    sleepStartTime = null;
-                }
-                container.remove();
-                window.CODER1_SPECIAL_VIEW_ACTIVE = false;
-                const settingsSection = document.querySelector('.settings-section');
-                if (settingsSection) {
-                    settingsSection.style.display = '';
-                }
-            });
-        }
-        
         // Start sleep timer if sleep mode
         if (type === 'sleep-mode') {
             startSleepTimer();
         }
         
-        // Add escape key handler
+        // Set up handlers for IDE settings
+        if (type === 'ide-settings') {
+            setTimeout(() => {
+                setupIDESettingsHandlers();
+            }, 100);
+        }
+        
+        // Set up handlers for documentation navigation
+        if (type === 'documentation') {
+            setTimeout(() => {
+                setupDocumentationHandlers();
+            }, 100);
+        }
+        
+        // Define exit function for reuse and back button support
+        function exitSpecialView() {
+            console.log('Exiting special view');
+            
+            // Stop sleep timer if active
+            if (typeof sleepTimerInterval !== 'undefined' && sleepTimerInterval) {
+                clearInterval(sleepTimerInterval);
+                sleepTimerInterval = null;
+                sleepStartTime = null;
+            }
+            
+            // Remove container
+            container.remove();
+            
+            // Reset global flag
+            window.CODER1_SPECIAL_VIEW_ACTIVE = false;
+            
+            // Show settings section again
+            const settingsSection = document.querySelector('.settings-section');
+            if (settingsSection) {
+                settingsSection.style.display = '';
+            }
+            
+            // Clean up back button handler
+            if (container._backButtonHandler) {
+                window.removeEventListener('popstate', container._backButtonHandler);
+            }
+        }
+        
+        // CRITICAL: Exit button setup must happen AFTER all view-specific handlers
+        // to ensure the button element exists and isn't replaced by innerHTML operations
+        const setupExitButton = () => {
+            const exitBtn = overlay.querySelector('.coder1-exit-btn');
+            console.log('Setting up exit button:', exitBtn);
+            
+            if (exitBtn) {
+                // Clear any existing handlers
+                exitBtn.onclick = null;
+                if (exitBtn._exitHandler) {
+                    exitBtn.removeEventListener('click', exitBtn._exitHandler);
+                }
+                
+                // Add click handler
+                const exitHandler = (e) => {
+                    console.log('Exit button clicked!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    exitSpecialView();
+                    return false;
+                };
+                
+                // Use capture phase to ensure we get the event first
+                exitBtn.addEventListener('click', exitHandler, true);
+                exitBtn.onclick = exitHandler; // Fallback
+                exitBtn._exitHandler = exitHandler; // Store for cleanup
+                
+                // Make absolutely sure button is clickable
+                exitBtn.style.pointerEvents = 'auto';
+                exitBtn.style.zIndex = '99999';
+                exitBtn.style.cursor = 'pointer';
+                exitBtn.style.position = 'absolute';
+                
+                // Remove any conflicting styles
+                exitBtn.style.userSelect = 'none';
+                exitBtn.disabled = false;
+                
+                console.log('Exit button handler attached successfully');
+            } else {
+                console.error('Exit button not found in overlay!');
+            }
+        };
+        
+        // Call setup immediately and also after a delay to handle any async DOM updates
+        setupExitButton();
+        setTimeout(setupExitButton, 200);
+        setTimeout(setupExitButton, 500);
+        
+        // Add browser back button support
+        const backButtonHandler = (e) => {
+            if (window.CODER1_SPECIAL_VIEW_ACTIVE) {
+                e.preventDefault();
+                exitSpecialView();
+            }
+        };
+        
+        window.addEventListener('popstate', backButtonHandler);
+        
+        // Push a new history state so back button works
+        window.history.pushState({specialView: type}, '', '');
+        
+        // Store the back button handler for cleanup
+        container._backButtonHandler = backButtonHandler;
+        
+        // Add escape key handler using the same exit function
         const escapeHandler = (e) => {
             if (e.key === 'Escape') {
-                if (sleepTimerInterval) {
-                    clearInterval(sleepTimerInterval);
-                    sleepTimerInterval = null;
-                    sleepStartTime = null;
-                }
-                container.remove();
-                window.CODER1_SPECIAL_VIEW_ACTIVE = false;
-                const settingsSection = document.querySelector('.settings-section');
-                if (settingsSection) {
-                    settingsSection.style.display = '';
-                }
+                exitSpecialView();
                 document.removeEventListener('keydown', escapeHandler);
             }
         };
@@ -834,6 +1181,24 @@
     
     // Make showSpecialView globally available
     window.showSpecialView = showSpecialView;
+    
+    // Global exit function for inline onclick
+    window.exitSpecialView = function() {
+        console.log('Global exitSpecialView called');
+        const container = document.querySelector('.coder1-special-view-container');
+        if (container) {
+            container.remove();
+            window.CODER1_SPECIAL_VIEW_ACTIVE = false;
+            const settingsSection = document.querySelector('.settings-section');
+            if (settingsSection) {
+                settingsSection.style.display = '';
+            }
+            // Handle browser history
+            if (window.history.length > 1) {
+                window.history.back();
+            }
+        }
+    };
     
     // JavaScript functions for infinite loop interface
     window.handleSpecTypeChange = function(radio) {
@@ -1069,6 +1434,220 @@
         console.log('System awakened!');
     };
     
+    // Documentation navigation functions
+    window.showDocSection = function(sectionId) {
+        console.log('showDocSection called with:', sectionId);
+        
+        // Find the special view container first
+        const container = document.querySelector('.coder1-special-view-container');
+        if (!container) {
+            console.error('Special view container not found');
+            return;
+        }
+        
+        // Hide all sections within the container
+        const sections = container.querySelectorAll('.doc-section');
+        console.log('Found sections:', sections.length);
+        sections.forEach(section => {
+            section.style.display = 'none';
+            section.classList.remove('active');
+        });
+        
+        // Remove active from all nav items within the container
+        const navItems = container.querySelectorAll('.nav-item');
+        console.log('Found nav items:', navItems.length);
+        navItems.forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Show selected section
+        const targetSection = container.querySelector('#' + sectionId + 'Section');
+        console.log('Target section:', targetSection);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+            targetSection.classList.add('active');
+            console.log('Showed section:', sectionId + 'Section');
+        } else {
+            console.error('Target section not found:', sectionId + 'Section');
+        }
+        
+        // Add active to clicked nav item
+        const navItem = container.querySelector(`[data-section="${sectionId}"]`);
+        console.log('Nav item to activate:', navItem);
+        if (navItem) {
+            navItem.classList.add('active');
+            console.log('Activated nav item for:', sectionId);
+        } else {
+            console.error('Nav item not found for section:', sectionId);
+        }
+    };
+    
+    // IDE Settings API key management functions
+    window.setupIDESettingsHandlers = function() {
+        const apiKeyInput = document.getElementById('claudeApiKey');
+        const toggleBtn = document.getElementById('toggleApiKeyVisibility');
+        const saveBtn = document.getElementById('saveApiKeyBtn');
+        const testBtn = document.getElementById('testConnectionBtn');
+        const clearBtn = document.getElementById('clearApiKeyBtn');
+        const statusIndicator = document.getElementById('connectionStatus');
+        
+        if (!apiKeyInput) return; // Not on IDE settings view
+        
+        // Load saved API key
+        const savedKey = localStorage.getItem('claudeApiKey');
+        if (savedKey) {
+            apiKeyInput.value = savedKey;
+            updateConnectionStatus('saved');
+        }
+        
+        // Toggle API key visibility
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = apiKeyInput.type === 'password';
+                apiKeyInput.type = isPassword ? 'text' : 'password';
+                const icon = toggleBtn.querySelector('i');
+                icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
+        }
+        
+        // Save API key
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const apiKey = apiKeyInput.value.trim();
+                if (!apiKey) {
+                    alert('Please enter an API key');
+                    return;
+                }
+                
+                if (!apiKey.startsWith('sk-ant-api03-')) {
+                    alert('Invalid API key format. Claude API keys start with "sk-ant-api03-"');
+                    return;
+                }
+                
+                localStorage.setItem('claudeApiKey', apiKey);
+                updateConnectionStatus('saved');
+                alert('API key saved successfully!');
+            });
+        }
+        
+        // Test connection
+        if (testBtn) {
+            testBtn.addEventListener('click', async () => {
+                const apiKey = apiKeyInput.value.trim();
+                if (!apiKey) {
+                    alert('Please enter an API key first');
+                    return;
+                }
+                
+                updateConnectionStatus('testing');
+                
+                try {
+                    // Simple test request to Claude API
+                    const response = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': apiKey,
+                            'anthropic-version': '2023-06-01'
+                        },
+                        body: JSON.stringify({
+                            model: 'claude-3-haiku-20240307',
+                            max_tokens: 10,
+                            messages: [{
+                                role: 'user',
+                                content: 'Hello'
+                            }]
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        updateConnectionStatus('connected');
+                        alert('Connection successful! API key is working.');
+                    } else {
+                        updateConnectionStatus('error');
+                        alert('Connection failed. Please check your API key.');
+                    }
+                } catch (error) {
+                    updateConnectionStatus('error');
+                    alert('Connection test failed: ' + error.message);
+                }
+            });
+        }
+        
+        // Clear API key
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear the saved API key?')) {
+                    localStorage.removeItem('claudeApiKey');
+                    apiKeyInput.value = '';
+                    updateConnectionStatus('offline');
+                    alert('API key cleared.');
+                }
+            });
+        }
+        
+        function updateConnectionStatus(status) {
+            if (!statusIndicator) return;
+            
+            const statusDot = statusIndicator.querySelector('.status-dot');
+            const statusText = statusIndicator.querySelector('span');
+            
+            statusDot.className = 'status-dot';
+            
+            switch (status) {
+                case 'connected':
+                    statusDot.classList.add('connected');
+                    statusText.textContent = 'Connected';
+                    break;
+                case 'saved':
+                    statusDot.classList.add('saved');
+                    statusText.textContent = 'API Key Saved';
+                    break;
+                case 'testing':
+                    statusDot.classList.add('testing');
+                    statusText.textContent = 'Testing Connection...';
+                    break;
+                case 'error':
+                    statusDot.classList.add('error');
+                    statusText.textContent = 'Connection Failed';
+                    break;
+                default:
+                    statusDot.classList.add('offline');
+                    statusText.textContent = 'Not Connected';
+            }
+        }
+    };
+    
+    // Documentation navigation setup function
+    window.setupDocumentationHandlers = function() {
+        const navItems = document.querySelectorAll('.nav-item[data-section]');
+        
+        if (navItems.length === 0) {
+            console.log('No documentation nav items found');
+            return;
+        }
+        
+        navItems.forEach(navItem => {
+            const sectionId = navItem.getAttribute('data-section');
+            
+            navItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Documentation nav clicked:', sectionId);
+                showDocSection(sectionId);
+            });
+            
+            // Also add as backup
+            navItem.onclick = (e) => {
+                e.preventDefault();
+                console.log('Documentation nav onclick:', sectionId);
+                showDocSection(sectionId);
+                return false;
+            };
+        });
+        
+        console.log('Documentation navigation handlers set up for', navItems.length, 'items');
+    };
+    
     // Override terminal buttons to use our special views
     function overrideTerminalButtons() {
         console.log('🎨 Coder1 Special Views V4 - Overriding terminal buttons...');
@@ -1161,6 +1740,453 @@
             }
         }
     }, 100);
+    
+    // Add CSS styles for new views
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        /* IDE Settings View Styles - Scoped to special view container */
+        .coder1-special-view-container .coder1-api-config-section {
+            margin-bottom: 30px;
+        }
+        
+        .coder1-special-view-container .api-config-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+        }
+        
+        .coder1-special-view-container .api-config-header i {
+            color: #8b5cf6;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+        
+        .coder1-special-view-container .api-key-section {
+            margin-bottom: 20px;
+        }
+        
+        .coder1-special-view-container .api-key-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .coder1-special-view-container .glassmorphism-input {
+            flex: 1;
+            padding: 12px 45px 12px 15px;
+            background: rgba(42, 42, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .coder1-special-view-container .visibility-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #a1a1aa;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: color 0.2s;
+        }
+        
+        .coder1-special-view-container .visibility-toggle:hover {
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .api-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .coder1-special-view-container .coder1-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .coder1-special-view-container .save-btn {
+            background: #10b981;
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .save-btn:hover {
+            background: #059669;
+        }
+        
+        .coder1-special-view-container .test-btn {
+            background: #8b5cf6;
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .test-btn:hover {
+            background: #7c3aed;
+        }
+        
+        .coder1-special-view-container .clear-btn {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .clear-btn:hover {
+            background: #dc2626;
+        }
+        
+        .coder1-special-view-container .api-help-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .coder1-special-view-container .help-icon i {
+            color: #10b981;
+            font-size: 20px;
+        }
+        
+        .coder1-special-view-container .help-content h4 {
+            margin: 0 0 12px 0;
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .help-content ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .coder1-special-view-container .help-content a {
+            color: #10b981;
+            text-decoration: none;
+        }
+        
+        .coder1-special-view-container .help-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .coder1-special-view-container .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+        }
+        
+        .coder1-special-view-container .status-label {
+            color: #a1a1aa;
+            font-size: 14px;
+        }
+        
+        .coder1-special-view-container .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .coder1-special-view-container .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6b7280;
+        }
+        
+        .coder1-special-view-container .status-dot.connected {
+            background: #10b981;
+        }
+        
+        .coder1-special-view-container .status-dot.saved {
+            background: #f59e0b;
+        }
+        
+        .coder1-special-view-container .status-dot.testing {
+            background: #8b5cf6;
+        }
+        
+        .coder1-special-view-container .status-dot.error {
+            background: #ef4444;
+        }
+        
+        .coder1-special-view-container .status-dot.offline {
+            background: #6b7280;
+        }
+        
+        .coder1-special-view-container .coder1-features-section {
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .coder1-special-view-container .features-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .coder1-special-view-container .features-header i {
+            color: #8b5cf6;
+            font-size: 20px;
+        }
+        
+        .coder1-special-view-container .feature-cards {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .coder1-special-view-container .feature-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px;
+            background: rgba(42, 42, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .coder1-special-view-container .feature-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 8px;
+            color: #8b5cf6;
+            font-size: 18px;
+        }
+        
+        .coder1-special-view-container .feature-info h4 {
+            margin: 0 0 8px 0;
+            color: #ffffff;
+            font-size: 16px;
+        }
+        
+        .coder1-special-view-container .feature-info p {
+            margin: 0;
+            color: #a1a1aa;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Documentation View Styles - Scoped to special view container */
+        .coder1-special-view-container .coder1-documentation-wrapper {
+            display: flex;
+            gap: 30px;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .coder1-special-view-container .coder1-documentation-nav {
+            width: 250px;
+            flex-shrink: 0;
+            padding-right: 25px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .coder1-special-view-container .nav-header {
+            margin-bottom: 25px;
+        }
+        
+        .coder1-special-view-container .nav-header h3 {
+            margin: 0 0 8px 0;
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .nav-header p {
+            margin: 0;
+            color: #a1a1aa;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .coder1-special-view-container .nav-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .coder1-special-view-container .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #a1a1aa;
+        }
+        
+        .coder1-special-view-container .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+        }
+        
+        .coder1-special-view-container .nav-item.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+        
+        .coder1-special-view-container .nav-item i {
+            width: 16px;
+            text-align: center;
+        }
+        
+        .coder1-special-view-container .coder1-documentation-content {
+            flex: 1;
+            padding-left: 30px;
+            overflow-y: auto;
+        }
+        
+        .doc-section {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .welcome-banner {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(16, 185, 129, 0.2));
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .welcome-banner h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 20px;
+        }
+        
+        .key-features, .getting-started {
+            margin-bottom: 30px;
+        }
+        
+        .key-features h3, .getting-started h3 {
+            margin: 0 0 20px 0;
+            color: #8b5cf6;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .feature-list {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+        }
+        
+        .feature-item i {
+            color: #10b981;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .step-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #8b5cf6;
+            color: #ffffff;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .step-item strong {
+            color: #ffffff;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .step-item p {
+            margin: 0;
+            color: #a1a1aa;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        /* Exit Button Fix */
+        .coder1-exit-btn {
+            position: absolute !important;
+            top: 20px !important;
+            right: 20px !important;
+            width: 32px !important;
+            height: 32px !important;
+            background: rgba(239, 68, 68, 0.2) !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            border-radius: 50% !important;
+            color: #ef4444 !important;
+            font-size: 16px !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s !important;
+            z-index: 1000 !important;
+            padding: 0 !important;
+        }
+        
+        .coder1-exit-btn:hover {
+            background: rgba(239, 68, 68, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+            color: #ffffff !important;
+            transform: scale(1.1) !important;
+        }
+        
+        .coder1-exit-btn:active {
+            transform: scale(0.95) !important;
+        }
+        
+        /* Ensure panel content fills container properly - Scoped to special views only */
+        .coder1-special-view-container .coder1-panel-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+    `;
+    document.head.appendChild(styleSheet);
     
     console.log('✅ Coder1 Special Views V4 initialized - Full functionality restored!');
 })();

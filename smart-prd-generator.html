@@ -6,7 +6,7 @@ File: smart-prd-generator.html
 Purpose: Complete Smart PRD & Wireframe Generator with 7-step wizard
 Status: PRODUCTION - Last updated: 2025-07-21
 Features: PRD generation, wireframes, expert consultation, version management, optimized spacing
-Dependencies: product-creation-hub.css, modular JS architecture (smart-prd-script-loader.js), Font Awesome, Google Fonts
+Dependencies: product-creation-hub.css, product-creation-hub.js, Font Awesome, Google Fonts
 Route: Served within React IDE at /ide
 Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
 ===============================================================================
@@ -17,20 +17,11 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coder1 - Smart PRD & Wireframe Generator</title>
-    <!-- Unified styles for proper Electron formatting -->
-    <link rel="stylesheet" href="static/coder1-unified-styles.css">
-    <!-- Additional component-specific styles -->
+    <link rel="stylesheet" href="static/styles.css">
     <link rel="stylesheet" href="static/product-creation-hub.css">
-    <!-- Problem-First Flow Styles -->
-    <link rel="stylesheet" href="static/problem-first-styles.css">
-    <!-- Layout Fixes -->
-    <link rel="stylesheet" href="static/layout-fixes.css">
+    <link rel="stylesheet" href="static/voice-button-fix.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Electron API Bridge for handling API calls in Electron -->
-    <script src="static/electron-api-bridge.js"></script>
-    <!-- Voice input functionality -->
-    <script src="static/smart-prd-voice.js"></script>
 </head>
 <body>
     <div class="animated-background">
@@ -42,14 +33,14 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
 
     <div class="container">
         <header class="header glassmorphism">
-            <img src="static/coder1-logo.svg" alt="Coder1" class="header-logo" onclick="window.location.href='/'">
-            <div class="header-content">
+            <img src="/static/coder1-logo.svg" alt="Coder1" class="header-logo" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 120px; height: 120px; z-index: 10; cursor: pointer;" onclick="window.location.href='/'">
+            <div class="header-content" style="padding-left: 130px;">
                 <div class="header-controls">
                     <button class="theme-toggle" id="themeToggle">
                         <i class="fas fa-moon"></i>
                     </button>
                     <div class="header-divider"></div>
-                    <button class="ide-enter-btn" id="enterIDE">
+                    <button class="ide-enter-btn" id="enterIDE" onclick="window.location.href='ide-build/index.html'">
                         <i class="fas fa-code"></i>
                         Enter Coder1 IDE
                     </button>
@@ -88,23 +79,30 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="message-content">
-                            <p>I'll help you create professional Product Requirements Documents and wireframes for your project. The more context that is entered here the better Claude Code will do at creating what you want.</p>
+                            <p>I'll help you create professional Product Requirements Documents and wireframes by first understanding the problem you're trying to solve. Start by describing the problem and who experiences it.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="chat-input-container">
-                    <div class="input-wrapper glassmorphism">
-                        <textarea 
-                            id="messageInput" 
-                            placeholder="Start by describing the problem you want to solve..."
-                            rows="2"
-                        ></textarea>
-                        <div class="input-controls">
-                            <button class="send-btn" id="sendMessage">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
+                <div style="width: 100%; padding: 20px; box-sizing: border-box;">
+                    <div style="width: 100%; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 100%; padding-right: 10px;">
+                                    <textarea 
+                                        id="messageInput" 
+                                        placeholder="Start by describing the problem you want to solve..."
+                                        rows="2"
+                                        style="width: 100%; box-sizing: border-box; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px; border-radius: 8px; resize: none; font-size: 16px;"
+                                    ></textarea>
+                                </td>
+                                <td style="width: auto;">
+                                    <button class="send-btn" id="sendMessage" style="background: #8b5cf6; border: none; color: white; padding: 12px 16px; border-radius: 8px; cursor: pointer; white-space: nowrap;">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -292,17 +290,15 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
                             <div class="step-center-text">Step 1</div>
                             <h4>1. Define Your Problem</h4>
                             <p>Tell us what problem you're trying to solve</p>
+                            
                             <!-- Problem Examples -->
-                            <div class="problem-examples" style="margin-top: 20px; margin-bottom: 20px; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 8px;">
-                                <h5 style="color: #8b5cf6; margin-bottom: 10px; font-weight: 600;">
-                                    <i class="fas fa-lightbulb"></i> Example Problems:
-                                </h5>
-                                <ul style="font-size: 0.9em; opacity: 0.8; margin-left: 20px; line-height: 1.8;">
+                            <div class="problem-examples">
+                                <h5><i class="fas fa-lightbulb"></i> Example Problem:</h5>
+                                <ul>
                                     <li>Teams waste time searching for commonly used prompts</li>
-                                    <li>Developers recreate the same boilerplate code repeatedly</li>
-                                    <li>Small businesses struggle to track feedback across channels</li>
                                 </ul>
                             </div>
+                            
                             <div class="step-actions">
                                 <button class="wizard-btn primary" id="startWizard" disabled>
                                     <i class="fas fa-rocket"></i>
@@ -460,7 +456,7 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
                 
                 <!-- Enter Coder1 IDE Button -->
                 <div style="text-align: center; margin: 30px 0;">
-                    <button class="btn primary enter-ide-btn" onclick="window.location.href='/ide'" style="font-size: 16px; padding: 15px 30px;">
+                    <button class="btn primary enter-ide-btn" onclick="window.location.href='ide-build/index.html'" style="font-size: 16px; padding: 15px 30px;">
                         <i class="fas fa-code"></i>
                         Enter Coder1 IDE
                     </button>
@@ -1011,16 +1007,11 @@ Claude Agents: This is the OFFICIAL version - do not modify copies elsewhere
         </div>
     </div>
 
-    <!-- Silence Errors for Demo -->
-    <script src="static/silence-errors.js"></script>
-    <!-- Core Product Creation Hub Script -->
-    <script src="static/product-creation-hub.js"></script>
-    <!-- Modular Architecture - Automated Script Loading -->
-    <script src="static/apps/smart-prd-script-loader.js"></script>
-    <script src="/static/shared/smart-prd-voice.js"></script>
-    <!-- Problem-First Flow Enhancements -->
-    <script src="static/problem-first-immediate.js"></script>
-    <script src="static/problem-first-enhancements.js"></script>
+    <script src="utils.js"></script>
+    <script src="product-creation-hub.js"></script>
+    <!-- Logo now in header, no need for separate script -->
+    <script src="/static/smart-prd-voice.js"></script>
     <!-- Logo is now in the fixed header, no additional positioning needed -->
+    <script src="static/textarea-fix.js"></script>
 </body>
 </html>

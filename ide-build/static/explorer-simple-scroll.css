@@ -1,0 +1,33 @@
+/* Explorer Simple Scroll - Minimal CSS-only scrollbar */
+
+/* Target the Explorer container specifically */
+.Explorer, 
+[class*="explorer" i],
+[class*="sidebar" i] {
+    max-height: calc(100vh - 350px) !important;  /* Leave room for buttons */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Ensure smooth scrolling */
+* {
+    scroll-behavior: smooth;
+}
+
+/* Simple scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}

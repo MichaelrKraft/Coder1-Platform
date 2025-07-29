@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Customization Studio - Live Preview</title>
+    
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --background: #0f0f23;
+            --surface: rgba(139, 92, 246, 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+        }
+        
+        /* Left Panel */
+        .control-panel {
+            width: 400px;
+            background: rgba(139, 92, 246, 0.05);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(45deg, var(--primary), #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Toggle Buttons */
+        .toggle-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* CSS Output */
+        .css-output {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            display: none;
+        }
+        
+        .css-output.show {
+            display: block;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-buttons button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Right Panel - Preview */
+        .preview-panel {
+            flex: 1;
+            position: relative;
+            background: #fff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Preview Controls at Top */
+        .preview-controls {
+            background: rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .preview-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.25rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preview-toggle .toggle-btn {
+            padding: 0.5rem 2rem;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        
+        .preview-toggle .toggle-btn.active {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .preview-content {
+            flex: 1;
+            overflow: auto;
+        }
+        
+        /* Demo Website Styles */
+        #demoWebsite {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        #demoWebsite * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        #demoWebsite .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+        }
+        
+        #demoWebsite .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #demoWebsite .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        #demoWebsite nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+        }
+        
+        #demoWebsite .hero {
+            background: #f5f5f5;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        #demoWebsite .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        #demoWebsite .btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+        
+        #demoWebsite .features {
+            padding: 4rem 2rem;
+            background: white;
+        }
+        
+        #demoWebsite .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        #demoWebsite .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        #demoWebsite .card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        #demoWebsite .card h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        #demoWebsite .form-section {
+            background: #f5f5f5;
+            padding: 4rem 2rem;
+        }
+        
+        #demoWebsite form {
+            max-width: 600px;
+            margin: 2rem auto 0;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        #demoWebsite .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        #demoWebsite .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        #demoWebsite .form-group input,
+        #demoWebsite .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            border-radius: 8px;
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+        
+        /* CSS Syntax Highlighting */
+        .css-comment { color: #6b7280; }
+        .css-property { color: #f472b6; }
+        .css-value { color: #60a5fa; }
+        .css-selector { color: #34d399; }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <div class="logo">✨</div>
+        <h1>Website Customization Studio</h1>
+        
+        <form id="customizationForm">
+            <div class="form-group">
+                <label>Website URL</label>
+                <input type="url" id="urlInput" value="https://example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Describe Your Changes</label>
+                <textarea id="descriptionInput" placeholder="e.g., Make the background purple gradient, change header to blue" required></textarea>
+            </div>
+            
+            <button type="submit" id="generateBtn">Generate CSS</button>
+        </form>
+        
+        <div class="css-output" id="cssOutput">
+            <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Generated CSS</h3>
+            <div class="code-block" id="codeBlock"></div>
+            <div class="action-buttons">
+                <button onclick="copyCSS()">📋 Copy</button>
+                <button onclick="downloadCSS()">💾 Download</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="preview-panel">
+        <div class="preview-controls">
+            <div class="preview-toggle">
+                <button class="toggle-btn active" id="beforeBtn" onclick="toggleView('before')">Before</button>
+                <button class="toggle-btn" id="afterBtn" onclick="toggleView('after')">After</button>
+            </div>
+        </div>
+        <div class="preview-content" id="previewContent">
+            <div id="demoWebsite">
+                <header class="header">
+                    <div class="nav-container">
+                        <div class="logo">Demo Website</div>
+                        <nav>
+                            <a href="#home">Home</a>
+                            <a href="#features">Features</a>
+                            <a href="#contact">Contact</a>
+                        </nav>
+                    </div>
+                </header>
+                
+                <section class="hero">
+                    <h1>Welcome to Our Demo Site</h1>
+                    <p>This is a sample website to demonstrate CSS customization</p>
+                    <button class="btn">Get Started</button>
+                </section>
+                
+                <section class="features">
+                    <div class="container">
+                        <h2>Our Features</h2>
+                        <div class="feature-grid">
+                            <div class="card">
+                                <h3>Feature One</h3>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                <button class="btn">Learn More</button>
+                            </div>
+                            <div class="card">
+                                <h3>Feature Two</h3>
+                                <p>Sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+                                <button class="btn">Learn More</button>
+                            </div>
+                            <div class="card">
+                                <h3>Feature Three</h3>
+                                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+                                <button class="btn">Learn More</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="form-section">
+                    <div class="container">
+                        <h2>Contact Us</h2>
+                        <form>
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" placeholder="Your name">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea placeholder="Your message"></textarea>
+                            </div>
+                            <button type="submit" class="btn">Send Message</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        let generatedCSS = '';
+        let currentView = 'before';
+        let customStyleElement = null;
+        
+        // Form submission
+        document.getElementById('customizationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const description = document.getElementById('descriptionInput').value.trim();
+            if (!description) return;
+            
+            // Generate CSS
+            generatedCSS = generateCSS(description);
+            
+            // Display CSS
+            displayCSS();
+            
+            // Auto-switch to "after" view
+            toggleView('after');
+            
+            showNotification('CSS generated! See the changes in the preview.');
+        });
+        
+        function generateCSS(description) {
+            const desc = description.toLowerCase();
+            let css = '/* Generated CSS */\n\n';
+            
+            // Background customization
+            if (desc.includes('background')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                const isGradient = desc.includes('gradient');
+                
+                css += `/* Background Customization */
+#demoWebsite {
+    background: ${isGradient ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.2)} 100%)` : 
+        color} !important;
+}
+
+#demoWebsite .hero {
+    background: ${isGradient ? 
+        `linear-gradient(135deg, ${adjustColor(color, 0.1)} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        adjustColor(color, 0.1)} !important;
+}
+
+#demoWebsite .form-section {
+    background: ${adjustColor(color, 0.05)} !important;
+}\n\n`;
+            }
+            
+            // Header customization
+            if (desc.includes('header')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Header Customization */
+#demoWebsite .header {
+    background: ${desc.includes('gradient') ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        color} !important;
+    ${desc.includes('rounded') ? 'border-radius: 0 0 20px 20px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);' : ''}
+}\n\n`;
+            }
+            
+            // Button customization
+            if (desc.includes('button')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Button Customization */
+#demoWebsite .btn,
+#demoWebsite button {
+    background: ${desc.includes('gradient') ? 
+        `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : 
+        color} !important;
+    ${desc.includes('rounded') ? 'border-radius: 50px;' : 'border-radius: 8px;'}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);' : ''}
+    transition: all 0.3s ease;
+}
+
+#demoWebsite .btn:hover,
+#demoWebsite button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}\n\n`;
+            }
+            
+            // Card customization
+            if (desc.includes('card')) {
+                const color = extractColor(desc) || '#ffffff';
+                css += `/* Card Customization */
+#demoWebsite .card {
+    background: ${color} !important;
+    ${desc.includes('shadow') ? 'box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);' : ''}
+    ${desc.includes('rounded') ? 'border-radius: 16px;' : ''}
+}
+
+#demoWebsite .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+}\n\n`;
+            }
+            
+            return css;
+        }
+        
+        function extractColor(text) {
+            const colors = {
+                'purple': '#8b5cf6',
+                'blue': '#3b82f6',
+                'green': '#10b981',
+                'red': '#ef4444',
+                'orange': '#f59e0b',
+                'pink': '#ec4899',
+                'yellow': '#f59e0b',
+                'indigo': '#6366f1',
+                'teal': '#14b8a6',
+                'gray': '#6b7280',
+                'dark': '#1a1a1a',
+                'light': '#f8f9fa'
+            };
+            
+            for (const [name, hex] of Object.entries(colors)) {
+                if (text.includes(name)) return hex;
+            }
+            
+            return null;
+        }
+        
+        function adjustColor(hex, factor) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(255 * factor);
+            const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+            const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
+            const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+            return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+        }
+        
+        function displayCSS() {
+            const codeBlock = document.getElementById('codeBlock');
+            const cssOutput = document.getElementById('cssOutput');
+            
+            // Syntax highlighting
+            const highlighted = generatedCSS
+                .replace(/\/\*.*?\*\//g, '<span class="css-comment">$&</span>')
+                .replace(/([a-zA-Z-]+):/g, '<span class="css-property">$1:</span>')
+                .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;')
+                .replace(/(#demoWebsite[^{]*)/g, '<span class="css-selector">$1</span>');
+            
+            codeBlock.innerHTML = highlighted;
+            cssOutput.classList.add('show');
+        }
+        
+        function toggleView(view) {
+            currentView = view;
+            
+            // Update buttons
+            document.getElementById('beforeBtn').classList.toggle('active', view === 'before');
+            document.getElementById('afterBtn').classList.toggle('active', view === 'after');
+            
+            // Remove existing custom styles
+            if (customStyleElement) {
+                customStyleElement.remove();
+                customStyleElement = null;
+            }
+            
+            // Apply custom styles if "after" view
+            if (view === 'after' && generatedCSS) {
+                customStyleElement = document.createElement('style');
+                customStyleElement.textContent = generatedCSS;
+                document.head.appendChild(customStyleElement);
+            }
+        }
+        
+        function copyCSS() {
+            navigator.clipboard.writeText(generatedCSS).then(() => {
+                showNotification('CSS copied to clipboard!');
+            });
+        }
+        
+        function downloadCSS() {
+            const blob = new Blob([generatedCSS], { type: 'text/css' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `custom-styles-${Date.now()}.css`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('CSS file downloaded!');
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

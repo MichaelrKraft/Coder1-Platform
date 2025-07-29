@@ -1,0 +1,78 @@
+/* Explorer Sidebar Scrollbar Fix */
+
+/* Target the main Explorer container */
+.Explorer, 
+[class*="Explorer"],
+[class*="explorer"],
+.sidebar,
+[class*="sidebar"] {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100vh !important;
+    position: relative !important;
+}
+
+/* Ensure the file tree container is scrollable */
+.Explorer > div:first-child,
+[class*="Explorer"] > div:first-child,
+[class*="explorer"] > div:first-child {
+    overflow-y: auto !important;
+    height: calc(100vh - 20px) !important;
+    padding-bottom: 300px !important; /* Space for settings buttons */
+}
+
+/* Keep settings section at bottom but within scrollable area */
+.settings-section {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    background: inherit !important;
+    z-index: 10 !important;
+}
+
+/* Ensure React Bits button stays visible */
+#react-bits-button {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    z-index: 10 !important;
+}
+
+/* Style the scrollbar */
+.Explorer::-webkit-scrollbar,
+[class*="Explorer"]::-webkit-scrollbar,
+[class*="explorer"]::-webkit-scrollbar {
+    width: 8px;
+}
+
+.Explorer::-webkit-scrollbar-track,
+[class*="Explorer"]::-webkit-scrollbar-track,
+[class*="explorer"]::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.Explorer::-webkit-scrollbar-thumb,
+[class*="Explorer"]::-webkit-scrollbar-thumb,
+[class*="explorer"]::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.Explorer::-webkit-scrollbar-thumb:hover,
+[class*="Explorer"]::-webkit-scrollbar-thumb:hover,
+[class*="explorer"]::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Alternative approach - target by structure */
+body > div > div > div:first-child {
+    overflow-y: auto !important;
+    max-height: 100vh !important;
+}
+
+/* Ensure project files section doesn't overflow */
+.project-files,
+[class*="project-files"],
+[class*="PROJECT FILES"] {
+    overflow-y: visible !important;
+}

@@ -1,0 +1,22 @@
+/* Explorer Padding Only - Adds bottom padding to prevent overlap */
+
+/* Find the project files container and add padding */
+.Explorer,
+[class*="Explorer"],
+[class*="explorer"],
+.sidebar,
+[class*="sidebar"] {
+    padding-bottom: 300px !important;
+}
+
+/* Alternative: Target the last item in project files */
+.Explorer > div:last-child,
+[class*="Explorer"] > div:last-child,
+[class*="explorer"] > div:last-child {
+    margin-bottom: 250px !important;
+}
+
+/* Ensure settings have proper spacing */
+.settings-section {
+    margin-top: 20px !important;
+}

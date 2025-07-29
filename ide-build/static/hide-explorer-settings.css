@@ -1,0 +1,36 @@
+/* Hide Explorer Settings Header - Target the specific structure */
+
+/* Method 1: Hide any non-button element containing only SETTINGS in Explorer area */
+.Explorer > *:not(button):not(.settings-section),
+[class*="explorer"] > *:not(button):not(.settings-section),
+[class*="sidebar"] > *:not(button):not(.settings-section) {
+    /* Will be evaluated by JavaScript */
+}
+
+/* Method 2: Target by visual position - elements that appear to be headers in sidebar */
+div:not(.settings-section):not(.settings-btn) {
+    /* Elements at specific positions will be hidden by JS */
+}
+
+/* Method 3: Hide elements marked as duplicate settings */
+.duplicate-settings-header {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Method 4: Ensure our custom settings section is always visible */
+.settings-section,
+.settings-section *,
+.settings-btn,
+#react-bits-button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

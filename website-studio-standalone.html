@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Customization Studio - Standalone Demo</title>
+    <meta name="description" content="Transform any website with natural language commands. Works entirely in your browser!">
+    
+    <style>
+        /* CSS Variables for Consistent Theme */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #3b82f6;
+            --background: #0f0f23;
+            --surface: rgba(139, 92, 246, 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Components */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-glass);
+        }
+        
+        .glass-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+            padding: 2rem;
+        }
+        
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-badge {
+            display: inline-block;
+            background: var(--warning);
+            color: var(--background);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .platform-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Output Section */
+        .output-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .output-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            position: relative;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .copy-btn, .download-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .copy-btn:hover, .download-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        /* Implementation Steps */
+        .steps-list {
+            list-style: none;
+            counter-reset: step-counter;
+            margin-top: 1rem;
+        }
+        
+        .steps-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .steps-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-glass);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Syntax Highlighting */
+        .css-property { color: #f472b6; }
+        .css-value { color: #60a5fa; }
+        .css-selector { color: #34d399; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="demo-badge">Standalone Demo Mode</div>
+            <h1>Website Customization Studio</h1>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+                Transform any website with natural language. This demo works entirely in your browser - no backend required!
+            </p>
+        </div>
+
+        <div class="grid">
+            <!-- Input Panel -->
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Customize Your Website</h2>
+                
+                <form id="customForm">
+                    <div class="form-group">
+                        <label class="form-label">Website URL</label>
+                        <input 
+                            type="url" 
+                            id="websiteUrl" 
+                            class="form-input" 
+                            placeholder="https://your-website.com"
+                            required
+                        >
+                        <span id="platformBadge" class="platform-badge" style="display: none;"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Describe Your Changes</label>
+                        <textarea 
+                            id="description" 
+                            class="form-textarea"
+                            placeholder="For example: 'Make the header purple with rounded corners' or 'Change all buttons to be more modern'"
+                            required
+                        ></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="generateBtn">
+                        <span id="btnText">Generate CSS</span>
+                        <span id="btnLoading" class="loading" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Preview</h2>
+                <div id="previewContent" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎨</div>
+                    <p>Your customized CSS will appear here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div id="outputSection" class="output-section">
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Generated CSS</h2>
+                
+                <div class="code-block" id="codeBlock"></div>
+                
+                <div class="code-actions">
+                    <button class="copy-btn" onclick="copyCSS()">📋 Copy CSS</button>
+                    <button class="download-btn" onclick="downloadCSS()">💾 Download CSS</button>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Implementation Steps</h3>
+                    <ol class="steps-list" id="stepsList"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // State
+        let generatedCSS = '';
+        let detectedPlatform = 'custom';
+
+        // DOM Elements
+        const form = document.getElementById('customForm');
+        const urlInput = document.getElementById('websiteUrl');
+        const descriptionInput = document.getElementById('description');
+        const platformBadge = document.getElementById('platformBadge');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const previewContent = document.getElementById('previewContent');
+        const outputSection = document.getElementById('outputSection');
+        const codeBlock = document.getElementById('codeBlock');
+        const stepsList = document.getElementById('stepsList');
+        const notification = document.getElementById('notification');
+
+        // Event Listeners
+        form.addEventListener('submit', handleSubmit);
+        urlInput.addEventListener('input', detectPlatform);
+
+        // Platform Detection
+        function detectPlatform() {
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                platformBadge.style.display = 'none';
+                return;
+            }
+            
+            let platform = 'custom';
+            
+            if (url.includes('shopify') || url.includes('.myshopify.com')) {
+                platform = 'shopify';
+            } else if (url.includes('wordpress') || url.includes('wp-')) {
+                platform = 'wordpress';
+            } else if (url.includes('squarespace')) {
+                platform = 'squarespace';
+            } else if (url.includes('wix')) {
+                platform = 'wix';
+            }
+            
+            detectedPlatform = platform;
+            platformBadge.textContent = platform.charAt(0).toUpperCase() + platform.slice(1);
+            platformBadge.style.display = 'inline-block';
+        }
+
+        // Form Submit Handler
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const url = urlInput.value.trim();
+            const description = descriptionInput.value.trim();
+            
+            if (!url || !description) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-block';
+            
+            // Simulate processing
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Generate CSS
+            generatedCSS = generateCSS(description, detectedPlatform);
+            
+            // Update UI
+            displayResults();
+            
+            // Reset loading state
+            generateBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            
+            showNotification('CSS generated successfully!', 'success');
+        }
+
+        // CSS Generation Logic
+        function generateCSS(description, platform) {
+            const desc = description.toLowerCase();
+            let css = '';
+            
+            // Detect what the user wants to customize
+            if (desc.includes('header')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Header Customization */
+.header, header, .site-header, .main-header {
+    background: ${desc.includes('gradient') ? `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : color};
+    ${desc.includes('rounded') ? 'border-radius: 0 0 20px 20px;' : ''}
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);' : ''}
+    ${desc.includes('sticky') || desc.includes('fixed') ? 'position: sticky;\n    top: 0;\n    z-index: 1000;' : ''}
+    padding: 20px 0;
+    transition: all 0.3s ease;
+}\n\n`;
+            }
+            
+            if (desc.includes('button')) {
+                const color = extractColor(desc) || '#8b5cf6';
+                css += `/* Button Customization */
+.btn, .button, button, input[type="submit"], input[type="button"] {
+    background: ${desc.includes('gradient') ? `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -0.1)} 100%)` : color};
+    border: none;
+    ${desc.includes('rounded') ? 'border-radius: 12px;' : 'border-radius: 6px;'}
+    color: white;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    ${desc.includes('shadow') ? 'box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);' : ''}
+}
+
+.btn:hover, .button:hover, button:hover {
+    transform: translateY(-2px);
+    ${desc.includes('shadow') ? 'box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);' : ''}
+    filter: brightness(1.1);
+}\n\n`;
+            }
+            
+            if (desc.includes('form') || desc.includes('contact')) {
+                css += `/* Form Customization */
+.form, .contact-form, form {
+    ${desc.includes('right') ? 'position: fixed;\n    right: 20px;\n    top: 50%;\n    transform: translateY(-50%);\n    max-width: 320px;' : 'max-width: 600px;\n    margin: 2rem auto;'}
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.form input, .form textarea, form input, form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form input:focus, .form textarea:focus {
+    outline: none;
+    border-color: ${extractColor(desc) || '#8b5cf6'};
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}\n\n`;
+            }
+            
+            if (desc.includes('text') || desc.includes('font')) {
+                css += `/* Typography Customization */
+body, .content {
+    font-family: ${desc.includes('modern') ? "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" : 'inherit'};
+    ${desc.includes('size') ? 'font-size: 18px;' : ''}
+    ${desc.includes('spacing') ? 'line-height: 1.8;' : ''}
+    ${extractColor(desc) ? `color: ${extractColor(desc)};` : ''}
+}
+
+h1, h2, h3, h4, h5, h6 {
+    ${desc.includes('weight') ? 'font-weight: 700;' : ''}
+    ${desc.includes('spacing') ? 'letter-spacing: -0.02em;' : ''}
+    margin-bottom: 1rem;
+}\n\n`;
+            }
+            
+            // If no specific elements detected, provide general styling
+            if (css === '') {
+                const color = extractColor(desc) || '#8b5cf6';
+                css = `/* General Website Customization */
+:root {
+    --primary-color: ${color};
+    --primary-dark: ${adjustColor(color, -0.1)};
+}
+
+/* Apply primary color theme */
+.accent, .highlight, .primary {
+    color: var(--primary-color);
+}
+
+.bg-accent, .bg-highlight, .bg-primary {
+    background-color: var(--primary-color);
+}
+
+/* Modern styling improvements */
+* {
+    transition: all 0.3s ease;
+}
+
+a:hover, button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Add subtle animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+    animation: fadeIn 0.5s ease-out;
+}`;
+            }
+            
+            return css;
+        }
+
+        // Helper Functions
+        function extractColor(text) {
+            const colors = {
+                'purple': '#8b5cf6',
+                'blue': '#3b82f6',
+                'green': '#10b981',
+                'red': '#ef4444',
+                'orange': '#f59e0b',
+                'pink': '#ec4899',
+                'yellow': '#f59e0b',
+                'indigo': '#6366f1',
+                'teal': '#14b8a6',
+                'gray': '#6b7280',
+                'black': '#000000',
+                'white': '#ffffff'
+            };
+            
+            for (const [name, hex] of Object.entries(colors)) {
+                if (text.includes(name)) return hex;
+            }
+            
+            // Check for hex colors
+            const hexMatch = text.match(/#[0-9a-fA-F]{6}/);
+            if (hexMatch) return hexMatch[0];
+            
+            return null;
+        }
+
+        function adjustColor(hex, factor) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(255 * factor);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function displayResults() {
+            // Update preview
+            previewContent.innerHTML = `
+                <div style="font-size: 2rem; margin-bottom: 1rem;">✨</div>
+                <h3 style="color: var(--success); margin-bottom: 0.5rem;">CSS Generated!</h3>
+                <p style="color: var(--text-muted);">Your customization is ready</p>
+            `;
+            
+            // Show output section
+            outputSection.classList.add('show');
+            
+            // Display CSS with syntax highlighting
+            const highlightedCSS = generatedCSS
+                .replace(/([a-zA-Z-]+):/g, '<span class="css-property">$1:</span>')
+                .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;')
+                .replace(/([.#][a-zA-Z-][a-zA-Z0-9-]*)/g, '<span class="css-selector">$1</span>');
+            
+            codeBlock.innerHTML = highlightedCSS;
+            
+            // Update implementation steps
+            const steps = getImplementationSteps(detectedPlatform);
+            stepsList.innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+            
+            // Scroll to output
+            outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function getImplementationSteps(platform) {
+            const steps = {
+                'shopify': [
+                    'Go to your Shopify admin → Online Store → Themes',
+                    'Click "Actions" → "Edit code" on your active theme',
+                    'Find "assets/theme.scss.liquid" or create new CSS file',
+                    'Paste the CSS at the bottom of the file',
+                    'Save and preview your store'
+                ],
+                'wordpress': [
+                    'Go to WordPress admin → Appearance → Customize',
+                    'Click "Additional CSS" in the customizer',
+                    'Paste the CSS code in the text area',
+                    'Click "Publish" to apply changes',
+                    'View your site to see the changes'
+                ],
+                'squarespace': [
+                    'Go to your Squarespace admin → Design → Custom CSS',
+                    'Paste the CSS in the Custom CSS editor',
+                    'Click "Save" to apply changes',
+                    'Preview your site',
+                    'Publish when satisfied'
+                ],
+                'wix': [
+                    'Go to your Wix Editor',
+                    'Click "Settings" → "Custom Code"',
+                    'Add new custom code → "Body - end"',
+                    'Wrap CSS in <style> tags and paste',
+                    'Apply and publish'
+                ],
+                'custom': [
+                    'Copy the generated CSS code',
+                    'Add to your website\'s main CSS file',
+                    'Or add within <style> tags in HTML',
+                    'Save and refresh your website',
+                    'Test across different devices'
+                ]
+            };
+            
+            return steps[platform] || steps['custom'];
+        }
+
+        function copyCSS() {
+            navigator.clipboard.writeText(generatedCSS).then(() => {
+                showNotification('CSS copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy CSS', 'error');
+            });
+        }
+
+        function downloadCSS() {
+            const blob = new Blob([generatedCSS], { type: 'text/css' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `website-customization-${Date.now()}.css`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('CSS file downloaded!', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>React Bits Components</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #0f0f23;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .close-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .close-btn:hover {
+            background: #ef4444;
+        }
+        
+        .component-item {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .component-item:hover {
+            background: #2a2a3e;
+            border-color: #8b5cf6;
+        }
+        
+        .component-item.selected {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+        
+        .emoji {
+            font-size: 20px;
+            display: inline-block;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .preview-area {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow: auto;
+        }
+        
+        .code-section {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 15px;
+            overflow: hidden;
+        }
+        
+        .code-area {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-x: auto;
+            color: #e0e0ff;
+            margin: 10px 0;
+        }
+        
+        .copy-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #7c3aed;
+        }
+        
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Components</h2>
+        <div id="components">
+            <div class="component-item" data-id="glow-btn">
+                <span class="emoji">✨</span>
+                <span>Glowing Button</span>
+            </div>
+            <div class="component-item" data-id="gradient-btn">
+                <span class="emoji">🌈</span>
+                <span>Gradient Button</span>
+            </div>
+            <div class="component-item" data-id="glass-card">
+                <span class="emoji">🪟</span>
+                <span>Glass Card</span>
+            </div>
+            <div class="component-item" data-id="glow-input">
+                <span class="emoji">💫</span>
+                <span>Glowing Input</span>
+            </div>
+            <div class="component-item" data-id="gradient-text">
+                <span class="emoji">🎨</span>
+                <span>Gradient Text</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main">
+        <div class="header">
+            <h1>React Bits Visual Components</h1>
+            <a href="./index.html" class="close-btn">Close</a>
+        </div>
+        
+        <div class="preview-area" id="preview">
+            <p style="color: #999;">Select a component to preview</p>
+        </div>
+        
+        <div class="code-section">
+            <h3>Component Code:</h3>
+            <div class="code-area" id="code">// Select a component to see its code</div>
+            <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+        </div>
+    </div>
+    
+    <script>
+        const components = {
+            'glow-btn': {
+                preview: '<button style="padding: 12px 24px; background: #8b5cf6; color: white; border: none; border-radius: 8px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); cursor: pointer; font-size: 16px; transition: all 0.3s;">Glowing Button</button>',
+                code: '<button className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:shadow-purple-600/50 transition-all">Glowing Button</button>'
+            },
+            'gradient-btn': {
+                preview: '<button style="padding: 12px 24px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">Gradient Button</button>',
+                code: '<button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg">Gradient Button</button>'
+            },
+            'glass-card': {
+                preview: '<div style="padding: 24px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; max-width: 300px;"><h3 style="margin-bottom: 10px;">Glass Card</h3><p>Beautiful glassmorphism effect</p></div>',
+                code: '<div className="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl">\n  <h3>Glass Card</h3>\n  <p>Beautiful glassmorphism effect</p>\n</div>'
+            },
+            'glow-input': {
+                preview: '<input type="text" placeholder="Type something..." style="padding: 8px 16px; background: #1a1a2e; border: 2px solid #8b5cf6; border-radius: 6px; color: white; outline: none; font-size: 14px;">',
+                code: '<input type="text" placeholder="Type something..." className="px-4 py-2 bg-gray-800 border-2 border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-600" />'
+            },
+            'gradient-text': {
+                preview: '<h2 style="font-size: 32px; font-weight: bold; background: linear-gradient(135deg, #8b5cf6, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Gradient Text</h2>',
+                code: '<h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Gradient Text</h2>'
+            }
+        };
+        
+        let selectedComponent = null;
+        
+        document.getElementById('components').addEventListener('click', (e) => {
+            const item = e.target.closest('.component-item');
+            if (item) {
+                document.querySelectorAll('.component-item').forEach(el => el.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                const id = item.dataset.id;
+                selectedComponent = components[id];
+                
+                document.getElementById('preview').innerHTML = selectedComponent.preview;
+                document.getElementById('code').textContent = selectedComponent.code;
+            }
+        });
+        
+        function copyCode() {
+            if (selectedComponent) {
+                navigator.clipboard.writeText(selectedComponent.code);
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>

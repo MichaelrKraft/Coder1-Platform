@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Bits - Visual Component Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0a0a1f;
+            color: #e0e0ff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .glass-panel {
+            background: rgba(20, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+        }
+        
+        .component-item {
+            background: rgba(30, 30, 50, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .component-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateX(4px);
+        }
+        
+        .component-item.selected {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex flex-col h-screen">
+        <!-- Header -->
+        <div class="glass-panel m-4 p-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-2xl font-bold text-purple-400 flex items-center gap-2">
+                    <span>🎨</span> React Bits Visual Integration
+                </h1>
+                <div class="px-3 py-1 bg-orange-500/20 border border-orange-500/30 rounded-lg text-sm">
+                    Demo Mode
+                </div>
+            </div>
+            <a href="./index.html" class="px-4 py-1.5 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors flex items-center gap-2 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Close
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex gap-4 px-4 pb-4 overflow-hidden">
+            <!-- Component Library Panel -->
+            <div class="glass-panel p-4 w-80 flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Components</h3>
+                <div id="componentList" class="flex-1 overflow-y-auto space-y-2">
+                    <!-- Components will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="flex-1 glass-panel p-4 flex flex-col">
+                <div class="mb-3">
+                    <h3 class="text-lg font-semibold">Live Preview - Click any element to replace it</h3>
+                </div>
+                
+                <div class="flex-1 relative rounded-lg overflow-hidden bg-gray-900">
+                    <iframe id="previewFrame" class="preview-frame" srcdoc='
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body {
+                                    font-family: system-ui, -apple-system, sans-serif;
+                                    background: #f3f4f6;
+                                    color: #1f2937;
+                                }
+                                .hero {
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    padding: 4rem 2rem;
+                                    text-align: center;
+                                }
+                                .hero h1 {
+                                    font-size: 3rem;
+                                    margin-bottom: 1rem;
+                                }
+                                .btn {
+                                    background: #3b82f6;
+                                    color: white;
+                                    padding: 12px 24px;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-size: 16px;
+                                    cursor: pointer;
+                                    margin: 1rem;
+                                }
+                                .cards {
+                                    padding: 3rem 2rem;
+                                    display: flex;
+                                    gap: 2rem;
+                                    justify-content: center;
+                                    flex-wrap: wrap;
+                                }
+                                .card {
+                                    background: white;
+                                    padding: 2rem;
+                                    border-radius: 8px;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    max-width: 300px;
+                                }
+                                .form {
+                                    padding: 3rem 2rem;
+                                    text-align: center;
+                                }
+                                input {
+                                    padding: 8px 12px;
+                                    border: 1px solid #d1d5db;
+                                    border-radius: 4px;
+                                    margin: 0.5rem;
+                                    width: 200px;
+                                }
+                                /* Hover effect */
+                                .rb-hover {
+                                    outline: 2px dashed #8b5cf6 !important;
+                                    outline-offset: 2px !important;
+                                    cursor: pointer !important;
+                                }
+                                .rb-selected {
+                                    outline: 2px solid #8b5cf6 !important;
+                                    outline-offset: 2px !important;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="hero">
+                                <h1>Demo Website</h1>
+                                <p>Click any element below to replace it with a React Bits component</p>
+                                <button class="btn">Get Started</button>
+                            </div>
+                            
+                            <div class="cards">
+                                <div class="card">
+                                    <h3>Feature One</h3>
+                                    <p>Replace this card with a glassmorphism card</p>
+                                    <button>Learn More</button>
+                                </div>
+                                <div class="card">
+                                    <h3>Feature Two</h3>
+                                    <p>Transform this into an animated card</p>
+                                    <button>Learn More</button>
+                                </div>
+                            </div>
+                            
+                            <div class="form">
+                                <h2>Contact Form</h2>
+                                <div>
+                                    <input type="text" placeholder="Your name">
+                                    <input type="email" placeholder="Your email">
+                                    <button class="btn">Submit</button>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    '></iframe>
+                </div>
+            </div>
+
+            <!-- Actions Panel -->
+            <div class="glass-panel p-4 w-96">
+                <div id="welcomePanel" class="text-center py-8">
+                    <div class="text-6xl mb-4">🎯</div>
+                    <h3 class="text-lg font-semibold mb-2">Click to Select</h3>
+                    <p class="text-sm text-gray-400">Click any element in the preview to replace it with a React Bits component</p>
+                </div>
+                
+                <div id="actionPanel" class="hidden">
+                    <h3 class="text-lg font-semibold mb-4">Selected Element</h3>
+                    <p id="elementInfo" class="text-sm text-purple-400 font-mono mb-4"></p>
+                    
+                    <div class="space-y-2">
+                        <button onclick="copyCode()" class="w-full px-4 py-2 bg-purple-600/20 border border-purple-600/30 rounded-lg hover:bg-purple-600/30 transition-colors">
+                            📋 Copy Component Code
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-400 mb-2">Component Code:</p>
+                        <pre id="codeDisplay" class="bg-gray-900 rounded-lg p-3 text-xs font-mono text-gray-300 overflow-auto max-h-64"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple component library
+        const components = [
+            {
+                name: '✨ Glowing Button',
+                code: '<button class="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:shadow-purple-600/50 transition-all duration-300 transform hover:scale-105">Click Me</button>',
+                type: 'button'
+            },
+            {
+                name: '🌈 Gradient Button',
+                code: '<button class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg transform hover:scale-105 transition-transform">Gradient</button>',
+                type: 'button'
+            },
+            {
+                name: '🪟 Glass Card',
+                code: '<div class="p-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl"><h3 class="text-lg font-bold mb-2">Glass Card</h3><p class="text-gray-300">Beautiful glassmorphism effect</p></div>',
+                type: 'card'
+            },
+            {
+                name: '💫 Glowing Input',
+                code: '<input type="text" placeholder="Enter text..." class="px-4 py-2 bg-gray-800 border border-purple-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" />',
+                type: 'input'
+            }
+        ];
+
+        let selectedComponent = null;
+        let selectedElement = null;
+
+        // Render components
+        function renderComponents() {
+            const list = document.getElementById('componentList');
+            components.forEach((comp, index) => {
+                const item = document.createElement('div');
+                item.className = 'component-item';
+                item.textContent = comp.name;
+                item.onclick = () => selectComponent(comp, item);
+                list.appendChild(item);
+            });
+        }
+
+        // Select component
+        function selectComponent(comp, element) {
+            document.querySelectorAll('.component-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedComponent = comp;
+            
+            if (selectedElement) {
+                document.getElementById('codeDisplay').textContent = comp.code;
+            }
+        }
+
+        // Setup iframe interaction
+        function setupIframe() {
+            const frame = document.getElementById('previewFrame');
+            const frameDoc = frame.contentDocument;
+            
+            // Add interaction handlers
+            frameDoc.addEventListener('mouseover', (e) => {
+                frameDoc.querySelectorAll('.rb-hover').forEach(el => el.classList.remove('rb-hover'));
+                e.target.classList.add('rb-hover');
+            });
+            
+            frameDoc.addEventListener('click', (e) => {
+                e.preventDefault();
+                frameDoc.querySelectorAll('.rb-selected').forEach(el => el.classList.remove('rb-selected'));
+                e.target.classList.add('rb-selected');
+                
+                selectedElement = e.target;
+                const tagName = e.target.tagName.toLowerCase();
+                const className = e.target.className.replace('rb-selected', '').trim();
+                const elementInfo = tagName + (className ? '.' + className : '');
+                
+                document.getElementById('elementInfo').textContent = elementInfo;
+                document.getElementById('welcomePanel').classList.add('hidden');
+                document.getElementById('actionPanel').classList.remove('hidden');
+                
+                if (selectedComponent) {
+                    document.getElementById('codeDisplay').textContent = selectedComponent.code;
+                }
+            });
+        }
+
+        // Copy code
+        function copyCode() {
+            if (selectedComponent) {
+                navigator.clipboard.writeText(selectedComponent.code);
+                alert('Component code copied to clipboard!');
+            }
+        }
+
+        // Initialize
+        renderComponents();
+        document.getElementById('previewFrame').onload = setupIframe;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Customization Studio - Customize Any Website</title>
+    <meta name="description" content="Transform any website with natural language commands. Enter your URL, describe changes, and get instant CSS.">
+    
+    <style>
+        /* CSS Variables for Consistent Theme */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #3b82f6;
+            --background: #0f0f23;
+            --surface: rgba(139, 92, 246, 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Components */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-glass);
+        }
+        
+        .glass-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .usage-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .usage-count {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 1rem;
+            border-radius: 12px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Main Layout */
+        .main-container {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 120px);
+        }
+        
+        /* Input Panel */
+        .input-panel {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .panel-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .panel-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .panel-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .form-input {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--text-primary);
+            font-size: 1rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .url-input-container {
+            position: relative;
+        }
+        
+        .platform-badge {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .platform-shopify {
+            background: rgba(95, 207, 142, 0.2);
+            color: #5fcf8e;
+            border: 1px solid rgba(95, 207, 142, 0.3);
+        }
+        
+        .platform-wordpress {
+            background: rgba(0, 115, 170, 0.2);
+            color: #0073aa;
+            border: 1px solid rgba(0, 115, 170, 0.3);
+        }
+        
+        .platform-squarespace {
+            background: rgba(255, 92, 0, 0.2);
+            color: #ff5c00;
+            border: 1px solid rgba(255, 92, 0, 0.3);
+        }
+        
+        .platform-custom {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Generate Button */
+        .generate-container {
+            margin-top: auto;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .generate-btn.loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loading-shimmer 1.5s infinite;
+        }
+        
+        @keyframes loading-shimmer {
+            to {
+                left: 100%;
+            }
+        }
+        
+        /* Preview Panel */
+        .preview-panel {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .preview-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .preview-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .toggle-group {
+            display: flex;
+            background: var(--glass);
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .device-selector {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .device-btn {
+            padding: 8px;
+            border: none;
+            background: var(--glass);
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .device-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Preview Content */
+        .preview-content {
+            flex: 1;
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .preview-mockup {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mockup-placeholder {
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .mockup-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--glass-border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .mockup-image {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .changes-overlay {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--success);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .changes-overlay.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* CSS Output Section */
+        .css-output {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .output-title {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .output-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .css-property {
+            color: #ff79c6;
+        }
+        
+        .css-value {
+            color: #50fa7b;
+        }
+        
+        .css-selector {
+            color: #8be9fd;
+        }
+        
+        .implementation-guide {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .guide-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .guide-steps {
+            list-style: none;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .guide-steps li {
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+        
+        .guide-steps li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                height: auto;
+            }
+            
+            .preview-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .preview-controls {
+                justify-content: space-between;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .input-panel, .preview-panel {
+                padding: 1.5rem;
+            }
+            
+            .nav-container {
+                padding: 0 1rem;
+            }
+            
+            .nav-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            max-width: 400px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            z-index: 1100;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        .notification.error {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        .notification.warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+        
+        /* Hidden Elements */
+        .hidden {
+            display: none;
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/website-studio-landing.html" class="logo">Website Studio</a>
+            <div class="nav-actions">
+                <div class="usage-indicator">
+                    <span>Free Trial:</span>
+                    <span class="usage-count" id="usageCount">3 remaining</span>
+                </div>
+                <a href="/website-studio-landing.html#pricing" class="btn btn-secondary">Upgrade</a>
+                <button class="btn btn-primary" id="helpBtn">Help</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Application -->
+    <div class="main-container">
+        <div class="app-grid">
+            <!-- Input Panel -->
+            <div class="glass-card input-panel">
+                <div class="panel-header">
+                    <h1>Customize Your Website</h1>
+                    <p>Enter your website URL and describe the changes you want to make</p>
+                </div>
+
+                <form id="customizationForm">
+                    <!-- URL Input -->
+                    <div class="form-group">
+                        <label for="websiteUrl" class="form-label">Website URL</label>
+                        <div class="url-input-container">
+                            <input 
+                                type="url" 
+                                id="websiteUrl" 
+                                class="form-input"
+                                placeholder="https://your-website.com"
+                                required
+                            >
+                            <div id="platformBadge" class="platform-badge hidden"></div>
+                        </div>
+                        <small class="form-hint" style="color: var(--text-muted); font-size: 0.75rem;">
+                            We'll automatically detect your platform (Shopify, WordPress, etc.)
+                        </small>
+                    </div>
+
+                    <!-- Description Input -->
+                    <div class="form-group">
+                        <label for="description" class="form-label">Describe Your Changes</label>
+                        <textarea 
+                            id="description" 
+                            class="form-input form-textarea"
+                            placeholder="For example: 'Make the header purple and add a contact form' or 'Change all buttons to be more modern with rounded corners'"
+                            required
+                        ></textarea>
+                        <small class="form-hint" style="color: var(--text-muted); font-size: 0.75rem;">
+                            Be specific about colors, layouts, or features you want to change
+                        </small>
+                    </div>
+
+                    <!-- Example Suggestions -->
+                    <div class="form-group">
+                        <div class="form-label">Quick Examples:</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="insertExample('Make all buttons purple with rounded corners')">
+                                🎨 Purple Buttons
+                            </button>
+                            <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="insertExample('Add a floating contact form on the right side')">
+                                📝 Contact Form
+                            </button>
+                            <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="insertExample('Make the header sticky and add a dark theme')">
+                                🌙 Dark Header
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="generate-container">
+                        <button 
+                            type="submit" 
+                            id="generateBtn" 
+                            class="btn btn-primary btn-large generate-btn"
+                        >
+                            <span id="generateText">✨ Generate CSS</span>
+                        </button>
+                        <div style="margin-top: 0.5rem; text-align: center;">
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">
+                                Press Ctrl+Enter to generate quickly
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="glass-card preview-panel">
+                <div class="preview-header">
+                    <div class="preview-title">Live Preview</div>
+                    <div class="preview-controls">
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-view="before" id="beforeBtn">Original</button>
+                            <button class="toggle-btn" data-view="after" id="afterBtn">With Changes</button>
+                        </div>
+                        <div class="device-selector">
+                            <button class="device-btn active" data-device="desktop" title="Desktop">🖥️</button>
+                            <button class="device-btn" data-device="tablet" title="Tablet">📱</button>
+                            <button class="device-btn" data-device="mobile" title="Mobile">📱</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-content">
+                    <div class="preview-mockup" id="previewMockup">
+                        <div class="mockup-placeholder">
+                            <div class="icon">🌐</div>
+                            <h3>Enter a website URL to see preview</h3>
+                            <p>We'll show you before and after comparisons</p>
+                        </div>
+                        <div class="changes-overlay" id="changesOverlay">
+                            ✨ Changes Applied
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSS Output Section -->
+                <div class="css-output hidden" id="cssOutput">
+                    <div class="output-header">
+                        <div class="output-title">Generated CSS</div>
+                        <div class="output-actions">
+                            <button class="btn btn-secondary" id="copyBtn">📋 Copy</button>
+                            <button class="btn btn-secondary" id="downloadBtn">💾 Download</button>
+                        </div>
+                    </div>
+                    <div class="code-block" id="codeBlock">
+                        <!-- Generated CSS will appear here -->
+                    </div>
+                    <div class="implementation-guide">
+                        <div class="guide-title">How to Apply These Changes:</div>
+                        <ul class="guide-steps" id="implementationSteps">
+                            <li>Copy the CSS code above</li>
+                            <li>Add it to your website's custom CSS section</li>
+                            <li>Save and refresh to see the changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // Application State
+        const state = {
+            currentView: 'before',
+            currentDevice: 'desktop',
+            detectedPlatform: null,
+            generatedCSS: null,
+            usageCount: 3,
+            isGenerating: false
+        };
+
+        // DOM Elements
+        const elements = {
+            form: document.getElementById('customizationForm'),
+            urlInput: document.getElementById('websiteUrl'),
+            descriptionInput: document.getElementById('description'),
+            platformBadge: document.getElementById('platformBadge'),
+            generateBtn: document.getElementById('generateBtn'),
+            generateText: document.getElementById('generateText'),
+            beforeBtn: document.getElementById('beforeBtn'),
+            afterBtn: document.getElementById('afterBtn'),
+            previewMockup: document.getElementById('previewMockup'),
+            changesOverlay: document.getElementById('changesOverlay'),
+            cssOutput: document.getElementById('cssOutput'),
+            codeBlock: document.getElementById('codeBlock'),
+            implementationSteps: document.getElementById('implementationSteps'),
+            copyBtn: document.getElementById('copyBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            usageCount: document.getElementById('usageCount'),
+            helpBtn: document.getElementById('helpBtn')
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            loadDraftData();
+            updateUsageDisplay();
+        });
+
+        // Event Listeners
+        function initializeEventListeners() {
+            // Form submission
+            elements.form.addEventListener('submit', handleFormSubmit);
+            
+            // URL input for platform detection
+            elements.urlInput.addEventListener('input', debounce(detectPlatform, 500));
+            elements.urlInput.addEventListener('blur', detectPlatform);
+            
+            // Description auto-save
+            elements.descriptionInput.addEventListener('input', debounce(saveDraft, 1000));
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+            
+            // Preview controls
+            elements.beforeBtn.addEventListener('click', () => setPreviewView('before'));
+            elements.afterBtn.addEventListener('click', () => setPreviewView('after'));
+            
+            // Device selector
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => setDeviceView(e.target.dataset.device));
+            });
+            
+            // CSS output actions
+            elements.copyBtn.addEventListener('click', copyCSS);
+            elements.downloadBtn.addEventListener('click', downloadCSS);
+            
+            // Help button
+            elements.helpBtn.addEventListener('click', showHelp);
+        }
+
+        // Form Submission Handler
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            if (state.isGenerating) return;
+            
+            const url = elements.urlInput.value.trim();
+            const description = elements.descriptionInput.value.trim();
+            
+            if (!url || !description) {
+                showNotification('Please fill in both URL and description fields', 'error');
+                return;
+            }
+            
+            if (state.usageCount <= 0) {
+                showNotification('You\'ve reached your free trial limit. Please upgrade to continue.', 'warning');
+                return;
+            }
+            
+            await generateCustomization(url, description);
+        }
+
+        // Platform Detection
+        async function detectPlatform() {
+            const url = elements.urlInput.value.trim();
+            
+            if (!url || !isValidUrl(url)) {
+                hidePlatformBadge();
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/website/detect-platform', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                }).catch(err => {
+                    console.log('Platform detection API not available, using fallback');
+                    return null;
+                });
+                
+                const result = response ? await response.json() : null;
+                
+                if (result.success) {
+                    state.detectedPlatform = result.data.platform;
+                    showPlatformBadge(result.data.platform, result.data.confidence);
+                } else {
+                    // Fallback to simple pattern matching
+                    let platform = 'custom';
+                    
+                    if (url.includes('shopify') || url.includes('.myshopify.com')) {
+                        platform = 'shopify';
+                    } else if (url.includes('wordpress') || url.includes('wp-')) {
+                        platform = 'wordpress';
+                    } else if (url.includes('squarespace') || url.includes('static1.squarespace.com')) {
+                        platform = 'squarespace';
+                    }
+                    
+                    state.detectedPlatform = platform;
+                    showPlatformBadge(platform);
+                }
+                
+            } catch (error) {
+                console.log('Platform detection failed:', error);
+                // Fallback to simple pattern matching
+                let platform = 'custom';
+                
+                if (url.includes('shopify') || url.includes('.myshopify.com')) {
+                    platform = 'shopify';
+                } else if (url.includes('wordpress') || url.includes('wp-')) {
+                    platform = 'wordpress';
+                } else if (url.includes('squarespace') || url.includes('static1.squarespace.com')) {
+                    platform = 'squarespace';
+                }
+                
+                state.detectedPlatform = platform;
+                showPlatformBadge(platform);
+            }
+        }
+
+        // CSS Generation
+        async function generateCustomization(url, description) {
+            setGeneratingState(true);
+            
+            try {
+                // Show loading in preview
+                showLoadingPreview();
+                
+                // Generate CSS using real API
+                const cssResponse = await fetch('http://localhost:8080/api/website/generate-css', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        description,
+                        platform: state.detectedPlatform,
+                        website_url: url
+                    })
+                });
+                
+                const cssResult = await cssResponse.json();
+                
+                if (!cssResult.success) {
+                    throw new Error(cssResult.error || 'Failed to generate CSS');
+                }
+                
+                // Create mockup using real API
+                const mockupResponse = await fetch('http://localhost:8080/api/website/create-mockup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        website_url: url,
+                        generated_css: cssResult.data.generated_css,
+                        description,
+                        platform: state.detectedPlatform
+                    })
+                });
+                
+                const mockupResult = await mockupResponse.json();
+                
+                if (mockupResult.success) {
+                    state.mockupData = mockupResult.data;
+                }
+                
+                // Update usage count
+                state.usageCount--;
+                updateUsageDisplay();
+                
+                // Update UI with results
+                displayGeneratedCSS(cssResult.data);
+                showAfterPreview(mockupResult.data);
+                setPreviewView('after');
+                
+                // Save to localStorage
+                saveDraft();
+                
+                showNotification('CSS generated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Generation failed:', error);
+                showNotification('Failed to generate CSS. Please try again.', 'error');
+                
+                // Fallback to mock data if API fails
+                try {
+                    await simulateGeneration();
+                    const cssResult = generateMockCSS(description, state.detectedPlatform);
+                    displayGeneratedCSS(cssResult);
+                    showAfterPreview();
+                    setPreviewView('after');
+                    showNotification('Using demo mode - API unavailable', 'warning');
+                } catch (fallbackError) {
+                    console.error('Fallback failed:', fallbackError);
+                }
+            } finally {
+                setGeneratingState(false);
+            }
+        }
+
+        // Mock CSS Generation
+        function generateMockCSS(description, platform) {
+            const templates = {
+                'button': `/* Modern Button Styling */
+.btn, .button, button {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.btn:hover, .button:hover, button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+}`,
+                'header': `/* Modern Header Styling */
+.header, header, .site-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 20px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header .logo, header .logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}`,
+                'contact': `/* Contact Form Styling */
+.contact-form {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    max-width: 300px;
+    z-index: 1000;
+}
+
+.contact-form input, .contact-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}`,
+                'default': `/* Custom Styling */
+.enhanced-element {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.enhanced-element:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}`
+            };
+
+            // Simple keyword matching
+            let selectedTemplate = 'default';
+            for (const [key, css] of Object.entries(templates)) {
+                if (description.toLowerCase().includes(key)) {
+                    selectedTemplate = key;
+                    break;
+                }
+            }
+
+            const css = templates[selectedTemplate];
+            
+            state.generatedCSS = {
+                css: css,
+                platform: platform || 'custom',
+                confidence: Math.random() * 0.3 + 0.7, // 70-100%
+                description: description
+            };
+
+            return state.generatedCSS;
+        }
+
+        // UI Update Functions
+        function setGeneratingState(isGenerating) {
+            state.isGenerating = isGenerating;
+            elements.generateBtn.disabled = isGenerating;
+            elements.generateBtn.classList.toggle('loading', isGenerating);
+            
+            if (isGenerating) {
+                elements.generateText.textContent = '⚡ Generating...';
+            } else {
+                elements.generateText.textContent = '✨ Generate CSS';
+            }
+        }
+
+        function showLoadingPreview() {
+            elements.previewMockup.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Generating your customization...</p>
+            `;
+        }
+
+        function showAfterPreview(mockupData) {
+            if (mockupData && mockupData.changes_highlighted && mockupData.changes_highlighted.length > 0) {
+                // Show real mockup data
+                elements.previewMockup.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
+                        <h3 style="color: var(--success); margin-bottom: 1rem;">Changes Applied!</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">Your CSS has been generated successfully.</p>
+                        
+                        <div style="text-align: left; margin-bottom: 1rem; padding: 1rem; background: var(--glass); border-radius: 8px;">
+                            <h4 style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.5rem;">Changes Made:</h4>
+                            <ul style="color: var(--text-secondary); font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                                ${mockupData.changes_highlighted.map(change => `<li>${change}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        ${mockupData.demo_mode ? `
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: var(--glass); border-radius: 8px; font-size: 0.75rem;">
+                            <strong>Demo Mode:</strong> ${mockupData.note || 'Using preview mode for demonstration.'}
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                // Show fallback preview
+                elements.previewMockup.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+                        <h3 style="color: var(--success); margin-bottom: 1rem;">Changes Applied!</h3>
+                        <p style="color: var(--text-muted);">Your CSS has been generated and is ready to use.</p>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--glass); border-radius: 8px; font-size: 0.875rem;">
+                            <strong>Preview Note:</strong> This is a demo. In production, you would see actual before/after screenshots of your website.
+                        </div>
+                    </div>
+                `;
+            }
+            elements.changesOverlay.classList.add('show');
+        }
+
+        function displayGeneratedCSS(cssResult) {
+            // Show the CSS output section
+            elements.cssOutput.classList.remove('hidden');
+            
+            // Store CSS in state
+            state.generatedCSS = cssResult.generated_css || cssResult.css;
+            
+            // Format and display CSS
+            const formattedCSS = formatCSS(state.generatedCSS);
+            elements.codeBlock.innerHTML = formattedCSS;
+            
+            // Update implementation steps based on platform
+            updateImplementationSteps(state.detectedPlatform || cssResult.platform);
+            
+            // Scroll to CSS output
+            elements.cssOutput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function formatCSS(css) {
+            // Simple CSS syntax highlighting
+            return css
+                .replace(/([a-zA-Z-]+):/g, '<span class="css-property">$1:</span>')
+                .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;')
+                .replace(/([.#][a-zA-Z-][a-zA-Z0-9-]*)/g, '<span class="css-selector">$1</span>');
+        }
+
+        function updateImplementationSteps(platform) {
+            const steps = {
+                'shopify': [
+                    'Go to your Shopify admin → Online Store → Themes',
+                    'Click "Actions" → "Edit code" on your active theme',
+                    'Find "assets/theme.scss.liquid" or create a new CSS file',
+                    'Paste the CSS code at the bottom of the file',
+                    'Save the file and preview your store'
+                ],
+                'wordpress': [
+                    'Go to WordPress admin → Appearance → Customize',
+                    'Click "Additional CSS" in the customizer',
+                    'Paste the CSS code in the text area',
+                    'Click "Publish" to apply the changes',
+                    'View your site to see the changes'
+                ],
+                'squarespace': [
+                    'Go to your Squarespace admin → Design → Custom CSS',
+                    'Paste the CSS code in the Custom CSS editor',
+                    'Click "Save" to apply the changes',
+                    'Preview your site to see the changes',
+                    'Publish when satisfied with the results'
+                ],
+                'custom': [
+                    'Copy the CSS code above',
+                    'Add it to your website\'s main CSS file',
+                    'Or add it within <style> tags in your HTML',
+                    'Save and refresh to see the changes',
+                    'Test across different devices'
+                ]
+            };
+
+            const platformSteps = steps[platform] || steps['custom'];
+            elements.implementationSteps.innerHTML = platformSteps
+                .map(step => `<li>${step}</li>`)
+                .join('');
+        }
+
+        // Platform Badge Functions
+        function showPlatformBadge(platform, confidence) {
+            const badge = elements.platformBadge;
+            const displayText = confidence ? 
+                `${platform} (${Math.round(confidence * 100)}%)` : 
+                platform;
+            badge.textContent = displayText;
+            badge.className = `platform-badge platform-${platform}`;
+            badge.classList.remove('hidden');
+        }
+
+        function hidePlatformBadge() {
+            elements.platformBadge.classList.add('hidden');
+        }
+
+        // Preview Controls
+        function setPreviewView(view) {
+            state.currentView = view;
+            
+            // Update toggle buttons
+            elements.beforeBtn.classList.toggle('active', view === 'before');
+            elements.afterBtn.classList.toggle('active', view === 'after');
+            
+            // Update preview content
+            if (view === 'before') {
+                elements.changesOverlay.classList.remove('show');
+                if (!state.generatedCSS) {
+                    elements.previewMockup.innerHTML = `
+                        <div class="mockup-placeholder">
+                            <div class="icon">🌐</div>
+                            <h3>Original Website</h3>
+                            <p>Enter a URL to see the original site</p>
+                        </div>
+                    `;
+                }
+            } else if (view === 'after' && state.generatedCSS) {
+                showAfterPreview();
+            }
+        }
+
+        function setDeviceView(device) {
+            state.currentDevice = device;
+            
+            // Update device buttons
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.device === device);
+            });
+            
+            // In a real implementation, this would adjust the preview size
+            console.log(`Preview switched to ${device} view`);
+        }
+
+        // CSS Actions
+        function copyCSS() {
+            if (!state.generatedCSS) return;
+            
+            navigator.clipboard.writeText(state.generatedCSS.css).then(() => {
+                showNotification('CSS copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy CSS', 'error');
+            });
+        }
+
+        function downloadCSS() {
+            if (!state.generatedCSS) return;
+            
+            const blob = new Blob([state.generatedCSS.css], { type: 'text/css' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'custom-styles.css';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('CSS file downloaded!', 'success');
+        }
+
+        // Helper Functions
+        function insertExample(text) {
+            elements.descriptionInput.value = text;
+            elements.descriptionInput.focus();
+            saveDraft();
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        async function simulateGeneration() {
+            // Simulate API processing time
+            await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
+        }
+
+        function saveDraft() {
+            const draft = {
+                url: elements.urlInput.value,
+                description: elements.descriptionInput.value,
+                platform: state.detectedPlatform,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('websiteStudio_draft', JSON.stringify(draft));
+        }
+
+        function loadDraftData() {
+            try {
+                const draft = JSON.parse(localStorage.getItem('websiteStudio_draft'));
+                if (draft && (Date.now() - draft.timestamp < 24 * 60 * 60 * 1000)) { // 24 hours
+                    elements.urlInput.value = draft.url || '';
+                    elements.descriptionInput.value = draft.description || '';
+                    if (draft.platform) {
+                        state.detectedPlatform = draft.platform;
+                        showPlatformBadge(draft.platform);
+                    }
+                }
+            } catch (error) {
+                console.log('No draft data found');
+            }
+        }
+
+        function updateUsageDisplay() {
+            elements.usageCount.textContent = `${state.usageCount} remaining`;
+            
+            if (state.usageCount <= 0) {
+                elements.usageCount.style.color = 'var(--error)';
+            } else if (state.usageCount === 1) {
+                elements.usageCount.style.color = 'var(--warning)';
+            }
+        }
+
+        function handleKeyboardShortcuts(e) {
+            // Ctrl+Enter to generate
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                if (!state.isGenerating) {
+                    elements.form.dispatchEvent(new Event('submit'));
+                }
+            }
+            
+            // Escape to clear
+            if (e.key === 'Escape') {
+                if (document.activeElement === elements.descriptionInput || 
+                    document.activeElement === elements.urlInput) {
+                    document.activeElement.blur();
+                }
+            }
+        }
+
+        function showHelp() {
+            const helpMessage = `
+                Website Customization Studio Help:
+                
+                1. Enter your website URL (we'll detect the platform)
+                2. Describe your changes in natural language
+                3. Click Generate CSS or press Ctrl+Enter
+                4. Toggle between Original and With Changes views
+                5. Copy or download the generated CSS
+                6. Follow the platform-specific instructions to apply
+                
+                Tips:
+                • Be specific about colors, sizes, and positions
+                • Mention specific elements like "header", "buttons", "form"
+                • Use device previews to check responsiveness
+                
+                Examples:
+                • "Make all buttons purple with rounded corners"
+                • "Add a sticky header with dark background"
+                • "Create a floating contact form on the right side"
+            `;
+            
+            alert(helpMessage);
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.getElementById('notificationContainer').appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

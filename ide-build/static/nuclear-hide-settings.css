@@ -1,0 +1,92 @@
+/* Nuclear Hide Settings - Extremely aggressive SETTINGS removal */
+
+/* Method 1: Hide any element that contains only SETTINGS text and is positioned like a header */
+*:not(button):not(.settings-btn) {
+    /* Use CSS to detect and hide SETTINGS text */
+}
+
+/* Method 2: Target common React class patterns for headers */
+div[class*="header"]:not(.settings-section),
+div[class*="title"]:not(.settings-section),
+div[class*="label"]:not(.settings-section),
+span[class*="header"]:not(.settings-section),
+span[class*="title"]:not(.settings-section),
+span[class*="label"]:not(.settings-section) {
+    /* Check if contains SETTINGS text - will be handled by JS */
+}
+
+/* Method 3: Position-based targeting - elements in left sidebar that could be headers */
+*:not(button):not(.settings-btn):not(.settings-section) {
+    /* Will be marked by JavaScript for specific hiding */
+}
+
+/* Method 4: Nuclear class-based hiding */
+.nuclear-hide-settings,
+.remove-settings-duplicate,
+.hide-settings-label {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+
+/* Method 5: Target elements by text content pattern (will be enhanced by JS) */
+/* This will be applied to elements that JS marks as containing SETTINGS */
+.contains-settings-text:not(.settings-btn):not(button) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Method 6: Extreme fallback - hide any small text elements in left area */
+/* Only applied by JS to very specific elements */
+.suspected-settings-duplicate {
+    opacity: 0 !important;
+    transform: scale(0) !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Method 7: Ensure our functional buttons always show */
+.settings-btn,
+.settings-section,
+.settings-section *,
+button,
+button * {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    width: auto !important;
+    transform: none !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: auto !important;
+    pointer-events: auto !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+}
+
+/* Method 8: Force hide known problematic patterns */
+/* These will be specifically targeted by JS */
+.react-generated-settings-header,
+.duplicate-settings-text,
+.unwanted-settings-label {
+    display: none !important;
+    position: absolute !important;
+    left: -99999px !important;
+    opacity: 0 !important;
+}

@@ -1,0 +1,92 @@
+/* Force Scrollbar Visibility */
+
+/* Target the Explorer/Sidebar specifically */
+.Explorer,
+[class*="Explorer"],
+[class*="explorer"],
+.sidebar,
+[class*="sidebar"],
+#root > div > div:first-child {
+    height: calc(100vh - 40px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    padding-bottom: 150px !important;
+}
+
+/* Force scrollbar to always show */
+.Explorer::-webkit-scrollbar,
+[class*="Explorer"]::-webkit-scrollbar,
+[class*="explorer"]::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+[class*="sidebar"]::-webkit-scrollbar {
+    width: 12px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.Explorer::-webkit-scrollbar-track,
+[class*="Explorer"]::-webkit-scrollbar-track,
+[class*="explorer"]::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track,
+[class*="sidebar"]::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 6px !important;
+    margin: 10px 0 !important;
+}
+
+.Explorer::-webkit-scrollbar-thumb,
+[class*="Explorer"]::-webkit-scrollbar-thumb,
+[class*="explorer"]::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb,
+[class*="sidebar"]::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.6) !important;
+    border-radius: 6px !important;
+    border: 2px solid transparent !important;
+    background-clip: padding-box !important;
+}
+
+.Explorer::-webkit-scrollbar-thumb:hover,
+[class*="Explorer"]::-webkit-scrollbar-thumb:hover,
+[class*="explorer"]::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover,
+[class*="sidebar"]::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.8) !important;
+}
+
+/* Force settings and buttons to be relative */
+.settings-section {
+    position: relative !important;
+    margin-top: 40px !important;
+    margin-bottom: 20px !important;
+    margin-left: 20px !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    z-index: 1 !important;
+}
+
+#react-bits-button {
+    position: relative !important;
+    margin: 20px !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    z-index: 1 !important;
+}
+
+/* Ensure content has proper spacing */
+.settings-section + * {
+    margin-top: 20px !important;
+}
+
+/* Force minimum height to ensure scrolling */
+.Explorer > *:last-child,
+[class*="Explorer"] > *:last-child,
+[class*="explorer"] > *:last-child,
+.sidebar > *:last-child {
+    margin-bottom: 100px !important;
+}

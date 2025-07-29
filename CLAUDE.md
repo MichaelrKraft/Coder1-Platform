@@ -298,5 +298,41 @@ All API endpoints follow consistent response structure:
 - Set up Electron wrapper
 - Updated command parser with new commands
 
+## Multi-Project Portfolio Structure
+
+**This is the root directory of a multi-project AI development portfolio containing several distinct applications:**
+
+### Active Projects
+
+#### 1. **Main Coder1 Platform** (This Repository)
+- **Primary Interface**: Smart PRD Generator (`smart-prd-generator.html`)
+- **Secondary Interface**: React IDE Component (`ide-react.html`)
+- **Architecture**: Node.js/Express with modular routes and static frontend
+- **Status**: Production ready with Electron wrapper
+
+#### 2. **DeckPress** (`deckpress-site/`)
+- **Technology**: Next.js 14+ with TypeScript, AI-powered pitch deck generator
+- **Architecture**: Modern React with inline editing, PDF export, OpenAI integration
+- **Commands**: `npm run dev`, `npm run build`, `npm run start`, `npm run lint`
+- **Status**: Production ready with comprehensive documentation
+
+#### 3. **React IDE Source** (`coder1-ide-source/`)
+- **Technology**: React 19+ with TypeScript, Socket.IO integration
+- **Purpose**: TypeScript source for the IDE component built into `/ide-build/`
+- **Commands**: `npm run build` (outputs to `/ide-build/`)
+- **Status**: Working production build preserved in `/ide-build/`
+
+### Project Interdependencies
+- **Main Platform** serves content from root directory and `/static/`
+- **React IDE** builds from `coder1-ide-source/` to `/ide-build/` directory
+- **DeckPress** operates independently as standalone Next.js application
+- **Shared Patterns**: All projects use consistent AI integration patterns and state management
+
+### Development Workflow
+1. **Choose Your Project**: Each has distinct development environments and commands
+2. **Check Dependencies**: Some projects share common patterns but operate independently
+3. **Use Correct Commands**: Each project has specific build/dev commands documented
+4. **Preserve Production Builds**: Never modify `/ide-build/` directly - use source directory
+
 ## Global Auto-Commit Hook (January 27, 2025)
 This project now uses a global Claude Code auto-commit hook that automatically commits and pushes changes to GitHub after successful file edits. The hook is configured in `~/.claude/settings.json` and works across all git repositories.
