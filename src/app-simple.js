@@ -148,6 +148,20 @@ app.get('/coder1-ide', (req, res) => {
     res.redirect('/ide');
 });
 
+// Serve IDE build directory for all IDE assets
+app.use('/ide', express.static(path.join(__dirname, '../ide-build'), {
+    setHeaders: (res, path) => {
+        // Set cache control headers for CSS and JS files
+        if (path.endsWith('.css') || path.endsWith('.js')) {
+            res.set({
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            });
+        }
+    }
+}));
+
 // Serve static files from static directory (comes AFTER custom routes)
 app.use(express.static(staticPath));
 

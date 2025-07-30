@@ -39,13 +39,12 @@
             
             // Also check for elements in header area with Coder text
             const rect = el.getBoundingClientRect();
-            if (rect.top < 100) { // Any text in header area
+            if (rect.top < 100 && rect.left > 150) { // Not the logo area
                 if (el.textContent === 'Coder1 IDE' || el.textContent === 'Coder1' || el.textContent === 'IDE') {
-                    // Remove it regardless of color
-                    el.style.display = 'none !important';
-                    el.style.visibility = 'hidden !important';
-                    el.style.opacity = '0 !important';
-                    el.textContent = '';
+                    const style = window.getComputedStyle(el);
+                    if (style.color.includes('rgb(0') || style.color.includes('blue')) {
+                        el.style.display = 'none !important';
+                    }
                 }
             }
         });

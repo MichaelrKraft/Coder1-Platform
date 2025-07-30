@@ -90,13 +90,7 @@ function addContextPrimingButton() {
             // Add click handler
             contextBtn.addEventListener('click', () => {
                 // Open Context Priming in new tab
-                // Check if we're on GitHub Pages
-                if (window.location.hostname.includes('github.io')) {
-                    window.open('../context-priming.html', '_blank');
-                } else {
-                    // For Render or local development
-                    window.open('/context-priming.html', '_blank');
-                }
+                window.open('/context-priming.html', '_blank');
             });
 
             // Find the best place to insert the button

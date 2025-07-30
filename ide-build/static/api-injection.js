@@ -29,11 +29,6 @@ function waitForReactApp() {
 }
 
 function enhanceExistingButtons() {
-    // DISABLED: Let coder1-special-views-v2.js handle the button clicks instead
-    // This was overriding the beautiful glassmorphism UI with simple notifications
-    console.log('⚠️ API button enhancement disabled - using special views instead');
-    return;
-    
     // Override click handlers for existing buttons
     const supervisionBtn = document.querySelector('button[title="Supervision"]');
     const sleepModeBtn = document.querySelector('button[title="Sleep Mode"]');
