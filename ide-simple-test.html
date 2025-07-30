@@ -69,8 +69,8 @@
         
         <h3>🔗 Asset Links:</h3>
         <ul>
-            <li><a href="ide-build/static/css/main.b23767f1.css" class="test-link" target="_blank">Main CSS File</a></li>
-            <li><a href="ide-build/static/js/main.50776b76.js" class="test-link" target="_blank">Main JS File</a></li>
+            <li><a href="ide-build/static/css/main.5c128812.css" class="test-link" target="_blank">Main CSS File</a></li>
+            <li><a href="ide-build/static/js/main.a1cfdcd5.js" class="test-link" target="_blank">Main JS File</a></li>
             <li><a href="ide-build/index.html" class="test-link" target="_blank">IDE Page</a></li>
         </ul>
         
@@ -88,7 +88,7 @@
         document.getElementById('js-test').className = 'test-result success';
         
         // Test CSS loading
-        fetch('ide-build/static/css/main.b23767f1.css')
+        fetch('ide-build/static/css/main.5c128812.css')
             .then(response => {
                 if (response.ok) {
                     document.getElementById('css-test').innerHTML = '<strong>✅ CSS Asset Test:</strong> Main CSS file loads correctly';
@@ -102,7 +102,7 @@
             });
             
         // Test JS loading
-        fetch('ide-build/static/js/main.50776b76.js')
+        fetch('ide-build/static/js/main.a1cfdcd5.js')
             .then(response => {
                 if (response.ok) {
                     document.getElementById('react-test').innerHTML = '<strong>✅ React Test:</strong> Main JS file loads correctly';

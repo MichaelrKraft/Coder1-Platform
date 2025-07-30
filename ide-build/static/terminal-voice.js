@@ -3,6 +3,9 @@
  * Adds push-to-talk voice input and TTS responses to the IDE terminal
  */
 
+// Global flag to stop all logging if needed
+window.STOP_TERMINAL_VOICE_LOGS = true;
+
 console.log('🎤 Loading Terminal Voice Integration...', new Date().toISOString());
 
 class TerminalVoice {
@@ -24,8 +27,104 @@ class TerminalVoice {
 
     init() {
         this.setupSpeechRecognition();
-        this.waitForTerminalLoad();
+        // Use the same logic that worked in the floating mic
+        this.autoAddMicrophone();
         this.addVoiceSettings();
+    }
+    
+    autoAddMicrophone() {
+        // Wait a bit longer for React to fully load, then use the same logic as floating mic
+        setTimeout(() => {
+            this.findAndAddMicrophone();
+        }, 3000);
+    }
+    
+    findAndAddMicrophone() {
+        console.log('🎤 Auto-adding microphone using working logic...');
+        
+        // Use the exact same logic that worked in the floating mic
+        const allInputs = document.querySelectorAll('input, textarea');
+        let bestInput = null;
+        let bestScore = 0;
+        
+        allInputs.forEach((input, i) => {
+            const rect = input.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                let score = 0;
+                
+                // Score based on size (terminal inputs are usually wide)
+                if (rect.width > 300) score += 50;
+                if (rect.width > 500) score += 25;
+                
+                // Score based on position (terminal usually in bottom half)
+                if (rect.top > window.innerHeight * 0.5) score += 30;
+                
+                // Score based on classes/attributes
+                const className = (input.className || '').toLowerCase();
+                const placeholder = (input.placeholder || '').toLowerCase();
+                
+                if (className.includes('terminal') || className.includes('xterm')) score += 100;
+                if (placeholder.includes('command') || placeholder.includes('type')) score += 75;
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestInput = input;
+                }
+            }
+        });
+        
+        if (bestInput && bestScore > 50) {
+            console.log('🎯 Auto: Best terminal input found, adding microphone');
+            this.addMicrophoneToInput(bestInput);
+        } else {
+            console.log('❌ Auto: No suitable terminal input found');
+        }
+    }
+    
+    addMicrophoneToInput(inputElement) {
+        // Remove existing mics
+        document.querySelectorAll('.terminal-voice-btn, .mic-prompt').forEach(el => el.remove());
+        
+        // Add microphone using the exact same working logic
+        const wrapper = inputElement.parentElement;
+        if (wrapper) {
+            wrapper.style.position = 'relative';
+            
+            const micBtn = document.createElement('button');
+            micBtn.className = 'mic-prompt terminal-voice-btn';
+            micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            micBtn.style.cssText = `
+                position: absolute !important;
+                left: 36px !important;
+                top: 50% !important;
+                transform: translateY(calc(-50% - 5px)) !important;
+                z-index: 1000 !important;
+                background: rgba(255, 140, 0, 0.2) !important;
+                border: 2px solid #ff8c00 !important;
+                border-radius: 6px !important;
+                width: 32px !important;
+                height: 32px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                color: #ff8c00 !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            `;
+            
+            wrapper.appendChild(micBtn);
+            inputElement.style.paddingLeft = '74px';
+            
+            // Set up voice functionality
+            if (this.isMobile) {
+                this.setupMobileVoice(micBtn);
+            } else {
+                this.setupDesktopVoice(micBtn);
+            }
+            
+            console.log('✅ Auto: Microphone successfully added!');
+        }
     }
 
     isInProjectFilesArea(element) {
@@ -67,27 +166,42 @@ class TerminalVoice {
     }
     
     waitForTerminalLoad() {
+        // Don't start if already found a terminal or if already running
+        if (this.terminalFound || this.isSearching) {
+            console.log('🔍 Terminal search already completed or in progress');
+            return;
+        }
+        
+        this.isSearching = true;
         let attempts = 0;
-        const maxAttempts = 100;
+        const maxAttempts = 20; // Reduced from 100
         
         const checkInterval = setInterval(() => {
+            if (window.STOP_TERMINAL_VOICE_LOGS) {
+                clearInterval(checkInterval);
+                this.isSearching = false;
+                return;
+            }
+            
             attempts++;
-            if (attempts % 10 === 1) { // Log less frequently
+            if (attempts === 1 || attempts % 5 === 0) { // Log even less frequently
                 console.log(`🔍 Attempt ${attempts}: Looking for terminal input...`);
             }
             
-            // Debug: Log all visible inputs with their positions
+            // Debug: Log all visible inputs with their positions (only on first attempt)
             const allInputs = document.querySelectorAll('input, textarea');
-            console.log('🔍 DEBUG: All visible inputs on page:');
-            allInputs.forEach((input, index) => {
-                const rect = input.getBoundingClientRect();
-                if (rect.width > 0 && rect.height > 0) {
-                    console.log(`  ${index}: ${input.tagName} at (${Math.round(rect.left)}, ${Math.round(rect.top)}) - ${rect.width}x${rect.height}`, 
-                        `placeholder: "${input.placeholder}"`, 
-                        `classes: "${input.className}"`,
-                        input);
-                }
-            });
+            if (attempts === 1) {
+                console.log('🔍 DEBUG: All visible inputs on page:');
+                allInputs.forEach((input, index) => {
+                    const rect = input.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        console.log(`  ${index}: ${input.tagName} at (${Math.round(rect.left)}, ${Math.round(rect.top)}) - ${rect.width}x${rect.height}`, 
+                            `placeholder: "${input.placeholder}"`, 
+                            `classes: "${input.className}"`,
+                            input);
+                    }
+                });
+            }
 
             // CHARACTERISTIC-BASED TERMINAL DETECTION - Look for terminal by properties, not position
             let prompt = null;
@@ -257,6 +371,8 @@ class TerminalVoice {
             
             if (prompt && !prompt.classList.contains('voice-enabled')) {
                 clearInterval(checkInterval);
+                this.isSearching = false;
+                this.terminalFound = true;
                 console.log('✅ Terminal input found, adding voice button:', prompt);
                 prompt.classList.add('voice-enabled'); // Mark as processed
                 this.addVoiceToTerminalInput(prompt);
@@ -265,6 +381,7 @@ class TerminalVoice {
                 this.observeForNewInputs();
             } else if (attempts >= maxAttempts) {
                 clearInterval(checkInterval);
+                this.isSearching = false;
                 console.warn('⚠️ No suitable input found after waiting');
                 // Still set up observer for future inputs
                 this.observeForNewInputs();
@@ -629,24 +746,52 @@ class TerminalVoice {
         const transcript = event.results[0][0].transcript.trim();
         const confidence = event.results[0][0].confidence;
         
-        // Fill terminal input field
-        const input = document.querySelector('.terminal-input input[type="text"]');
-        if (input) {
-            input.value = transcript;
-            input.focus();
+        // Find the terminal input - use the same input where the microphone was added
+        let terminalInput = this.currentTerminalInput || document.querySelector('.voice-enabled');
+        
+        if (!terminalInput) {
+            // Fallback: find the input in bottom half of screen
+            const allInputs = document.querySelectorAll('input[type="text"], textarea');
+            allInputs.forEach(input => {
+                const rect = input.getBoundingClientRect();
+                if (rect.top > window.innerHeight * 0.5 && rect.width > 300) {
+                    terminalInput = input;
+                }
+            });
         }
-
-        // Auto-execute simple commands with high confidence
-        if (confidence > 0.8 && this.isSimpleCommand(transcript)) {
-            // Silent acknowledgment - removed "Got it" speech
+        
+        if (terminalInput) {
+            // Set the transcribed text
+            terminalInput.value = transcript;
+            terminalInput.focus();
+            
+            // Trigger React events
+            terminalInput.dispatchEvent(new Event('input', { bubbles: true }));
+            terminalInput.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            // Execute the command immediately
             setTimeout(() => {
-                this.executeCommand();
-            }, 500);
-        } else {
-            // Silent acknowledgment - removed "Got it" speech
+                // Simple approach: simulate Enter key press
+                const enterEvent = new KeyboardEvent('keydown', {
+                    key: 'Enter',
+                    code: 'Enter',
+                    keyCode: 13,
+                    which: 13,
+                    bubbles: true,
+                    cancelable: true
+                });
+                
+                terminalInput.dispatchEvent(enterEvent);
+                
+                // Also try pressing Enter on the input programmatically
+                if (terminalInput.form) {
+                    terminalInput.form.dispatchEvent(new Event('submit', { bubbles: true }));
+                }
+            }, 300);
         }
 
-        this.showTranscript(transcript, confidence);
+        // Show transcript without confidence percentage
+        this.showTranscript(transcript);
     }
 
     onRecognitionError(event) {
@@ -677,22 +822,8 @@ class TerminalVoice {
     }
 
     executeCommand() {
-        // Look for form submission or enter key simulation
-        const form = document.querySelector('.terminal-input');
-        const input = document.querySelector('.terminal-input input[type="text"]');
-        
-        if (form && typeof form.onsubmit === 'function') {
-            form.onsubmit();
-        } else if (input) {
-            // Simulate Enter key press
-            const enterEvent = new KeyboardEvent('keypress', {
-                key: 'Enter',
-                code: 'Enter',
-                keyCode: 13,
-                bubbles: true
-            });
-            input.dispatchEvent(enterEvent);
-        }
+        // This function is now handled directly in onRecognitionResult
+        // Keeping it for backward compatibility but it's no longer used
     }
 
     updateMicIcon(state) {
@@ -719,20 +850,20 @@ class TerminalVoice {
         }
     }
 
-    showTranscript(transcript, confidence) {
-        // Show transcript briefly above the input
-        const input = document.querySelector('.terminal-input input[type="text"]');
-        if (!input) return;
+    showTranscript(transcript) {
+        // Show transcript briefly above the input (without confidence %)
+        const terminalInput = document.querySelector('.voice-enabled') || 
+                             document.querySelector('input[type="text"]');
+        if (!terminalInput) return;
 
         const transcriptDiv = document.createElement('div');
         transcriptDiv.className = 'voice-transcript';
         transcriptDiv.innerHTML = `
             <span class="transcript-text">"${transcript}"</span>
-            <span class="transcript-confidence">${Math.round(confidence * 100)}%</span>
         `;
 
         // Position above input
-        const inputRect = input.getBoundingClientRect();
+        const inputRect = terminalInput.getBoundingClientRect();
         transcriptDiv.style.position = 'fixed';
         transcriptDiv.style.left = inputRect.left + 'px';
         transcriptDiv.style.top = (inputRect.top - 40) + 'px';
@@ -740,12 +871,12 @@ class TerminalVoice {
 
         document.body.appendChild(transcriptDiv);
 
-        // Remove after 3 seconds
+        // Remove after 2 seconds (shorter since no confidence info)
         setTimeout(() => {
             if (transcriptDiv.parentNode) {
                 transcriptDiv.remove();
             }
-        }, 3000);
+        }, 2000);
     }
 
     showTooltip(message) {
@@ -1433,5 +1564,327 @@ if (document.readyState === 'loading') {
     }, 1000);
 }
 
+// EMERGENCY FALLBACK: Try multiple times with longer delays (but only once)
+if (!window.terminalVoiceFallbackStarted) {
+    window.terminalVoiceFallbackStarted = true;
+    
+    [3000, 5000, 10000].forEach(delay => {
+        setTimeout(() => {
+            if (!window.terminalVoice || !document.querySelector('.mic-prompt')) {
+                console.log(`🚨 FALLBACK: Trying terminal voice initialization after ${delay}ms`);
+                try {
+                    if (!window.terminalVoice) {
+                        window.terminalVoice = new TerminalVoice();
+                    } else {
+                        // Try to add microphone again
+                        window.terminalVoice.waitForTerminalLoad();
+                    }
+                } catch (error) {
+                    console.error(`❌ Fallback failed at ${delay}ms:`, error);
+                }
+            }
+        }, delay);
+    });
+}
+
 // Add debugging for script load
 console.log('🎤 Terminal Voice script fully loaded, waiting for initialization...');
+
+// MANUAL TRIGGER FUNCTION - Call this from console if microphone doesn't appear
+window.forceAddMicrophone = function() {
+    console.log('🔧 MANUAL: Force adding microphone...');
+    
+    // Find any input that looks like it could be a terminal
+    const allInputs = document.querySelectorAll('input[type="text"], textarea');
+    console.log(`Found ${allInputs.length} inputs to check`);
+    
+    let found = false;
+    allInputs.forEach((input, i) => {
+        const rect = input.getBoundingClientRect();
+        if (rect.width > 200 && rect.height > 20 && rect.top > window.innerHeight * 0.3) {
+            console.log(`🎯 Manual: Adding mic to input ${i}:`, input);
+            
+            // Simple microphone button creation
+            const micBtn = document.createElement('button');
+            micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            micBtn.className = 'mic-prompt terminal-voice-btn';
+            micBtn.style.cssText = `
+                position: absolute !important;
+                left: 8px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 9999 !important;
+                background: rgba(255, 140, 0, 0.2) !important;
+                border: 2px solid #ff8c00 !important;
+                border-radius: 6px !important;
+                width: 36px !important;
+                height: 36px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                color: #ff8c00 !important;
+            `;
+            
+            // Make parent relative
+            if (input.parentElement) {
+                input.parentElement.style.position = 'relative';
+                input.parentElement.appendChild(micBtn);
+                input.style.paddingLeft = '50px';
+                console.log('✅ Manual microphone added!');
+                found = true;
+            }
+        }
+    });
+    
+    if (!found) {
+        console.log('❌ Manual: No suitable inputs found');
+    }
+};
+
+console.log('💡 TIP: If microphone is missing, run window.forceAddMicrophone() in console');
+
+// NUCLEAR OPTION: Add microphone to EVERY input on the page
+window.addMicToAllInputs = function() {
+    console.log('💥 NUCLEAR: Adding microphone to ALL inputs...');
+    
+    const allInputs = document.querySelectorAll('input, textarea');
+    console.log(`Found ${allInputs.length} total inputs`);
+    
+    allInputs.forEach((input, i) => {
+        const rect = input.getBoundingClientRect();
+        console.log(`Input ${i}:`, {
+            tag: input.tagName,
+            type: input.type,
+            size: `${Math.round(rect.width)}x${Math.round(rect.height)}`,
+            position: `(${Math.round(rect.left)}, ${Math.round(rect.top)})`,
+            visible: rect.width > 0 && rect.height > 0,
+            classes: input.className,
+            placeholder: input.placeholder
+        });
+        
+        // Add mic to ANY visible input
+        if (rect.width > 50 && rect.height > 15) {
+            const micBtn = document.createElement('div');
+            micBtn.innerHTML = '🎤';
+            micBtn.style.cssText = `
+                position: fixed !important;
+                left: ${rect.left + 5}px !important;
+                top: ${rect.top + rect.height/2 - 15}px !important;
+                z-index: 999999 !important;
+                background: red !important;
+                color: white !important;
+                padding: 5px !important;
+                border: 3px solid yellow !important;
+                border-radius: 50% !important;
+                width: 30px !important;
+                height: 30px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                font-size: 16px !important;
+                pointer-events: auto !important;
+            `;
+            
+            micBtn.onclick = () => {
+                alert(`Microphone clicked on input ${i}! Type: ${input.type}, Classes: ${input.className}`);
+            };
+            
+            document.body.appendChild(micBtn);
+            console.log(`✅ Added fixed-position mic to input ${i}`);
+        }
+    });
+};
+
+// SIMPLE FLOATING BUTTON - Always visible
+window.addFloatingMic = function() {
+    console.log('🎯 Adding floating microphone button...');
+    
+    // Remove any existing floating mics
+    document.querySelectorAll('.floating-mic').forEach(el => el.remove());
+    
+    const floatingMic = document.createElement('div');
+    floatingMic.className = 'floating-mic';
+    floatingMic.innerHTML = '🎤';
+    floatingMic.style.cssText = `
+        position: fixed !important;
+        bottom: 100px !important;
+        right: 50px !important;
+        z-index: 9999999 !important;
+        background: #ff8c00 !important;
+        color: white !important;
+        padding: 15px !important;
+        border: 3px solid #fff !important;
+        border-radius: 50% !important;
+        width: 60px !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        font-size: 24px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+        pointer-events: auto !important;
+    `;
+    
+    floatingMic.onclick = () => {
+        console.log('🎤 Floating mic clicked! Now finding terminal input...');
+        
+        // Find the best terminal input when user clicks the floating mic
+        const allInputs = document.querySelectorAll('input, textarea');
+        console.log(`Found ${allInputs.length} inputs to analyze:`);
+        
+        let bestInput = null;
+        let bestScore = 0;
+        
+        allInputs.forEach((input, i) => {
+            const rect = input.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                let score = 0;
+                
+                // Score based on size (terminal inputs are usually wide)
+                if (rect.width > 300) score += 50;
+                if (rect.width > 500) score += 25;
+                
+                // Score based on position (terminal usually in bottom half)
+                if (rect.top > window.innerHeight * 0.5) score += 30;
+                
+                // Score based on classes/attributes
+                const className = (input.className || '').toLowerCase();
+                const placeholder = (input.placeholder || '').toLowerCase();
+                
+                if (className.includes('terminal') || className.includes('xterm')) score += 100;
+                if (placeholder.includes('command') || placeholder.includes('type')) score += 75;
+                
+                console.log(`Input ${i}:`, {
+                    element: input,
+                    score: score,
+                    size: `${Math.round(rect.width)}x${Math.round(rect.height)}`,
+                    position: `(${Math.round(rect.left)}, ${Math.round(rect.top)})`,
+                    classes: input.className,
+                    placeholder: input.placeholder,
+                    type: input.type
+                });
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestInput = input;
+                }
+            }
+        });
+        
+        if (bestInput) {
+            console.log('🎯 Best terminal input found:', bestInput);
+            
+            // Remove existing mics
+            document.querySelectorAll('.terminal-voice-btn, .mic-prompt').forEach(el => el.remove());
+            
+            // Add microphone to the best input
+            const wrapper = bestInput.parentElement;
+            if (wrapper) {
+                wrapper.style.position = 'relative';
+                
+                const micBtn = document.createElement('button');
+                micBtn.className = 'mic-prompt terminal-voice-btn';
+                micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                micBtn.style.cssText = `
+                    position: absolute !important;
+                    left: 8px !important;
+                    top: 50% !important;
+                    transform: translateY(-50%) !important;
+                    z-index: 1000 !important;
+                    background: rgba(255, 140, 0, 0.2) !important;
+                    border: 2px solid #ff8c00 !important;
+                    border-radius: 6px !important;
+                    width: 36px !important;
+                    height: 36px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    cursor: pointer !important;
+                    color: #ff8c00 !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                `;
+                
+                wrapper.appendChild(micBtn);
+                bestInput.style.paddingLeft = '50px';
+                
+                // Add click handler for basic functionality
+                micBtn.onclick = (e) => {
+                    e.preventDefault();
+                    alert('Microphone clicked! Speech-to-text would activate here.');
+                };
+                
+                console.log('✅ Microphone successfully added to terminal input!');
+                
+                // Verify the microphone was actually added and is visible
+                setTimeout(() => {
+                    const addedMic = document.querySelector('.terminal-voice-btn');
+                    if (addedMic) {
+                        const micRect = addedMic.getBoundingClientRect();
+                        const computedStyle = window.getComputedStyle(addedMic);
+                        console.log('🔍 Microphone verification:', {
+                            found: true,
+                            visible: micRect.width > 0 && micRect.height > 0,
+                            display: computedStyle.display,
+                            visibility: computedStyle.visibility,
+                            opacity: computedStyle.opacity,
+                            position: `(${Math.round(micRect.left)}, ${Math.round(micRect.top)})`,
+                            size: `${Math.round(micRect.width)}x${Math.round(micRect.height)}`,
+                            zIndex: computedStyle.zIndex,
+                            parent: addedMic.parentElement?.tagName
+                        });
+                        
+                        if (micRect.width === 0 || micRect.height === 0) {
+                            console.log('⚠️ Microphone added but not visible! Trying absolute positioning...');
+                            
+                            // Force absolute positioning relative to viewport
+                            const inputRect = bestInput.getBoundingClientRect();
+                            addedMic.style.position = 'fixed !important';
+                            addedMic.style.left = (inputRect.left + 8) + 'px !important';
+                            addedMic.style.top = (inputRect.top + inputRect.height/2 - 18) + 'px !important';
+                            addedMic.style.zIndex = '999999 !important';
+                            
+                            console.log('🔧 Applied fixed positioning to microphone');
+                        }
+                        
+                        alert('Microphone added! Check the terminal input box for an orange microphone icon.');
+                    } else {
+                        console.log('❌ Microphone was not found after adding!');
+                        alert('Failed to add microphone - it was removed or hidden by the React app.');
+                    }
+                }, 100);
+            }
+        } else {
+            console.log('❌ No suitable terminal input found');
+            alert('No suitable terminal input found. Check console for details.');
+        }
+    };
+    
+    document.body.appendChild(floatingMic);
+    console.log('✅ Floating microphone added to bottom-right corner');
+};
+
+console.log('💡 EMERGENCY FUNCTIONS:');
+console.log('  - window.addMicToAllInputs() - Add mic to every input');
+console.log('  - window.addFloatingMic() - Add floating mic button');
+console.log('  - window.STOP_TERMINAL_VOICE_LOGS = true - Stop all logging');
+
+// Add emergency stop function
+window.stopTerminalVoiceLogs = function() {
+    window.STOP_TERMINAL_VOICE_LOGS = true;
+    console.log('🛑 Terminal voice logging stopped');
+};
+
+// Auto-add floating mic after 15 seconds if no other mic found (only once)
+if (!window.autoFloatingMicAdded) {
+    window.autoFloatingMicAdded = true;
+    setTimeout(() => {
+        if (!document.querySelector('.mic-prompt') && !document.querySelector('.floating-mic')) {
+            console.log('🚨 AUTO: No microphone found after 15s, adding floating mic');
+            window.addFloatingMic();
+        }
+    }, 15000);
+}

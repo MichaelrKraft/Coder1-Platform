@@ -87,12 +87,10 @@
 
 .terminal-content {
   flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.5;
-  min-width: 0;
+  overflow: hidden;
+  min-height: 0;
   width: 100%;
+  position: relative;
 }
 
 .terminal-line {

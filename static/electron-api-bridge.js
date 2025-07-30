@@ -78,18 +78,24 @@
     console.log('🔗 Navigating to:', path);
     
     // Get the base directory from current location
-    const currentPath = window.location.pathname;
-    const baseDir = currentPath.substring(0, currentPath.lastIndexOf('/'));
+    const currentUrl = window.location.href;
+    const baseDir = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
     
-    if (path === '/ide') {
-      // Navigate to the IDE
-      window.location.href = 'file://' + baseDir + '/ide-build/index.html';
+    if (path === '/ide' || path === 'ide-build/index.html') {
+      // Navigate to the full IDE now that assets are confirmed working
+      const ideUrl = baseDir + '/ide-build/index.html';
+      console.log('🎯 IDE Navigation URL:', ideUrl);
+      window.location.href = ideUrl;
     } else if (path === '/') {
       // Navigate to home
-      window.location.href = 'file://' + baseDir + '/smart-prd-generator.html';
+      const homeUrl = baseDir + '/smart-prd-generator.html';
+      console.log('🏠 Home Navigation URL:', homeUrl);
+      window.location.href = homeUrl;
     } else if (path === '/context-priming.html' || path === '/context-priming') {
       // Navigate to context priming
-      window.location.href = 'file://' + baseDir + '/context-priming.html';
+      const contextUrl = baseDir + '/context-priming.html';
+      console.log('🧠 Context Navigation URL:', contextUrl);
+      window.location.href = contextUrl;
     } else {
       console.warn('Unknown navigation path:', path);
     }
@@ -97,22 +103,32 @@
 
   // Override click handlers for navigation links
   document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM loaded, setting up navigation handlers...');
+    
     // Fix Enter Coder1 IDE buttons
-    const ideButtons = document.querySelectorAll('[onclick*="/ide"], #enterIDE');
-    ideButtons.forEach(button => {
-      button.onclick = function(e) {
+    const ideButton = document.getElementById('enterIDE');
+    if (ideButton) {
+      console.log('🔧 Setting up IDE button handler');
+      ideButton.onclick = function(e) {
         e.preventDefault();
+        console.log('🖱️ IDE button clicked');
         window.electronNavigate('/ide');
       };
-    });
+    } else {
+      console.warn('⚠️ IDE button not found');
+    }
 
     // Fix Context Priming button
     const contextButton = document.getElementById('contextPriming');
     if (contextButton) {
+      console.log('🔧 Setting up context button handler');
       contextButton.onclick = function(e) {
         e.preventDefault();
+        console.log('🖱️ Context button clicked');
         window.electronNavigate('/context-priming.html');
       };
+    } else {
+      console.warn('⚠️ Context button not found');
     }
 
     // Fix any navigation buttons with onclick

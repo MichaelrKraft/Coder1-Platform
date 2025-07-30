@@ -1,0 +1,426 @@
+/**
+ * Desktop Styles - Consolidated CSS for Desktop IDE
+ * Fixes logo, loading states, panel sizing, and overall desktop experience
+ */
+
+/* ===== Loading State ===== */
+.desktop-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #0a0a1f;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 300ms ease-out;
+}
+
+.desktop-loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.desktop-loading-content {
+    text-align: center;
+    color: #e0e0ff;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.desktop-loading-spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px;
+    border: 3px solid rgba(139, 92, 246, 0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: desktop-spin 1s linear infinite;
+}
+
+@keyframes desktop-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== Logo Fixes ===== */
+.header-coder1-logo,
+.logo-background,
+img[alt="Coder1"],
+img[alt="Coder1 Logo"],
+[class*="logo"] img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 140px !important;
+    height: 140px !important;
+    object-fit: contain !important;
+    position: absolute !important;
+    left: 20px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10000 !important;
+}
+
+/* ===== Terminal Styles ===== */
+.terminal-status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    font-size: 12px;
+    color: #a0a0a0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.terminal-status-indicator .status-icon {
+    font-size: 10px;
+    transition: color 0.3s ease;
+}
+
+.terminal-status-indicator.ready .status-icon {
+    color: #4ade80;
+}
+
+.terminal-status-indicator.processing .status-icon {
+    color: #fbbf24;
+    animation: pulse 1s infinite;
+}
+
+.terminal-status-indicator.error .status-icon {
+    color: #ef4444;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Desktop terminal styling */
+.terminal-container {
+    background: rgba(0, 0, 0, 0.95) !important;
+    border: 1px solid rgba(139, 92, 246, 0.2) !important;
+    height: 100%;
+}
+
+.terminal-content,
+.xterm-screen {
+    padding-bottom: 20px !important;
+    height: calc(100% - 40px);
+    overflow-y: auto;
+}
+
+/* Terminal output styling */
+.terminal-command {
+    color: #8b5cf6;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.terminal-output-line {
+    color: #e5e5e5;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.terminal-error {
+    color: #ef4444;
+}
+
+.terminal-success {
+    color: #4ade80;
+}
+
+.terminal-info {
+    color: #60a5fa;
+}
+
+/* ===== Voice Button ===== */
+.desktop-voice-button {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #8b5cf6;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.desktop-voice-button:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-1px);
+}
+
+.desktop-voice-button.recording {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #ef4444;
+    animation: pulse-recording 1.5s infinite;
+}
+
+@keyframes pulse-recording {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.voice-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(20, 20, 40, 0.95);
+    color: #e0e0ff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+}
+
+.voice-toast.fade-out {
+    animation: fadeOut 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+/* ===== Panel Management ===== */
+.panel-toggle-button {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    padding: 6px 12px;
+    margin: 0 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.panel-toggle-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.panel-toggle-button.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: #8b5cf6;
+    color: #fff;
+}
+
+.panel-toggle-button .icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.panel-toggle-button .label {
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .panel-toggle-button .label {
+        display: none;
+    }
+}
+
+/* Panel transitions */
+[data-panel] {
+    transition: width 300ms ease, height 300ms ease, opacity 300ms ease;
+}
+
+[data-panel].hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Terminal full width when ReactBits hidden */
+body.react-bits-hidden .terminal-panel,
+body.react-bits-hidden .main-content {
+    width: 100% !important;
+}
+
+/* ===== Header Cleanup ===== */
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: #24283b;
+    border-bottom: 1px solid #414868;
+    min-height: 40px;
+}
+
+.terminal-header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.terminal-control-btn {
+    padding: 6px 16px;
+    background: #2a2e42;
+    border: 2px solid transparent;
+    color: #c0caf5;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.terminal-control-btn:hover {
+    background: #363a52;
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(255, 158, 0, 0.7);
+}
+
+.terminal-control-btn.active {
+    background: #ff9e00;
+    color: #1a1b26;
+    box-shadow: 0 0 20px rgba(255, 158, 0, 0.8);
+}
+
+/* ===== Hide Web-Only Elements ===== */
+.github-link,
+.feedback-button,
+.web-only-feature,
+.cookie-banner,
+.analytics-prompt {
+    display: none !important;
+}
+
+/* ===== Smooth Initial Render ===== */
+body.desktop-initializing * {
+    transition: none !important;
+}
+
+body.desktop-ready * {
+    transition: all 200ms ease-out;
+}
+
+/* ===== Agent Button Enhancements ===== */
+.agent-button {
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.agent-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.25) 100%);
+}
+
+.agent-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
+}
+
+/* Agent button tooltip */
+.agent-button-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    margin-bottom: 8px;
+    z-index: 10000;
+}
+
+.agent-button-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+.agent-button:hover .agent-button-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Desktop modal enhancements */
+.agent-modal {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: modalFadeIn 300ms ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Focus states for keyboard navigation */
+.agent-button:focus-visible,
+.panel-toggle-button:focus-visible,
+.terminal-control-btn:focus-visible {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users */
+.agent-button:focus:not(:focus-visible),
+.panel-toggle-button:focus:not(:focus-visible),
+.terminal-control-btn:focus:not(:focus-visible) {
+    outline: none;
+}

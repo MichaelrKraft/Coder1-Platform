@@ -6,7 +6,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { protocol } = require('electron');
 
 let app;
 let isInitialized = false;
@@ -38,9 +37,50 @@ function handleRequest(request, callback) {
     method: request.method,
     headers: request.headers,
     path: url.pathname,
-    query: Object.fromEntries(url.searchParams)
+    query: Object.fromEntries(url.searchParams),
+    body: null // Initialize body
   };
   
+  // Handle POST/PUT requests with body
+  if (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH') {
+    let body = [];
+    
+    request.on('data', (chunk) => {
+      body.push(chunk);
+    });
+    
+    request.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      
+      // Try to parse as JSON
+      try {
+        req.body = JSON.parse(bodyString);
+      } catch (e) {
+        // If not JSON, keep as string
+        req.body = bodyString;
+      }
+      
+      // Now process the request with body
+      processRequest(app, req, callback);
+    });
+    
+    request.on('error', (err) => {
+      console.error('Request stream error:', err);
+      callback({
+        statusCode: 500,
+        headers: { 'Content-Type': 'text/plain' },
+        data: Buffer.from('Request stream error')
+      });
+    });
+    
+    return; // Don't process yet, wait for body
+  }
+  
+  // For non-body requests (GET, DELETE, etc.), process immediately
+  processRequest(app, req, callback);
+}
+
+function processRequest(app, req, callback) {
   // Create a mock response object
   const res = {
     statusCode: 200,

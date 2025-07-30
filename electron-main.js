@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, protocol } = require('electron');
+const { app, BrowserWindow, Menu, shell, protocol, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { initializeServer, handleRequest } = require('./electron-server');
@@ -15,22 +15,35 @@ if (!fs.existsSync(projectsPath)) {
 process.env.PROJECTS_PATH = projectsPath;
 
 function createWindow() {
-  // Initialize the Express server within Electron
+  console.log('createWindow called');
+  
+  // Initialize the Express server within Electron with error handling
   console.log('Initializing Express server within Electron...');
-  initializeServer();
+  try {
+    initializeServer();
+  } catch (error) {
+    console.error('Failed to initialize server:', error);
+    // Continue anyway - the app can work without the server for now
+  }
 
+  console.log('Creating BrowserWindow...');
   // Create the browser window
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
+    center: true, // Center the window
+    show: true, // Show immediately
+    alwaysOnTop: false, // Don't keep on top
+    focusable: true,
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true,
+      contextIsolation: false, // Disable context isolation
+      sandbox: false, // Disable sandbox
       webSecurity: false, // Allow loading local files
       webviewTag: true
     },
     icon: path.join(__dirname, 'static', 'favicon.ico'),
-    titleBarStyle: 'hiddenInset'
+    titleBarStyle: 'default' // Use default title bar for better visibility
   });
 
   // Create application menu
@@ -69,7 +82,9 @@ function createWindow() {
       label: 'View',
       submenu: [
         { label: 'PRD Generator', click: () => navigateTo('/') },
-        { label: 'IDE', click: () => navigateTo('/ide') },
+        { type: 'separator' },
+        { label: 'IDE (Classic Web)', click: () => navigateTo('/ide') },
+        { label: 'IDE (Desktop Native)', click: () => navigateTo('/ide-desktop') },
         { type: 'separator' },
         { role: 'reload' },
         { role: 'forceReload' },
@@ -91,25 +106,90 @@ function createWindow() {
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
+  // Show window when ready
+  mainWindow.once('ready-to-show', () => {
+    console.log('Window ready to show');
+    mainWindow.show();
+    mainWindow.focus();
+    mainWindow.center();
+    mainWindow.moveTop();
+    console.log('Window should now be visible and focused');
+  });
+
+  // Add error handling for the window
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Page failed to load:', errorCode, errorDescription);
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('Page finished loading successfully');
+    
+    // Inject error handler to prevent window from closing
+    mainWindow.webContents.executeJavaScript(`
+      window.addEventListener('error', (event) => {
+        console.error('Window error:', event.message, event.filename, event.lineno);
+        event.preventDefault();
+        return true;
+      });
+      
+      window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled promise rejection:', event.reason);
+        event.preventDefault();
+        return true;
+      });
+      
+      // Prevent navigation that could close the window
+      window.addEventListener('beforeunload', (event) => {
+        console.log('Preventing window unload');
+        event.preventDefault();
+        event.returnValue = '';
+        return '';
+      });
+    `);
+  });
+
+  mainWindow.webContents.on('crashed', (event, killed) => {
+    console.error('Window crashed:', killed);
+  });
+
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('Render process gone:', details);
+  });
+
+  // Prevent window from closing on errors
+  mainWindow.webContents.on('will-prevent-unload', (event) => {
+    console.log('Preventing unload');
+    event.preventDefault();
+  });
+
+  mainWindow.on('closed', () => {
+    console.log('Window closed');
+    mainWindow = null;
+  });
+
   // Load the main page directly from file
   const indexPath = path.join(__dirname, 'smart-prd-generator.html');
   console.log('Loading main page from:', indexPath);
   
-  mainWindow.loadFile(indexPath).catch(err => {
+  mainWindow.loadFile(indexPath).then(() => {
+    console.log('Main page loaded successfully');
+  }).catch(err => {
     console.error('Failed to load main page:', err);
+    console.error('Error details:', err.stack);
     // Fallback to a simple error page
-    mainWindow.loadURL(`data:text/html,<h1>Error loading Coder1</h1><p>${err.message}</p>`);
+    mainWindow.loadURL(`data:text/html,<h1>Error loading Coder1</h1><p>${err.message}</p><p>Path: ${indexPath}</p>`);
   });
 
-  // Open DevTools only in development mode when explicitly set
-  if (process.env.NODE_ENV === 'development' && process.env.OPEN_DEVTOOLS === 'true') {
+  // Open DevTools only in development
+  if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
 }
+
+// Handle navigation from renderer process
+ipcMain.on('navigate', (event, path) => {
+  navigateTo(path);
+});
 
 // Navigation helpers
 function navigateTo(routePath) {
@@ -118,6 +198,7 @@ function navigateTo(routePath) {
     const routeMap = {
       '/': 'smart-prd-generator.html',
       '/ide': 'ide-build/index.html',
+      '/ide-desktop': 'ide-build/index-desktop.html',
       '/platform': 'static/homepage.html',
       '/context-priming': 'context-priming.html'
     };
@@ -199,7 +280,8 @@ function openPreferences() {
 }
 
 // Set up custom protocol to handle API requests
-app.whenReady().then(() => {
+app.on('ready', () => {
+  console.log('Electron app is ready!');
   // Register a custom protocol for API requests
   protocol.registerStringProtocol('coder1-api', (request, callback) => {
     // This will be used for API calls
@@ -212,30 +294,15 @@ app.whenReady().then(() => {
     });
   });
   
-  // Intercept HTTP requests to localhost and redirect to file protocol
-  protocol.interceptFileProtocol('http', (request, callback) => {
-    const url = new URL(request.url);
-    
-    // Handle API requests
-    if (url.pathname.startsWith('/api/')) {
-      handleRequest(request, (response) => {
-        const dataUrl = `data:${response.headers['Content-Type'] || 'text/plain'};base64,${response.data.toString('base64')}`;
-        callback({ url: dataUrl });
-      });
-    } else {
-      // Handle static file requests
-      const filePath = path.join(__dirname, url.pathname.substring(1));
-      callback({ path: filePath });
-    }
-  });
   
+  console.log('Creating window now...');
   createWindow();
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  console.log('All windows closed - NOT quitting app');
+  // Don't quit the app even on non-macOS platforms for now
+  // We want to debug why the window is closing
 });
 
 app.on('activate', () => {
@@ -248,3 +315,23 @@ app.on('activate', () => {
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
 });
+
+// Keep the process alive
+setInterval(() => {
+  // Keep-alive heartbeat
+}, 1000);
+
+// Prevent the app from exiting
+process.on('exit', (code) => {
+  console.log('Process attempting to exit with code:', code);
+});
+
+process.on('beforeExit', (code) => {
+  console.log('Process about to exit with code:', code);
+  // Prevent exit by scheduling more work
+  setTimeout(() => {
+    console.log('Keeping process alive...');
+  }, 0);
+});
+
+console.log('Electron main process started');

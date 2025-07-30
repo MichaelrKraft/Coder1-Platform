@@ -6,6 +6,7 @@
 const WebSocket = require('ws');
 const { ClaudeCodeAPI } = require('../integrations/claude-code-api');
 const { logger } = require('../monitoring/comprehensive-logger');
+const { TerminalHandler } = require('./terminal-handler');
 
 class StreamingServer {
     constructor(server, options = {}) {
@@ -20,15 +21,23 @@ class StreamingServer {
             path: '/ws/infinite-loop'
         });
         
+        // Create WebSocket server for terminal
+        this.terminalWss = new WebSocket.Server({
+            server,
+            path: '/ws/terminal'
+        });
+        
         this.claudeAPI = new ClaudeCodeAPI(
             process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_API_KEY
         );
         
         this.clients = new Map();
         this.activeStreams = new Map();
+        this.terminalHandler = new TerminalHandler();
         
         this.setupWebSocketServer();
         this.setupInfiniteLoopWebSocket();
+        this.setupTerminalWebSocket();
     }
     
     setupWebSocketServer() {
@@ -261,6 +270,15 @@ class StreamingServer {
         });
         
         logger.info('Infinite Loop WebSocket server initialized on /ws/infinite-loop');
+    }
+    
+    // Setup terminal WebSocket
+    setupTerminalWebSocket() {
+        this.terminalWss.on('connection', (ws, req) => {
+            this.terminalHandler.handleConnection(ws);
+        });
+        
+        logger.info('Terminal WebSocket server initialized on /ws/terminal');
     }
 }
 

@@ -1,0 +1,24 @@
+
+> coder1-platform@1.0.0 start
+> electron .
+
+Initializing Express server within Electron...
+Static directory path: /Users/michaelkraft/Coder1-Platform/static
+[INFO] Using Claude Code CLI Bridge to leverage Max subscription 
+✅ Infinite loop routes loaded (AI-powered mode)
+[INFO] Using Claude Code CLI Bridge to leverage Max subscription 
+✅ Agent requirements routes loaded successfully
+✅ Hivemind routes loaded successfully
+✅ Parallel agents routes loaded successfully
+✅ Voice routes loaded successfully
+[INFO] Using Claude Code CLI Bridge to leverage Max subscription 
+✅ Terminal AI initialized with Claude (via CLI - using Max subscription)
+✅ Terminal chat routes loaded successfully
+✅ Product creation routes loaded successfully
+✅ Context management routes loaded successfully
+✅ Website platform detection routes loaded successfully
+✅ Website CSS generation routes loaded successfully
+✅ Website mockup creation routes loaded successfully
+✅ Website authentication routes loaded successfully
+✅ Enhanced Magic routes loaded successfully (53 components)
+Loading main page from: /Users/michaelkraft/Coder1-Platform/smart-prd-generator.html
