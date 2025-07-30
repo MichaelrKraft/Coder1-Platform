@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import Terminal from './components/Terminal';
 import Explorer from './components/Explorer';
 import Preview from './components/Preview';
-import ReactBits from './components/ReactBits';
+import IDELayout from './components/IDELayout';
 import HivemindDashboard from './components/HivemindDashboard';
 import SupervisionView from './components/SupervisionView';
 import SleepModeView from './components/SleepModeView';
@@ -31,7 +31,7 @@ function App() {
           <div className="main-content">
             {activeView === 'explorer' && <Explorer />}
             {activeView === 'terminal' && (
-              <Terminal 
+              <IDELayout 
                 isSleepMode={isSleepMode}
                 setIsSleepMode={setIsSleepMode}
                 isSupervisionOn={isSupervisionOn}
