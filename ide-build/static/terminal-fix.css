@@ -1,0 +1,36 @@
+/* Terminal Layout Fix */
+.main-content {
+    position: relative !important;
+    height: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.terminal {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.terminal-content {
+    overflow: hidden !important;
+}
+
+/* Hide any elements that might be interfering */
+.content-area > div:not(.main-content) {
+    display: none !important;
+}
+
+/* Ensure xterm takes full space */
+.xterm {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.xterm-viewport {
+    overflow-y: auto !important;
+}

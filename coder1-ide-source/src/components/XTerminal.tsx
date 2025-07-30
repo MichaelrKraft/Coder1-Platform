@@ -122,7 +122,10 @@ const XTerminal = React.forwardRef<any, XTerminalProps>(({ onMicrophoneClick, on
     ws.current.onopen = () => {
       console.log('Terminal WebSocket connected');
       setIsConnected(true);
-      term.write('\r\n\x1b[32mTerminal connected!\x1b[0m\r\n');
+      // Only show connection message on first connect
+      if (!term.buffer.active.cursorY || term.buffer.active.cursorY === 0) {
+        term.write('\r\n\x1b[32mTerminal connected!\x1b[0m\r\n');
+      }
     };
 
     ws.current.onmessage = (event) => {
@@ -146,20 +149,24 @@ const XTerminal = React.forwardRef<any, XTerminalProps>(({ onMicrophoneClick, on
 
     ws.current.onerror = (error) => {
       console.error('Terminal WebSocket error:', error);
-      term.write('\r\n\x1b[31mConnection error. Please refresh the page.\x1b[0m\r\n');
+      // Don't spam errors
     };
 
     ws.current.onclose = () => {
       console.log('Terminal WebSocket disconnected');
       setIsConnected(false);
-      term.write('\r\n\x1b[33mConnection closed. Attempting to reconnect...\x1b[0m\r\n');
+      // Show disconnection message only once
+      if (!term.element?.getAttribute('data-disconnect-shown')) {
+        term.write('\r\n\x1b[33mConnection closed. Attempting to reconnect...\x1b[0m\r\n');
+        term.element?.setAttribute('data-disconnect-shown', 'true');
+      }
       
-      // Attempt to reconnect after 3 seconds
+      // Attempt to reconnect after 5 seconds
       setTimeout(() => {
         if (!ws.current || ws.current.readyState === WebSocket.CLOSED) {
           connectWebSocket(term);
         }
-      }, 3000);
+      }, 5000);
     };
   };
 
