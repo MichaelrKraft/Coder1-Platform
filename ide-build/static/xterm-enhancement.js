@@ -43,8 +43,13 @@
     
     // Add toggle button to terminal header
     function addTerminalToggle() {
+        let attempts = 0;
+        const maxAttempts = 30;
+        
         const checkInterval = setInterval(() => {
+            attempts++;
             const terminalHeader = document.querySelector('.terminal-header-right');
+            
             if (terminalHeader && !document.querySelector('.terminal-mode-toggle')) {
                 clearInterval(checkInterval);
                 
@@ -56,6 +61,7 @@
                 toggleBtn.style.marginRight = '10px';
                 toggleBtn.style.backgroundColor = '#2a2e42';
                 toggleBtn.style.border = '2px solid #ff9e00';
+                toggleBtn.style.boxShadow = '0 0 10px rgba(255, 158, 0, 0.5)';
                 
                 // Insert before the first button
                 const firstBtn = terminalHeader.querySelector('button');
@@ -67,8 +73,24 @@
                 
                 // Add click handler
                 toggleBtn.addEventListener('click', toggleTerminalMode);
+                
+                // Show success message in terminal
+                const terminalContent = document.querySelector('.terminal-content');
+                if (terminalContent) {
+                    const successMsg = document.createElement('div');
+                    successMsg.style.color = '#9ece6a';
+                    successMsg.style.padding = '5px';
+                    successMsg.style.fontFamily = 'Monaco, monospace';
+                    successMsg.textContent = '✅ Real Terminal feature loaded! Click the "🖥️ Real Terminal" button above to switch modes.';
+                    terminalContent.insertBefore(successMsg, terminalContent.firstChild);
+                }
             }
-        }, 1000);
+            
+            if (attempts >= maxAttempts) {
+                clearInterval(checkInterval);
+                console.error('Could not find terminal header after', maxAttempts, 'attempts');
+            }
+        }, 500);
     }
     
     // Toggle between chat and real terminal
