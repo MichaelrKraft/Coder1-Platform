@@ -54,7 +54,6 @@ function App() {
             )}
             {activeView === 'preview' && <Preview />}
           </div>
-          <ReactBits />
         </div>
       </div>
       
